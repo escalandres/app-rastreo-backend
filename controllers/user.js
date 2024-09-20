@@ -21,6 +21,9 @@ export async function login(req, res){
     try {
         const { email, password } = req.body;
         const result = await getUser(email)
+
+        console.log(result)
+
         if(!result.success){
             return res.status(404).json({success: false, message: "The user does not exist"})
         }
@@ -28,10 +31,15 @@ export async function login(req, res){
             return res.status(404).json({success: false, message: "The password is invalid"})
         }
         // Agregar una cookie con JWT para autenticar a los usuarios   
-        const token = jwt.sign({ user: result.user }, process.env.KEY, { expiresIn: '1h' });
-        res.cookie('AuthToken', token, { maxAge: 3 * 24 * 60 * 60 * 1000 });
+        const token = jwt.sign({ user: {
+            id: result.user.id,
+            email: result.user.email,
+            name: result.user.name,
+            lastname: result.user.lastname
+        }}, process.env.KEY, { expiresIn: '1m' });
+        // res.cookie('AuthToken', token, { maxAge: 3 * 24 * 60 * 60 * 1000 });
         req.session.user = { id: result.user.id, email: result.user.email };
-        return res.status(200).json({ success: true });
+        return res.status(200).json({ success: true, token: token });
     } catch (error) {
         console.error('Ocurrio un error:',error);
         // Enviar respuesta JSON indicando fallo
@@ -63,17 +71,22 @@ export async function login(req, res){
 
 export async function signup(req,res){
     try {
-        const { email, password, name } = req.body;
+        const { email, password, name, lastname } = req.body;
         const userID = crypto.randomBytes(16).toString('hex');
         const hashedPassword = await bcrypt.hash(password, 10);
-        const response = await registerNewUser({id: userID, email: email, name: name, password: hashedPassword})
+        const response = await registerNewUser({id: userID, email: email, name: name, lastname: lastname, password: hashedPassword})
         if(!response.success){
             return res.status(401).json({success: false, message: "Error al crear su cuenta de usuario. Inténtelo nuevamente"})
         }
-        const userFolder = path.join(__dirname, '../', 'drive',userID)
-        fs.promises.mkdir(userFolder)
+        // Agregar una cookie con JWT para autenticar a los usuarios
+        const token = jwt.sign({ user: {
+            id: result.user.id,
+            email: result.user.email,
+            name: result.user.name,
+            lastname: result.user.lastname
+        }}, process.env.KEY, { expiresIn: '1m' });
         req.session.user = {id: userID, email: email}
-        res.status(200).json({success: true})
+        res.status(200).json({success: true, token: token})
     } catch (error) {
         console.error('Ocurrio un error:',error);
         // Enviar respuesta JSON indicando fallo

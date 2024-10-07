@@ -52,6 +52,11 @@ app.use(session({
     },
 }));
 
+app.get('/', (req, res) => {
+    res.send('App rastreo de paquetes');
+});
+
+
 app.get('/test', (req, res) => {
     res.send('Hola mundo');
 });

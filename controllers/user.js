@@ -22,7 +22,7 @@ export async function login(req, res){
         const { email, password } = req.body;
         const result = await getUser(email)
 
-        console.log(result)
+        // console.log(result)
 
         if(!result.success){
             return res.status(404).json({success: false, message: "The user does not exist"})
@@ -38,7 +38,7 @@ export async function login(req, res){
             lastname: result.user.lastname
         }}, process.env.KEY, { expiresIn: '1m' });
         // res.cookie('AuthToken', token, { maxAge: 3 * 24 * 60 * 60 * 1000 });
-        req.session.user = { id: result.user.id, email: result.user.email };
+        //req.session.user = { id: result.user.id, email: result.user.email };
         return res.status(200).json({ success: true, token: token });
     } catch (error) {
         console.error('Ocurrio un error:',error);
@@ -60,7 +60,7 @@ export async function login(req, res){
 //         // Agregar una cookie con JWT para autenticar a los usuarios   
 //         const token = jwt.sign({ user: result.user }, process.env.KEY, { expiresIn: '1h' });
 //         res.cookie('AuthToken', token, { maxAge: 3 * 24 * 60 * 60 * 1000 });
-//         req.session.user = { id: result.user.id, email: result.user.email };
+//         //req.session.user = { id: result.user.id, email: result.user.email };
 //         return res.status(200).json({ success: true });
 //     } catch (error) {
 //         console.error('Ocurrio un error:',error);
@@ -85,7 +85,7 @@ export async function signup(req,res){
             name: result.user.name,
             lastname: result.user.lastname
         }}, process.env.KEY, { expiresIn: '1m' });
-        req.session.user = {id: userID, email: email}
+        //req.session.user = {id: userID, email: email}
         res.status(200).json({success: true, token: token})
     } catch (error) {
         console.error('Ocurrio un error:',error);

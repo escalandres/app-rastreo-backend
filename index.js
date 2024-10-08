@@ -10,6 +10,7 @@ import cookieParser from 'cookie-parser';
 
 // -------------- My modules --------------
 import userRoutes from './routes/user.js';
+import trackerRoutes from './routes/tracker.js';
 // import uploadRoutes from './routes/upload.js';
 // import createRoutes from './routes/create.js';
 // import fileRoutes from './routes/file.js';
@@ -62,6 +63,8 @@ app.get('/test', (req, res) => {
 });
 
 app.use('/user', userRoutes);
+
+app.use('/api/tracker', trackerRoutes);
 
 
 

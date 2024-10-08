@@ -2,20 +2,7 @@ import { getUser, registerNewUser, changePassword, getOTP, registrarOTP } from "
 import { sendRecoverEmail } from "./modules/resend.mjs";
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
-import path from 'path';
-import fs from 'fs';
 import jwt from 'jsonwebtoken';
-
-// import { dirname } from 'path';
-// import { fileURLToPath } from 'url';
-// Set up storage for uploaded files
-
-// const currentFileURL = import.meta.url;
-// // Convierte la URL del archivo en una ruta de sistema de archivos
-// const currentFilePath = fileURLToPath(currentFileURL);
-// // Obtiene el directorio del archivo actual
-// const __dirname = dirname(currentFilePath);
-
 
 export async function login(req, res){
     try {

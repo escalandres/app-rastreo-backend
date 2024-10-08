@@ -141,6 +141,27 @@ export async function changePassword(email,password) {
   }
 }
 
+export async function guardarCoordenadas(coordenadas) {
+  try {
+    const client = await connect()
+    const collection = client.collection('bitacora_envios');
+
+    const dbResult = await collection.insertOne(coordenadas);
+    if (dbResult.acknowledged) {
+      return { success: true, result: "Registro guardado!", error: "" };
+    } else {
+      return { success: false, result: "", error: "No se pudo guardar el regsitro" }
+    }
+  } catch (error) {
+    console.error('Ocurrio un error:', error);
+    return {success: false, message: error};
+  } finally {
+    disconnect();
+  }
+}
+
+
+
 // Funciones auxiliares
 
 function generarOTP() {

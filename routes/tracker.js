@@ -30,4 +30,18 @@ router.post('/test-json', (req, res) => {
     res.send({success: true});
 });
 
+router.post('/post-test', (req, res) => {
+    console.log("----------------");
+n
+    if(req.body.datos !== "AT+CMGR=0ERROR"){
+        console.log("req.body.datos", req.body.datos);
+        subirDatos(req,res);
+    }else{
+        console.log("Formato de mensaje no válido");
+        res.status(400).send({success: false});
+    }
+});
+
+
+
 export default router;

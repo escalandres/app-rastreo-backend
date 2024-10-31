@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body{
+            color:rgba(0,0,0,0.87);
+            width: 50%;
+        }
+        .center-icon{
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .container{
+            border-style: solid;
+            border-width: thin;
+            border-color: #dadce0;
+            border-radius: 8px;
+            padding: 40px 20px;
+        }
+        .container__main-text{
+            font-family:'Google Sans',Roboto,RobotoDraft,Helvetica,Arial,sans-serif;
+            border-bottom:thin solid #dadce0;
+            color:rgba(0,0,0,0.87);
+            line-height:32px;
+            padding-bottom:24px;
+            text-align:center;
+            word-break:break-word
+        }
+        .container__text{
+            font-family:Roboto-Regular,Helvetica,Arial,sans-serif;
+            font-size:14px;color:rgba(0,0,0,0.87);
+            line-height:20px;
+            padding-top:20px;
+            text-align:left
+        }
+        .button{
+            color:#ffffff!important;
+            cursor:pointer;
+            display:inline-block;
+            font-size:14px;
+            font-weight:500;
+            line-height:20px;
+            margin-top:20px;
+            padding:10px 24px;
+            text-align:center;
+            text-decoration:none;
+            background-color: rgb(79, 70, 229);
+            border: 1px solid #4f46e5!important;
+            border-radius: 0.5rem;
+            transition-duration: 150ms;
+            text-transform: none;
+        }
+        .button:hover {
+            border-color: #646cff!important;
+            background-color: #646cff;
+        }
+        .button:active {
+            background-color: #4f46e5;
+        }
+        .link{
+            color:#4f46e5!important;text-decoration: none;
+        }
+        .link:hover{
+            color:#646cff!important;text-decoration: none;
+        }
+        .footer__text{
+            font-family:Roboto-Regular,Helvetica,Arial,sans-serif;
+            color:rgba(0,0,0,0.54);
+            font-size:11px;
+            line-height:18px;
+            padding-top:12px;
+            text-align:center
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="center-icon">
+            <img src="https://res.cloudinary.com/deudksu4e/image/upload/v1730330521/dark-cosmos.png" width="80" height="60" aria-hidden="true" style="margin-bottom:16px; margin: auto;" alt="Cosmos" class="CToWUd" data-bit="iit">
+        </div>
+        <div class="container__main-text"><div style="font-size:24px">Código de verificación</div></div>
+        <div class="container__text">
+            Hemos recibido su solicitud para restaurar la contraseña de la cuenta <span style="font-weight:bold">{email}</span>.
+            <br>
+            <br>
+            Use este código para restablecer su contraseña:
+            <div style="text-align:center;font-size:36px;margin-top:20px;line-height:44px">{otp}</div>
+            <br>
+            Para restablecer su contraseña, haga clic en el botón de abajo, o ingrese con el siguiente <a class="link" href="http://localhost:3100/cambiar-contrasena">enlace</a>
+            <br>
+            <a class="button" href="http://localhost:3100/cambiar-contrasena" type="submit">Recuperar contraseña</a>
+            <br>
+            <br>Este código expirará en <span style="font-weight:bold">30 minutos</span>.
+            <br><br>
+            Si no solicitó restablecer su contraseña, por favor ignore este correo.</div>
+    </div>
+    <div style="text-align:left">
+        <div class="footer__text">
+            <div>
+                Usted recibió este correo para solicitar un cambio de contraseña de su cuenta.
+            </div>
+            <div style="direction:ltr">
+                © 2024 Cosmos, <a  class="footer__text">Aplicación de rastreo</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

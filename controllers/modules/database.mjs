@@ -67,17 +67,21 @@ export async function registerNewUser(user) {
 
 export async function registrarOTP(email) {
   try {
-    let dbResult = await getUser(email);
-    // console.log(dbResult)
-    if(dbResult.success){
-      const username = dbResult.user.name;
+    const client = await connect();
+    let dbResult = await client.collection("users").findOne({email: email});
+    console.log(dbResult)
+    if(dbResult){
       const otp = generarOTP();
       const timeStamp = generarTimestamp();
-      const client = await connect()
+      console.log("otp", otp);
+      console.log("timeStamp", timeStamp);
+      console.log("email", email);
+      
+      console.log("------conectado----------");
       dbResult = await client.collection("otp").insertOne({otp: otp,email:email, timestamp: timeStamp});
 
       if (dbResult.acknowledged) {
-        return { success: true, result: {otp: otp, name: username}, error: "" };
+        return { success: true, result: {otp: otp, email: email}, error: "" };
       } else {
         return { success: false, result: "", error: "No se pudo crear el usuario" }
       }
@@ -165,13 +169,13 @@ export async function guardarCoordenadas(coordenadas) {
 // Funciones auxiliares
 
 function generarOTP() {
-  const min = 1000; // El número mínimo de 4 dígitos (inclusive)
-  const max = 9999; // El número máximo de 4 dígitos (inclusive)
+  const min = 100000; // El número mínimo de 6 dígitos (inclusive)
+  const max = 999999; // El número máximo de 6 dígitos (inclusive)
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 function generarTimestamp() {
-  const duracionEnMilisegundos = 300000; // 5 minutos en milisegundos
+  const duracionEnMilisegundos = 1800000; // 30 minutos en milisegundos
   const ahora = Date.now(); // Obtiene la marca de tiempo actual.
   const timestampConDuracion = ahora + duracionEnMilisegundos;
   return timestampConDuracion;

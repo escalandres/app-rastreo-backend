@@ -5,8 +5,8 @@ import session from 'express-session';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 
-// import { fileURLToPath } from 'url';
-// import { dirname } from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 
 // -------------- My modules --------------
 import userRoutes from './routes/user.js';
@@ -15,16 +15,20 @@ import trackerRoutes from './routes/tracker.js';
 // import createRoutes from './routes/create.js';
 // import fileRoutes from './routes/file.js';
 import { checkCookie } from './controllers/modules/checkCookie.mjs';
-
+import sendMail from './controllers/modules/nodemailer.js';
 
 // -------------- Variables modules --------------
 const app = express();
 
 // -------------- Variables Globales --------------
+// Obtiene la URL del archivo actual
+const currentFileURL = import.meta.url;
+// Convierte la URL del archivo en una ruta de sistema de archivos
+const currentFilePath = fileURLToPath(currentFileURL);
 // Obtiene el directorio del archivo actual
-// const __dirname = dirname(currentFilePath);
-// global.__dirname = __dirname;
-// global.VIEWS_PATH = path.join(__dirname, 'src', 'views');
+const __dirname = dirname(currentFilePath);
+global.__dirname = __dirname;
+global.TEMPLATES_PATH = path.join(__dirname, 'src', 'email_templates');
 // global.CONTROLLER_PATH = path.join(__dirname, 'controllers');
 // global.MODULES_PATH = path.join(__dirname, 'controllers', 'modules');
 // global.DRIVE_PATH = path.join(__dirname, 'drive');
@@ -53,6 +57,9 @@ app.use(session({
     },
 }));
 
+// Aplicar los middlewares en orden
+// app.use(express.static(path.join(__dirname, 'public')));
+
 app.get('/', (req, res) => {
     res.send('App rastreo de paquetes');
 });
@@ -66,7 +73,15 @@ app.use('/user', userRoutes);
 
 app.use('/api/tracker', trackerRoutes);
 
-
+app.post('/sendmail', async (req, res) => {
+    const { to, subject, text } = req.body;
+    try {
+        let info = await sendMail(to, subject, text);
+        res.status(200).send(`Email sent: ${info}`);
+    } catch (error) {
+        res.status(500).send("Error sending email");
+    }
+});
 
 app.listen(process.env.PORT, () => console.log(`App running on http://localhost:${process.env.PORT}`))
 

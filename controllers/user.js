@@ -1,5 +1,6 @@
 import { getUser, registerNewUser, changePassword, getOTP, registrarOTP } from "./modules/database.mjs";
 import { sendRecoverEmail } from "./modules/resend.mjs";
+import { sendOtpEmail } from "./modules/email.mjs";
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
@@ -95,6 +96,7 @@ export async function logout(req,res){
 
 export async function changeUserPassword(req,res){
     try {
+        console.log("-----Cambiando contraseña-----");
         const { password, email } = req.body;
         const hashedPassword = await bcrypt.hash(password, 10);
         const response = await changePassword(email, hashedPassword)
@@ -115,12 +117,11 @@ export async function generateOTP(req,res){
         const email = req.body.email;
         const response = await registrarOTP(email)
         if (!response.success) return res.status(401).json({ success: false, messageCode: "Error al crear su cuenta de usuario. Inténtelo nuevamente" });
-        const token = jwt.sign({ email: email }, process.env.KEY, { expiresIn: '10m' });
-        res.cookie('OtpToken', token, { maxAge: 10 * 60 * 1000 });
-        const respuesta = await sendRecoverEmail(email,response.result.name,response.result.otp)
-        if (!respuesta.success) return res.status(401).json({ success: false, message: "Error al crear su cuenta de usuario. Inténtelo nuevamente" })
-        
-        return res.status(200).json({ success: true })
+        const respuesta = await sendOtpEmail(email,response.result.otp)
+        if (!respuesta.success) return res.status(401).json({ success: false, message: "Error al generar código OTP. Inténtelo nuevamente" })
+        const token = jwt.sign({ email: email }, process.env.KEY, { expiresIn: '30m' });
+
+        return res.status(200).json({ success: true, token: token });
     } catch (error) {
         console.error(error);
       // Enviar respuesta JSON indicando fallo
@@ -130,17 +131,17 @@ export async function generateOTP(req,res){
 
 export async function checkOTP(req,res){
     try {
-        const otp = req.body.otp;
-        const token = req.cookies.AuthToken;
-        const decoded = jwt.verify(token, process.env.KEY);
-        const response = await getOTP(decoded.email)
+        const { otp, email } = req.body;
+        // const token = req.cookies.AuthToken;
+        // const decoded = jwt.verify(token, process.env.KEY);
+        const response = await getOTP(email)
         if (!response.success) return res.status(401).json({ success: false, message: "Error al crear su cuenta de usuario. Inténtelo nuevamente" })
 
         if (!Date.now() < response.timestamp) return res.status(401).json({ success: false, message: "El código de seguridad ha expirado. Inténtelo nuevamente" })
         if (otp !== response.result.otp.toString()) return res.status(401).json({ success: false, message: "El código de seguridad ingresado es incorrecto" })
-        const token2 = jwt.sign({ email: email, otp: otp }, process.env.KEY, { expiresIn: '5m' });
-        res.cookie('ChangeToken', token2, {maxAge: 5 * 60 * 1000});
-        return res.redirect('/change-password')
+        // const token2 = jwt.sign({ email: email, otp: otp }, process.env.KEY, { expiresIn: '5m' });
+        // res.cookie('ChangeToken', token2, {maxAge: 5 * 60 * 1000});
+        return res.status(200).json({ success: true });
     } catch (error) {
         console.error(error);
         // Enviar respuesta JSON indicando fallo

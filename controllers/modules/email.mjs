@@ -1,21 +1,42 @@
-import handlebars from 'handlebars';
 import fs from 'fs';
-import path from 'path';
-import { dirname } from 'path';
-import { fileURLToPath } from 'url';
-// Set up storage for uploaded files
+import path from "path";
+import sendMail from './nodemailer.js';
 
-const currentFileURL = import.meta.url;
-// Convierte la URL del archivo en una ruta de sistema de archivos
-const currentFilePath = fileURLToPath(currentFileURL);
-// Obtiene el directorio del archivo actual
-const __dirname = dirname(currentFilePath);
 
-export var PLANTILLAS = {
+export const PLANTILLAS = {
     recover: {
         subject: "Recuperar cuenta",
         file: 'p.html'
     },
+    otp: {
+        subject: "Código de verificación:",
+        file: 'otp.html'
+    }
+}
+
+export async function sendOtpEmail(email,otp) {
+    try{
+        const templatePath = path.join(TEMPLATES_PATH, `${PLANTILLAS.otp.file}`);
+        let template = fs.readFileSync(templatePath, 'utf8');
+        console.log("template");
+        const variables = {
+            otp: otp,
+            email: email
+        };
+        // Reemplaza las variables en la plantilla
+        Object.keys(variables).forEach(key => {
+            console.log("key", key);
+            const regex = new RegExp(`{${key}}`, 'g');
+            template = template.replace(regex, variables[key]);
+        });
+    
+        let subject = `${PLANTILLAS.otp.subject} ${otp}`;
+        let info = await sendMail(email,subject,template);
+        return {success: true, message: info};
+    }catch(error){
+        console.error('Error al enviar el correo. ',error);
+        return {success: false, error: error}
+    }
 }
 
 export function createEmail(plantilla, name, code) {

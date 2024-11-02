@@ -1,4 +1,7 @@
 import {MongoClient} from 'mongodb';
+import crypto from 'crypto';
+
+
 const uri = process.env.DATABASE_URL;
 // const client = new MongoClient(uri, {useNewUrlParser: true, useUnifiedTopology: true});
 const client = new MongoClient(uri, {});
@@ -30,6 +33,8 @@ export async function getUser(email) {
     const dbResult = await usersCollection.findOne({email: email});
 
     if (dbResult) {
+      console.log("Usuario encontrado:", dbResult);
+      await usersCollection.updateOne({email: email}, {$set: {last_login: new Date()}});
       return {success: true, user: dbResult, error: "" };
     } else {
       return {success: false, user: {}, error: "Usuario no encontrado"}
@@ -164,7 +169,79 @@ export async function guardarCoordenadas(coordenadas) {
   }
 }
 
+export async function authGoogle(oauth) {
+  try {
+    const client = await connect()
+    const collection = client.collection('users');
+    const dbResult = await collection.findOne({email: oauth.email});
 
+    if (dbResult) {
+      // console.log("Usuario encontrado:", dbResult);
+      await collection.updateOne({email: oauth.email}, {$set: {last_login: new Date()}});
+      return { success: true, user: dbResult, error: "" };
+    } else {
+      const userID = crypto.randomBytes(16).toString('hex');
+      const currentDate = new Date();
+      const provider = "https://accounts.google.com"
+      const user = {id: userID, email: oauth.email, name: oauth.name,given_name: oauth.given_name, lastname: oauth.family_name,
+          oauth_provider: provider, oauth_user_id: oauth.sub, email_verified: oauth.email_verified, profile_picture: oauth.picture,
+          created_date: currentDate, last_login: currentDate };
+       // Crear índices únicos en email y userId
+        await collection.createIndex({ email: 1 }, { unique: true });
+        await collection.createIndex({ id: 1 }, { unique: true });
+
+        const dbResult = await collection.insertOne(user);
+        if (dbResult.acknowledged) {
+          return { success: true, user: user, error: "" };
+        } else {
+          return { success: false, user: {}, error: "No se pudo crear el usuario" }
+        }
+    }
+  } catch (error) {
+    console.error('Error al buscar el usuario. ',error);
+    return { success: false, user: {}, error: error }
+  } finally {
+    disconnect();
+  }
+
+}
+
+export async function authGithub(oauth) {
+  try {
+    const client = await connect()
+    const collection = client.collection('users');
+    const dbResult = await collection.findOne({email: oauth.email});
+
+    if (dbResult) {
+      //console.log("Usuario encontrado:", dbResult);
+      await collection.updateOne({email: oauth.email}, {$set: {last_login: new Date()}});
+      return { success: true, user: dbResult, error: "" };
+    } else {
+      const userID = crypto.randomBytes(16).toString('hex');
+      const currentDate = new Date();
+      const provider = "https://api.github.com"
+      const user = {id: userID, email: oauth.email, name: oauth.name, oauth_provider: provider, 
+          oauth_user_id: oauth.id, email_verified: true, profile_picture: oauth.avatar_url,
+          created_date: currentDate, last_login: currentDate};
+       // Crear índices únicos en email y userId
+        await collection.createIndex({ email: 1 }, { unique: true });
+        await collection.createIndex({ id: 1 }, { unique: true });
+
+        const dbResult = await collection.insertOne(user);
+        if (dbResult.acknowledged) {
+          return { success: true, user: user, error: "" };
+        } else {
+          return { success: false, user: {}, error: "No se pudo crear el usuario" }
+        }
+    }
+  } catch (error) {
+    console.error('Error al buscar el usuario. ',error);
+    return { success: false, user: {}, error: error }
+  } finally {
+    disconnect();
+  }
+
+}
 
 // Funciones auxiliares
 

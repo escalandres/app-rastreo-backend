@@ -32,12 +32,12 @@ router.post('/test-json', (req, res) => {
 
 router.post('/post-test', (req, res) => {
     console.log("----------------");
-n
-    if(req.body.datos !== "AT+CMGR=0ERROR"){
+    if(req.body.datos !== "AT+CMGR=0ERROR" && req.body.datos !== "Enviando informacion de los rastreadores al servidor"){
         console.log("req.body.datos", req.body.datos);
         subirDatos(req,res);
     }else{
         console.log("Formato de mensaje no válido");
+        console.log("-------req.body.datos", req.body.datos);
         res.status(400).send({success: false});
     }
 });

@@ -168,7 +168,7 @@ export function validateChangeToken(req, res, next) {
 
 export async function googleAuth(req, res){
     try {
-        // console.log("access_token",req.body.oauth)
+        console.log("-------------Autenticando con Google-------------");
         const oAuth2Client = new OAuth2Client(
             process.env.GOOGLE_CLIENT_ID,
             process.env.GOOGLE_CLIENT_SECRET,
@@ -206,7 +206,7 @@ export async function googleAuth(req, res){
 
 export async function githubAuth(req, res){
     try {
-        // console.log("Sigun github")
+        console.log("-------------Autenticando con GitHub-------------");
         const code = req.body.code;
         // console.log("------code",code)
         const githubToken = await getGithubToken(code);
@@ -243,7 +243,7 @@ export async function githubAuth(req, res){
 
 export async function linkedinAuth(req, res){
     try {
-        //console.log("Sigun github")
+        console.log("-------------Autenticando con LinkedIn-------------");
         const code = req.body.code;
 
         const githubToken = await getGithubToken(code);

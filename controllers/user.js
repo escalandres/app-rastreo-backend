@@ -206,10 +206,11 @@ export async function googleAuth(req, res){
 
 export async function githubAuth(req, res){
     try {
-        //console.log("Sigun github")
+        // console.log("Sigun github")
         const code = req.body.code;
-
+        // console.log("------code",code)
         const githubToken = await getGithubToken(code);
+        if(githubToken === undefined) return res.status(401).json({ success: false });
         ///console.log("githubToken",githubToken)
         const githubUser = await getGithubUser(githubToken);
         //console.log("githubUser",githubUser)
@@ -229,7 +230,7 @@ export async function githubAuth(req, res){
             name: response.user.name,
             profile_picture: response.user.profile_picture
         }}, process.env.KEY, { expiresIn: '1h' });
-        //console.log("token",token);
+        // console.log("token",token);
         // res.cookie('AuthToken', token, { maxAge: 3 * 24 * 60 * 60 * 1000 });
         //req.session.user = { id: result.user.id, email: result.user.email };
         return res.status(200).json({ success: true, token: token });
@@ -291,6 +292,7 @@ async function getGithubToken(code){
         return response.json()
     }).then((data) => {
         //console.log(data)
+        console.log("getGithubToken",data.access_token);
         token = data.access_token;
     }).catch((error) => {
         console.error('Error:', error);
@@ -308,7 +310,7 @@ async function getGithubUser(token){
     }).then((response) => {
         return response.json()
     }).then((data) => {
-        //console.log("user", data)
+        console.log("user", data)
         user = data;
     }).catch((error) => {
         console.error('Error:', error);

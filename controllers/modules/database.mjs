@@ -171,6 +171,9 @@ export async function guardarCoordenadas(coordenadas) {
 
 export async function authGoogle(oauth) {
   try {
+
+    console.log("oauth",oauth)
+
     const client = await connect()
     const collection = client.collection('users');
     const dbResult = await collection.findOne({email: oauth.email});
@@ -213,7 +216,7 @@ export async function authGithub(oauth) {
     const dbResult = await collection.findOne({email: oauth.email});
 
     if (dbResult) {
-      //console.log("Usuario encontrado:", dbResult);
+      // console.log("Usuario encontrado:", dbResult);
       await collection.updateOne({email: oauth.email}, {$set: {last_login: new Date()}});
       return { success: true, user: dbResult, error: "" };
     } else {

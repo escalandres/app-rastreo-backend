@@ -172,7 +172,7 @@ export async function guardarCoordenadas(coordenadas) {
 export async function authGoogle(oauth) {
   try {
 
-    console.log("oauth",oauth)
+    // console.log("oauth",oauth)
 
     const client = await connect()
     const collection = client.collection('users');

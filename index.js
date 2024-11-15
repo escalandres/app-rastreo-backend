@@ -11,10 +11,6 @@ import { dirname } from 'path';
 // -------------- My modules --------------
 import userRoutes from './routes/user.js';
 import trackerRoutes from './routes/tracker.js';
-// import uploadRoutes from './routes/upload.js';
-// import createRoutes from './routes/create.js';
-// import fileRoutes from './routes/file.js';
-import { checkCookie } from './controllers/modules/checkCookie.mjs';
 import sendMail from './controllers/modules/nodemailer.js';
 
 // -------------- Variables modules --------------
@@ -29,12 +25,6 @@ const currentFilePath = fileURLToPath(currentFileURL);
 const __dirname = dirname(currentFilePath);
 global.__dirname = __dirname;
 global.TEMPLATES_PATH = path.join(__dirname, 'src', 'email_templates');
-// global.CONTROLLER_PATH = path.join(__dirname, 'controllers');
-// global.MODULES_PATH = path.join(__dirname, 'controllers', 'modules');
-// global.DRIVE_PATH = path.join(__dirname, 'drive');
-
-
-
 
 // -------------- settings --------------
 app.use(express.json());

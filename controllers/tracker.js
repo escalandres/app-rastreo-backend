@@ -17,10 +17,11 @@ function formatDate(inputDate) {
 }
 
 function extraerDatos(mensaje) {
-    //mensaje.replace('AT+', '');
+    // mensaje.replace('AT+', '');
     //console.log("mensaje", mensaje);
     // Expresión regular para extraer los datos
-    const regex = /\+CMGR:\s'REC UNREAD','(\+52\d{10,12})','','(\d{2}\/\d{2}\/\d{2},\d{2}:\d{2}:\d{2}-\d{2})'id:(\d+),latitud:([-\d.]+),longitud:([-\d.]+);/;
+    // const regex = /\+CMGR:\s'REC UNREAD','(\+52\d{10,12})','','(\d{2}\/\d{2}\/\d{2},\d{2}:\d{2}:\d{2}-\d{2})'id:(\d+),latitud:([-\d.]+),longitud:([-\d.]+);/;
+    const regex = /AT\+CMGR=\d+\+CMGR:\s'REC UNREAD','(\+52\d{10,12})','','(\d{2}\/\d{2}\/\d{2},\d{2}:\d{2}:\d{2}-\d{2})'id:(\d+),latitud:([-\d.]+),longitud:([-\d.]+);OK/;
     const resultado = regex.exec(mensaje);
 
     if (resultado) {

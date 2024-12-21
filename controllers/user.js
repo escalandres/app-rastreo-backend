@@ -45,8 +45,12 @@ export async function signup(req,res){
         const userID = crypto.randomBytes(16).toString('hex');
         const hashedPassword = await bcrypt.hash(password, 10);
         const fullName = name + " " + lastname;
-        const response = await registerNewUser({id: userID, email: email, name: fullName, given_name:name, lastname: lastname, password: hashedPassword, 
-            created_date: currentDate, last_login: currentDate, profile_picture: ""});
+        let userInfo = {
+            id: userID, email: email, name: fullName, given_name:name, lastname: lastname, 
+            password: hashedPassword, created_date: currentDate, last_login: currentDate, 
+            profile_picture: "", contenedores: [], otp: []
+        }
+        const response = await registerNewUser(userInfo);
         if(!response.success){
             return res.status(401).json({success: false, message: "Error al crear su cuenta de usuario. Inténtelo nuevamente"})
         }

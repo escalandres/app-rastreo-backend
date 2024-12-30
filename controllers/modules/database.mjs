@@ -246,6 +246,27 @@ export async function authGithub(oauth) {
 
 }
 
+export async function consultaEmpresasPaqueteria() {
+  try {
+    const client = await connect()
+    const collection = client.collection('empresas_paqueteria');
+    const dbResult = await collection.find({}).toArray();
+
+    if (dbResult) {
+      console.log("Documentos obtenidos:", dbResult);
+      return {success: true, catalogo: dbResult, error: "" };
+    } else {
+      return {success: false, catalogo: {}, error: "Usuario no encontrado"}
+    }
+  } catch (error) {
+    console.error('Error al obtener el catálogo. ',error);
+    return {success: false, user: {}, error: error}
+  } finally {
+    disconnect();
+  }
+}
+
+
 // Funciones auxiliares
 
 function generarOTP() {

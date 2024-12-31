@@ -26,6 +26,8 @@ async function disconnect() {
   }
 }
 
+// ----------------------- User Controller -----------------------
+
 export async function getUser(email) {
   try {
     const client = await connect()
@@ -246,6 +248,15 @@ export async function authGithub(oauth) {
 
 }
 
+// ----------------------- Tracker Controller -----------------------
+
+
+
+
+
+
+
+// ----------------------- Shipment Controller -----------------------
 export async function consultaEmpresasPaqueteria() {
   try {
     const client = await connect()
@@ -266,8 +277,105 @@ export async function consultaEmpresasPaqueteria() {
   }
 }
 
+export async function registerNewShipment(shipment) {
+  try {
+    const client = await connect()
+    const shipmentCollection = client.collection('shipments');
+    const shipmentID = generarOTP();
+    console.log("shipmentID", shipmentID);
+    shipment.id = shipmentID;
+    console.log("shipment", shipment);
+    // Crear índices únicos en email y userId
+    await shipmentCollection.createIndex({ id: 1 }, { unique: true });
 
-// Funciones auxiliares
+    const dbResult = await shipmentCollection.insertOne(shipment);
+    if (dbResult.acknowledged) {
+      return { success: true, result: "Envío registrado!", error: "" };
+    } else {
+      return { success: false, result: "", error: "No se pudo registrar el envío" }
+    }
+  } catch (error) {
+    console.error('Ocurrio un error:', error);
+    return {success: false, message: error};
+  } finally {
+    disconnect();
+  }
+}
+
+export async function updateShipment(shipment) {
+  try {
+    const client = await connect()
+    const shipmentCollection = client.collection('shipments');
+    const shipmentID = generarOTP();
+    shipment.id = shipmentID;
+    // Crear índices únicos en email y userId
+
+    await shipmentCollection.updateOne({id: shipment.id}, {$push: { locations: newLocation }});
+    await shipmentCollection.updateOne({id: shipment.id}, {$push: { shipment_status: newStatus}});
+
+
+    const dbResult = await shipmentCollection.updateOne({id: shipment.id}, {$set: { delivery_date: newDeliveryDate}});
+    if (dbResult.acknowledged) {
+      return { success: true, result: "Envío registrado!", error: "" };
+    } else {
+      return { success: false, result: "", error: "No se pudo registrar el envío" }
+    }
+  } catch (error) {
+    console.error('Ocurrio un error:', error);
+    return {success: false, message: error};
+  } finally {
+    disconnect();
+  }
+}
+
+export async function getContainerShipments(containerID) {
+  try {
+    const client = await connect()
+    const collection = client.collection('shipments');
+    const dbResult = await collection.find({ container_id: parseInt(containerID)}).toArray();
+    if (dbResult) {
+      console.log("Documentos obtenidos:", dbResult);
+      return {success: true, results: dbResult, error: "" };
+    } else {
+      return {success: false, results: {}, error: "Usuario no encontrado"}
+    }
+  } catch (error) {
+    console.error('Error al obtener el catálogo. ',error);
+    return {success: false, user: {}, error: error}
+  } finally {
+    disconnect();
+  }
+}
+
+export async function getCurrentContainerShipment(containerID) {
+  try {
+    const client = await connect()
+    const collection = client.collection('shipments');
+    const dbResult = await collection.findOne({ container_id: parseInt(containerID) }, { sort: { start_date: -1 }}); // Ordena por fecha de inicio de envío de forma descendente. Obtener fecha más actual
+
+    if (dbResult) {
+      console.log("Documentos obtenidos:", dbResult);
+      return {success: true, results: dbResult, error: "" };
+    } else {
+      return {success: false, results: {}, error: "Usuario no encontrado"}
+    }
+  } catch (error) {
+    console.error('Error al obtener el catálogo. ',error);
+    return {success: false, user: {}, error: error}
+  } finally {
+    disconnect();
+  }
+}
+
+// ----------------------- App Controller -----------------------
+
+
+
+
+
+
+
+// ----------------------- Funciones auxiliares -----------------------
 
 function generarOTP() {
   const min = 100000; // El número mínimo de 6 dígitos (inclusive)

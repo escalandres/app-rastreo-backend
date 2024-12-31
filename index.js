@@ -10,6 +10,7 @@ import { dirname } from 'path';
 
 // -------------- My modules --------------
 import userRoutes from './routes/user.js';
+import appRoutes from './routes/user.js';
 import trackerRoutes from './routes/tracker.js';
 import shipmentRoutes from './routes/shipment.js';
 import sendMail from './controllers/modules/nodemailer.js';
@@ -61,6 +62,7 @@ app.get('/test', (req, res) => {
 });
 
 app.use('/user', userRoutes);
+app.use('/app', appRoutes);
 
 app.use('/api/tracker', trackerRoutes);
 app.use('/api/shipment', shipmentRoutes);

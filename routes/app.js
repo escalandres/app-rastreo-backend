@@ -3,7 +3,7 @@ import { dhlTracking, obtenerEmpresasPaqueteria } from '../controllers/shipment.
 
 const router = express.Router();
 
-router.get('/get-user-shipments', dhlTracking);
+router.get('/get-user-containers', dhlTracking);
 router.get('/empresas-paqueteria', obtenerEmpresasPaqueteria);
 
 export default router;

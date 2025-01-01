@@ -1,9 +1,10 @@
 import express from 'express';
-import { dhlTracking, obtenerEmpresasPaqueteria } from '../controllers/shipment.js';
+import { obtenerContenedoresUsuario, vincularRastreador } from '../controllers/app.js';
 
 const router = express.Router();
 
-router.get('/get-user-containers', dhlTracking);
-router.get('/empresas-paqueteria', obtenerEmpresasPaqueteria);
+router.get('/get-user-containers', obtenerContenedoresUsuario);
+router.post('/link-tracker', vincularRastreador);
+// router.get('/empresas-paqueteria', obtenerEmpresasPaqueteria);
 
 export default router;

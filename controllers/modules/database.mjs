@@ -65,7 +65,7 @@ export async function registerNewUser(user) {
       return { success: false, result: "", error: "No se pudo crear el usuario" }
     }
   } catch (error) {
-    console.error('Ocurrio un error:', error);
+    console.error('Ocurrió un error:', error);
     return {success: false, message: error};
   } finally {
     disconnect();
@@ -79,7 +79,7 @@ export async function registrarOTP(email) {
     console.log(dbResult)
     if(dbResult){
       const otp = generarOTP();
-      const timeStamp = generarTimestamp();
+      const timeStamp = generateTimestamp();
       console.log("otp", otp);
       console.log("timeStamp", timeStamp);
       console.log("email", email);
@@ -94,7 +94,7 @@ export async function registrarOTP(email) {
       }
     }else return { success: false, result: "", error: "No existe el usuario" }
   } catch (error) {
-    console.error('Ocurrio un error:', error);
+    console.error('Ocurrió un error:', error);
     return { success: false, user: {}, error: error }
   } finally {
     disconnect();
@@ -122,10 +122,10 @@ export async function getOTP(email) {
     if (otp !== "") {      
       return { success: true, result: otp, error: "" };
     } else {
-      return { success: false, result: {}, error: "Categoria no encontrado" }
+      return { success: false, result: {}, error: "Categoría no encontrado" }
     }
   } catch (error) {
-    console.error('Ocurrio un error:', error);
+    console.error('Ocurrió un error:', error);
     return { success: false, user: {}, error: error }
   } finally {
     disconnect();
@@ -145,7 +145,7 @@ export async function changePassword(email,password) {
       return { success: false, result: "", error: "No se pudo modificar el articulo" }
     }
   } catch (error) {
-    console.error('Ocurrio un error:', error);
+    console.error('Ocurrió un error:', error);
     return { success: false, user: {}, error: error }
   } finally {
     disconnect();
@@ -161,10 +161,10 @@ export async function guardarCoordenadas(coordenadas) {
     if (dbResult.acknowledged) {
       return { success: true, result: "Registro guardado!", error: "" };
     } else {
-      return { success: false, result: "", error: "No se pudo guardar el regsitro" }
+      return { success: false, result: "", error: "No se pudo guardar el registro" }
     }
   } catch (error) {
-    console.error('Ocurrio un error:', error);
+    console.error('Ocurrió un error:', error);
     return {success: false, message: error};
   } finally {
     disconnect();
@@ -295,7 +295,7 @@ export async function registerNewShipment(shipment) {
       return { success: false, result: "", error: "No se pudo registrar el envío" }
     }
   } catch (error) {
-    console.error('Ocurrio un error:', error);
+    console.error('Ocurrió un error:', error);
     return {success: false, message: error};
   } finally {
     disconnect();
@@ -321,7 +321,59 @@ export async function updateShipment(shipment) {
       return { success: false, result: "", error: "No se pudo registrar el envío" }
     }
   } catch (error) {
-    console.error('Ocurrio un error:', error);
+    console.error('Ocurrió un error:', error);
+    return {success: false, message: error};
+  } finally {
+    disconnect();
+  }
+}
+
+export async function getUserContainers(userID) {
+  try {
+    const client = await connect()
+    const collection = client.collection('trackers');
+    const dbResult = await collection.find({ id: userID}).toArray();
+    if (dbResult) {
+      console.log("Documentos obtenidos:", dbResult);
+      return {success: true, results: dbResult, error: "" };
+    } else {
+      return {success: false, results: {}, error: "Usuario no encontrado"}
+    }
+  } catch (error) {
+    console.error('Error al obtener el catálogo. ',error);
+    return {success: false, user: {}, error: error}
+  } finally {
+    disconnect();
+  }
+}
+
+export async function linkTracker(tracker) {
+  try {
+    const client = await connect()
+    const collection = client.collection('trackers');
+
+    // Verifica si el tracker ya está vinculado a otro usuario 
+    const existingTracker = await collection.findOne({ id: tracker.id });
+
+    if(existingTracker){
+      if (existingTracker.user_id === tracker.user_id) { 
+        return { success: false, error: "El tracker ya está vinculado a este usuario." }
+      } 
+      else { 
+        return { success: false, error: "El tracker ya está vinculado a otro usuario." }
+      }
+    }else{
+      await collection.createIndex({ id: 1 }, { unique: true });
+
+      const dbResult = await collection.insertOne(tracker);
+      if (dbResult.acknowledged) {
+        return { success: true, result: "¡Se ha vinculado el tracker a su cuenta!", error: "" };
+      } else {
+        return { success: false, result: "", error: "Ocurrió un error al vincular el tracker. Inténtelo nuevamente!" }
+      }
+    }
+  } catch (error) {
+    console.error('Ocurrió un error:', error);
     return {success: false, message: error};
   } finally {
     disconnect();
@@ -383,9 +435,9 @@ function generarOTP() {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-function generarTimestamp() {
-  const duracionEnMilisegundos = 1800000; // 30 minutos en milisegundos
+function generateTimestamp() {
+  const limitInMilliseconds = 1800000; // 30 minutos en milisegundos
   const ahora = Date.now(); // Obtiene la marca de tiempo actual.
-  const timestampConDuracion = ahora + duracionEnMilisegundos;
-  return timestampConDuracion;
+  const timestampWithLimit = ahora + limitInMilliseconds;
+  return timestampWithLimit;
 }

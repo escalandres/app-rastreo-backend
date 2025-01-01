@@ -17,7 +17,6 @@ router.get('/test', (req, res) => {
     };
     console.log(json);
     let js = JSON.stringify(json);
-      // Serializar a cadena JSON (esto convierte el objeto en una cadena JSON)
     console.log(js);
     res.send('Hay conexion con el servidor');
 });

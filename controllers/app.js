@@ -1,4 +1,5 @@
-import { consultaEmpresasPaqueteria, registerNewShipment, getContainerShipments, getCurrentContainerShipment, getUserContainers } from "./modules/database.mjs";
+import jwt from "jsonwebtoken";
+import { consultaEmpresasPaqueteria, registerNewShipment, getContainerShipments, getCurrentContainerShipment, getUserContainers, linkTracker } from "./modules/database.mjs";
 
 export async function dhlTracking(req, res) {
     const myHeaders = new Headers();
@@ -50,9 +51,11 @@ export async function registrarNuevoEnvio(req, res) {
 }
 
 export async function obtenerContenedoresUsuario(req, res) {
+    console.log("Obteniendo contenedores de usuario");
     const authHeader = req.headers['authorization']; 
     if (authHeader) { 
         const token = authHeader.split(' ')[1]; // Assuming 'Bearer <token>' 
+        console.log("Token:", token);
         const decodedToken = jwt.verify(token, process.env.key); 
         console.log("Decoded token:", decodedToken);
         const result = await getUserContainers(decodedToken.user.id);
@@ -91,26 +94,37 @@ export async function obtenerEnvioMasReciente(req, res) {
 }
 
 export async function vincularRastreador(req, res) {
-    const { trackerID } = req.body;
-    const authHeader = req.headers['authorization']; 
-    if (authHeader) { 
-        const token = authHeader.split(' ')[1]; // Assuming 'Bearer <token>' 
-        const decodedToken = jwt.verify(token, process.env.key); 
-        console.log("Decoded token:", decodedToken);
-        const tracker = {
-            id: parseInt(trackerID),
-            user_id: decodedToken.user.id,
-            nickname: `Rastreador ${id}`,
-            linking_date: new Date(),
-            shipments: []
+    console.log("vinculado rastreador");
+
+    try{
+        const { trackerID } = req.body;
+        const authHeader = req.headers['authorization']; 
+        if (authHeader) { 
+            const token = authHeader.split(' ')[1]; // Assuming 'Bearer <token>' 
+            const decodedToken = jwt.verify(token, process.env.key); 
+            console.log("Decoded token:", decodedToken);
+            const tracker = {
+                id: parseInt(trackerID),
+                user_id: decodedToken.user.id,
+                nickname: `Rastreador ${trackerID}`,
+                linking_date: new Date(),
+                img: '',
+                shipments: []
+            }
+            const result = await linkTracker(tracker);
+            console.log("result:", result);
+            if(!result.success){
+                return res.status(200).json({success: false, message: result.error});
+            }else{
+                return res.status(200).json({success: true, message: result.message});
+            }
+        } else { 
+            res.status(401).json({ success: false, message: 'No se proporcionó el token o no es válido' });
         }
-        const result = await linkTracker(tracker);
-        if(!result.success){
-            return res.status(400).json({success: false, message: result.error});
-        }else{
-            return res.status(200).json({success: true, message: result.message});
-        }
-    } else { 
-        res.status(401).json({ success: false, message: 'No se proporcionó el token o no es válido' });
+    }catch(error){
+        console.error("Error:", error);
+        res.status(500).json({ success: false, message: 'Ocurrió un error al vincular' });
+
     }
+    
 }

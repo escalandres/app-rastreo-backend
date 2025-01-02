@@ -10,7 +10,7 @@ import { dirname } from 'path';
 
 // -------------- My modules --------------
 import userRoutes from './routes/user.js';
-import appRoutes from './routes/user.js';
+import appRoutes from './routes/app.js';
 import trackerRoutes from './routes/tracker.js';
 import shipmentRoutes from './routes/shipment.js';
 import sendMail from './controllers/modules/nodemailer.js';

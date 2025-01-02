@@ -3,7 +3,7 @@ import { obtenerContenedoresUsuario, vincularRastreador } from '../controllers/a
 
 const router = express.Router();
 
-router.get('/get-user-containers', obtenerContenedoresUsuario);
+router.get('/get-user-tracker', obtenerContenedoresUsuario);
 router.post('/link-tracker', vincularRastreador);
 // router.get('/empresas-paqueteria', obtenerEmpresasPaqueteria);
 

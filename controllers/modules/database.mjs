@@ -332,7 +332,7 @@ export async function getUserContainers(userID) {
   try {
     const client = await connect()
     const collection = client.collection('trackers');
-    const dbResult = await collection.find({ id: userID}).toArray();
+    const dbResult = await collection.find({ user_id: userID}).toArray();
     if (dbResult) {
       console.log("Documentos obtenidos:", dbResult);
       return {success: true, results: dbResult, error: "" };

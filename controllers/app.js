@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import { validateToken } from "./modules/utils.mjs";
 import { consultaEmpresasPaqueteria, registerNewShipment, getContainerShipments, getCurrentContainerShipment, getUserContainers, linkTracker } from "./modules/database.mjs";
 
 export async function dhlTracking(req, res) {
@@ -55,17 +56,18 @@ export async function obtenerContenedoresUsuario(req, res) {
     const authHeader = req.headers['authorization']; 
     if (authHeader) { 
         const token = authHeader.split(' ')[1]; // Assuming 'Bearer <token>' 
-        console.log("Token:", token);
-        const decodedToken = jwt.verify(token, process.env.key); 
-        console.log("Decoded token:", decodedToken);
-        const result = await getUserContainers(decodedToken.user.id);
-        if(!result.success){
-            return res.status(400).json({success: false, message: result.error});
-        }else{
-            return res.status(200).json({success: true, message: result.results});
+        const decodedToken = validateToken(token);
+        if(decodedToken){
+            const result = await getUserContainers(decodedToken.user.id);
+            if(!result.success){
+                return res.status(400).json({success: false, message: result.error});
+            }else{
+                return res.status(200).json({success: true, message: result.results});
+            }
         }
+        res.status(401).json({ success: false, message: 'El token proporcionado no es válido' });
     } else { 
-        res.status(401).json({ success: false, message: 'No se proporcionó el token o no es válido' });
+        return res.status(404).json({ success: false, message: 'No se proporcionó el token' });
     }
 }
 
@@ -82,42 +84,47 @@ export async function obtenerEnviosContenedor(req, res) {
 }
 
 export async function obtenerEnvioMasReciente(req, res) {
-    console.log("req.query:", req.query);
-    const { containerID } = req.query;
-    console.log("containerID:", containerID);
-    const result = await getCurrentContainerShipment(containerID);
-    if(!result.success){
-        return res.status(400).json({success: false, message: result.error});
-    }else{
-        return res.status(200).json({success: true, message: result.results});
+    const { trackerID } = req.query;
+    const authHeader = req.headers['authorization']; 
+    const token = authHeader.split(' ')[1]; // Assuming 'Bearer <token>' 
+    const decodedToken = validateToken(token);
+    if(decodedToken){
+        const result = await getCurrentContainerShipment(trackerID, decodedToken.user.id);
+        if(!result.success){
+            return res.status(400).json({success: false, message: result.error});
+        }else{
+            return res.status(200).json({success: true, message: result.results});
+        }
     }
+    return res.status(401).json({ success: false, message: 'El token proporcionado no es válido' });
 }
 
 export async function vincularRastreador(req, res) {
     console.log("vinculado rastreador");
-
     try{
         const { trackerID } = req.body;
         const authHeader = req.headers['authorization']; 
         if (authHeader) { 
             const token = authHeader.split(' ')[1]; // Assuming 'Bearer <token>' 
-            const decodedToken = jwt.verify(token, process.env.key); 
-            console.log("Decoded token:", decodedToken);
-            const tracker = {
-                id: parseInt(trackerID),
-                user_id: decodedToken.user.id,
-                nickname: `Rastreador ${trackerID}`,
-                linking_date: new Date(),
-                img: '',
-                shipments: []
+            const decodedToken = validateToken(token);
+            if(decodedToken){
+                const tracker = {
+                    id: parseInt(trackerID),
+                    user_id: decodedToken.user.id,
+                    nickname: `Rastreador ${trackerID}`,
+                    linking_date: new Date(),
+                    img: '',
+                    shipments: []
+                }
+                const result = await linkTracker(tracker);
+                console.log("result:", result);
+                if(!result.success){
+                    return res.status(200).json({success: false, message: result.error});
+                }else{
+                    return res.status(200).json({success: true, message: result.message});
+                }
             }
-            const result = await linkTracker(tracker);
-            console.log("result:", result);
-            if(!result.success){
-                return res.status(200).json({success: false, message: result.error});
-            }else{
-                return res.status(200).json({success: true, message: result.message});
-            }
+            return res.status(401).json({ success: false, message: 'No se proporcionó el token o no es válido' });
         } else { 
             res.status(401).json({ success: false, message: 'No se proporcionó el token o no es válido' });
         }
@@ -128,3 +135,4 @@ export async function vincularRastreador(req, res) {
     }
     
 }
+

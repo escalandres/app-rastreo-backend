@@ -1,4 +1,5 @@
-import {MongoClient} from 'mongodb';
+import { MongoClient } from 'mongodb';
+import {generarOTP, generateTimestamp} from './utils.mjs';
 import crypto from 'crypto';
 
 
@@ -429,15 +430,3 @@ export async function getCurrentContainerShipment(containerID) {
 
 // ----------------------- Funciones auxiliares -----------------------
 
-function generarOTP() {
-  const min = 100000; // El número mínimo de 6 dígitos (inclusive)
-  const max = 999999; // El número máximo de 6 dígitos (inclusive)
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-function generateTimestamp() {
-  const limitInMilliseconds = 1800000; // 30 minutos en milisegundos
-  const ahora = Date.now(); // Obtiene la marca de tiempo actual.
-  const timestampWithLimit = ahora + limitInMilliseconds;
-  return timestampWithLimit;
-}

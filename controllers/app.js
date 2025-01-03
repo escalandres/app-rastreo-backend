@@ -91,9 +91,9 @@ export async function obtenerEnvioMasReciente(req, res) {
     if(decodedToken){
         const result = await getCurrentContainerShipment(trackerID);
         if(!result.success){
-            return res.status(400).json({success: false, message: result.error});
+            return res.status(400).json({success: false, message: result.error, result: {}});
         }else{
-            return res.status(200).json({success: true, message: result.results});
+            return res.status(200).json({success: true, message: '', result: result.result});
         }
     }
     return res.status(401).json({ success: false, message: 'El token proporcionado no es válido' });

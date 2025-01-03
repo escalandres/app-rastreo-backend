@@ -66,14 +66,15 @@ export async function subirDatos(req, res){
                 }
 
                 const dbResponse = await updateShipment(dbResult.result.id, trackerData, statusInfo);
+                console.log(dbResponse);
+                if(!dbResponse.success){
+                    return res.status(400).json({success: false, message: "Error al guardar coordenadas"})
+                }else{
+                    return res.status(200).json({success: true, message: "Coordenadas guardadas correctamente"})
+                }
             }
         }
-        const result = await guardarCoordenadas(coordenadas);
-        if(!result.success){
-            return res.status(400).json({success: false, message: "Error al guardar coordenadas"})
-        }else{
-            return res.status(200).json({success: true, message: "Coordenadas guardadas correctamente"})
-        }
+        
     } catch (error) {
         console.error('Ocurrio un error:',error);
         // Enviar respuesta JSON indicando fallo

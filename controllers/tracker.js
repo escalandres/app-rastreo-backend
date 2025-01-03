@@ -1,4 +1,5 @@
-import { guardarCoordenadas } from "./modules/database.mjs";
+import { guardarCoordenadas, getCurrentContainerShipment, updateShipment } from "./modules/database.mjs";
+
 
 function formatDate(inputDate) {
     // Divide la fecha y la hora
@@ -34,16 +35,39 @@ function extraerDatos(mensaje) {
             latitud: parseFloat(resultado[4]),
             longitud: parseFloat(resultado[5])
         };
-        return objetoDatos;
+        console.log("objetoDatos", objetoDatos);
+        const datosRastreador = {
+            date: formatDate(resultado[2]),
+            lat: parseFloat(resultado[4]),
+            lng: parseFloat(resultado[5])
+        };
+        return datosRastreador;
     } else {
-        throw new Error("Formato de mensaje no válido");
+        console.error("Formato de mensaje no válido");
+        return {};
     }
 }
 
 export async function subirDatos(req, res){
     try {
-        const coordenadas = extraerDatos(req.body.datos);
-        console.log("Coordenadas:",coordenadas);
+        // Extraer datos del mensaje enviado por el rastreador
+        const trackerData = extraerDatos(req.body.datos);
+        console.log("Coordenadas:",trackerData);
+
+        // Obtener información envío actual del rastreador provista por la paquetería
+        const dbResult = await obtenerEnvioMasReciente();
+        if(shipmentInfo.success){
+            //Envio en curso
+            if(!dbResult.result.delivery_date){
+                let statusInfo = {};
+                if(dbResult.result.shipment_data.company === "DHL"){
+                    let companyInfo = await queryDHL(dbResult.result.shipment_data.tracking_number, dbResult.result.shipment_data. service_id);
+                    statusInfo = processDHLResponse(companyInfo, dbResult.result.shipment_status);
+                }
+
+                const dbResponse = await updateShipment(dbResult.result.id, trackerData, statusInfo);
+            }
+        }
         const result = await guardarCoordenadas(coordenadas);
         if(!result.success){
             return res.status(400).json({success: false, message: "Error al guardar coordenadas"})
@@ -56,3 +80,56 @@ export async function subirDatos(req, res){
         res.status(400).json({ success: false , message: "Error al guardar coordenadas"});
     }
 }
+
+async function obtenerEnvioMasReciente(trackerID) {
+    return await getCurrentContainerShipment(trackerID);
+}
+
+async function queryDHL(trackingCode, service) {
+    let serviceInfo = {};
+    const myHeaders = new Headers();
+    myHeaders.append("DHL-API-Key", process.env.DHL_API_KEY);    
+    const requestOptions = {
+        method: "GET",
+        headers: myHeaders,
+        redirect: "follow"
+    };
+    const language = "es";
+    const limit = 1;
+    console.log(`service: ${service}, language: ${language}, limit: ${limit}`);
+    try{
+        let response = await fetch(`https://api-eu.dhl.com/track/shipments?trackingNumber=${trackingCode}&service=${service}&language=${language}&limit=${limit}`, requestOptions);
+        let data = await response.text();
+        serviceInfo = JSON.parse(data);
+    }
+    catch(error){
+        console.error('error', error);
+    }
+    return serviceInfo;
+}
+
+function processDHLResponse(dhlResponse, shipmentStatus){
+    //Verificar si el estatus ya existe en la DB
+    const existe = shipmentStatus.some(item => item.timestamp === dhlResponse.status.timestamp);
+    // Si no existe, extraer información a guardar
+    if(!existe){
+        let lastStatus = { 
+            timestamp: dhlResponse.status.timestamp, 
+            status_code: dhlResponse.status.statusCode,
+            description: `${traducirEstado(dhlResponse.status.statusCode)} | ${dhlResponse.status.description}`,
+            location: dhlResponse.status.location.address.addressLocality 
+        };
+        return lastStatus
+    } 
+    return {};
+}
+
+function traducirEstado(estado) { 
+    const traducciones = { 
+        'delivered': 'Entregado', 
+        'transit': 'En tránsito', 
+        'failure': 'Error' 
+    }; 
+    return traducciones[estado] || 'Estado desconocido';
+}
+

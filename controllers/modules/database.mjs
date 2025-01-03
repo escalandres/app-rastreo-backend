@@ -1,5 +1,5 @@
 import { MongoClient } from 'mongodb';
-import {generarOTP, generateTimestamp} from './utils.mjs';
+import {generarOTP, generateTimestamp, isEmptyObj, formatDateToTimestamp} from './utils.mjs';
 import crypto from 'crypto';
 
 
@@ -303,24 +303,18 @@ export async function registerNewShipment(shipment) {
   }
 }
 
-export async function updateShipment(shipment) {
+export async function updateShipment(shipmentID, newLocation, newStatus) {
   try {
     const client = await connect()
     const shipmentCollection = client.collection('shipments');
-    const shipmentID = generarOTP();
-    shipment.id = shipmentID;
-    // Crear índices únicos en email y userId
-
-    await shipmentCollection.updateOne({id: shipment.id}, {$push: { locations: newLocation }});
-    await shipmentCollection.updateOne({id: shipment.id}, {$push: { shipment_status: newStatus}});
-
-
-    const dbResult = await shipmentCollection.updateOne({id: shipment.id}, {$set: { delivery_date: newDeliveryDate}});
-    if (dbResult.acknowledged) {
-      return { success: true, result: "Envío registrado!", error: "" };
-    } else {
-      return { success: false, result: "", error: "No se pudo registrar el envío" }
+    if(!isEmptyObj(newLocation)) await shipmentCollection.updateOne({id: shipmentID}, {$push: { locations: newLocation }});
+    if(!isEmptyObj(newStatus)) await shipmentCollection.updateOne({id: shipmentID}, {$push: { shipment_status: newStatus}});
+    if(newStatus.status_code === "delivered"){
+      let newDeliveryDate = new Date();
+      newDeliveryDate = formatDateToTimestamp(date);
+      await shipmentCollection.updateOne({id: shipmentID}, {$set: { delivery_date: newDeliveryDate}});
     }
+    return {success: true, message: 'Guardado exitoso'};
   } catch (error) {
     console.error('Ocurrió un error:', error);
     return {success: false, message: error};
@@ -408,9 +402,9 @@ export async function getCurrentContainerShipment(containerID) {
 
     if (dbResult) {
       console.log("Documentos obtenidos:", dbResult);
-      return {success: true, results: dbResult, error: "" };
+      return {success: true, result: dbResult, error: "" };
     } else {
-      return {success: false, results: {}, error: "Usuario no encontrado"}
+      return {success: false, result: {}, error: "Usuario no encontrado"}
     }
   } catch (error) {
     console.error('Error al obtener el catálogo. ',error);

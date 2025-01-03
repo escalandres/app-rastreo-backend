@@ -1,9 +1,10 @@
+import { json } from "express";
 import { consultaEmpresasPaqueteria, registerNewShipment, getContainerShipments, getCurrentContainerShipment } from "./modules/database.mjs";
 
 export async function dhlTracking(req, res) {
     const myHeaders = new Headers();
     myHeaders.append("DHL-API-Key", process.env.DHL_API_KEY);
-
+    let serviceInfo = {};
     // console.log(process.env.DHL_API_KEY);
     
     const requestOptions = {
@@ -14,15 +15,45 @@ export async function dhlTracking(req, res) {
     const trackingCode = 2989923510;
     // const trackingCode = 1466833546;
     const service = "express";
-    const language = "it";
+    const language = "es";
     const limit = 2;
     console.log(`service: ${service}, language: ${language}, limit: ${limit}`);
-    fetch(`https://api-eu.dhl.com/track/shipments?trackingNumber=${trackingCode}&service=${service}&language=${language}&limit=${limit}`, requestOptions)
-        .then((response) => response.text())
-        .then((result) => console.log(result))
-        .catch((error) => console.error(error));
-    return res.status(200).json({ message: "Shipment tracked successfully" });
+    try{
+        let response = await fetch(`https://api-eu.dhl.com/track/shipments?trackingNumber=${trackingCode}&service=${service}&language=${language}&limit=${limit}`, requestOptions);
+        let data = await response.text();
+        serviceInfo = JSON.parse(data);
+    }
+    catch(error){
+        console.error('error', error);
+    }
+
+    console.log('serviceInfo',serviceInfo);
+    return res.status(200).json({ message: "Shipment tracked successfully", result: serviceInfo });
 }
+
+export async function queryDHL(trackingCode, service) {
+    let serviceInfo = {};
+    const myHeaders = new Headers();
+    myHeaders.append("DHL-API-Key", process.env.DHL_API_KEY);    
+    const requestOptions = {
+        method: "GET",
+        headers: myHeaders,
+        redirect: "follow"
+    };
+    const language = "es";
+    const limit = 1;
+    console.log(`service: ${service}, language: ${language}, limit: ${limit}`);
+    try{
+        let response = await fetch(`https://api-eu.dhl.com/track/shipments?trackingNumber=${trackingCode}&service=${service}&language=${language}&limit=${limit}`, requestOptions);
+        let data = await response.text();
+        serviceInfo = JSON.parse(data);
+    }
+    catch(error){
+        console.error('error', error);
+    }
+    return serviceInfo;
+}
+
 
 export async function obtenerEmpresasPaqueteria(req, res) {
     const empresas = await consultaEmpresasPaqueteria();

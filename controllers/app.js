@@ -89,7 +89,7 @@ export async function obtenerEnvioMasReciente(req, res) {
     const token = authHeader.split(' ')[1]; // Assuming 'Bearer <token>' 
     const decodedToken = validateToken(token);
     if(decodedToken){
-        const result = await getCurrentContainerShipment(trackerID, decodedToken.user.id);
+        const result = await getCurrentContainerShipment(trackerID);
         if(!result.success){
             return res.status(400).json({success: false, message: result.error});
         }else{

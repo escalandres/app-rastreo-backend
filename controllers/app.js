@@ -84,6 +84,7 @@ export async function obtenerEnviosContenedor(req, res) {
 }
 
 export async function obtenerEnvioMasReciente(req, res) {
+    console.log("Obteniendo envío más reciente");
     const { trackerID } = req.query;
     const authHeader = req.headers['authorization']; 
     const token = authHeader.split(' ')[1]; // Assuming 'Bearer <token>' 

@@ -307,11 +307,14 @@ export async function updateShipment(shipmentID, newLocation, newStatus) {
   try {
     const client = await connect()
     const shipmentCollection = client.collection('shipments');
+    console.log("shipmentID", shipmentID);
+    console.log("newLocation", newLocation);
+    console.log("newStatus", newStatus);
     if(!isEmptyObj(newLocation)) await shipmentCollection.updateOne({id: shipmentID}, {$push: { locations: newLocation }});
     if(!isEmptyObj(newStatus)) await shipmentCollection.updateOne({id: shipmentID}, {$push: { shipment_status: newStatus}});
     if(newStatus.status_code === "delivered"){
       let newDeliveryDate = new Date();
-      newDeliveryDate = formatDateToTimestamp(date);
+      newDeliveryDate = formatDateToTimestamp(newDeliveryDate);
       await shipmentCollection.updateOne({id: shipmentID}, {$set: { delivery_date: newDeliveryDate}});
     }
     return {success: true, message: 'Guardado exitoso'};

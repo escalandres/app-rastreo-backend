@@ -1,5 +1,5 @@
 import { guardarCoordenadas, getCurrentContainerShipment, updateShipment } from "./modules/database.mjs";
-
+import { traducirEstado } from "./modules/utils.mjs";
 
 function formatDate(inputDate) {
     // Divide la fecha y la hora
@@ -23,23 +23,25 @@ function extraerDatos(mensaje) {
     // Expresión regular para extraer los datos
     // const regex = /\+CMGR:\s'REC UNREAD','(\+52\d{10,12})','','(\d{2}\/\d{2}\/\d{2},\d{2}:\d{2}:\d{2}-\d{2})'id:(\d+),latitud:([-\d.]+),longitud:([-\d.]+);/;
     // const regex = /AT\+CMGR=\d+\+CMGR:\s'REC UNREAD','(\+52\d{10,12})','','(\d{2}\/\d{2}\/\d{2},\d{2}:\d{2}:\d{2}-\d{2})'id:(\d+),latitud:([-\d.]+),longitud:([-\d.]+);OK/;
-    const regex = /\+CMT:\s'(\+52\d{10,12})','','(\d{2}\/\d{2}\/\d{2},\d{2}:\d{2}:\d{2}-\d{2})'id:(\d+),latitud:([-\d.]+),longitud:([-\d.]+);/;
+    // const regex = /\+CMT:\s'(\+52\d{10,12})','','(\d{2}\/\d{2}\/\d{2},\d{2}:\d{2}:\d{2}-\d{2})'id:(\d+),latitud:([-\d.]+),longitud:([-\d.]+);/;
+    const regex = /\+(CMT|CMGR):\s'REC UNREAD','(\+52\d{10,12})','','(\d{2}\/\d{2}\/\d{2},\d{2}:\d{2}:\d{2}-\d{2})'id:(\d+),latitud:([-\d.]+),longitud:([-\d.]+);/;
 
     const resultado = regex.exec(mensaje);
 
     if (resultado) {
         const objetoDatos = {
-            numero: resultado[1],
-            fecha: formatDate(resultado[2]),
-            id: resultado[3],
-            latitud: parseFloat(resultado[4]),
-            longitud: parseFloat(resultado[5])
+            numero: resultado[2],
+            fecha: formatDate(resultado[3]),
+            id: resultado[4],
+            latitud: parseFloat(resultado[5]),
+            longitud: parseFloat(resultado[6])
         };
         console.log("objetoDatos", objetoDatos);
         const datosRastreador = {
-            date: formatDate(resultado[2]),
-            lat: parseFloat(resultado[4]),
-            lng: parseFloat(resultado[5])
+            id: "48273619",
+            date: formatDate(resultado[3]),
+            lat: parseFloat(resultado[5]),
+            lng: parseFloat(resultado[6])
         };
         return datosRastreador;
     } else {
@@ -55,8 +57,8 @@ export async function subirDatos(req, res){
         console.log("Coordenadas:",trackerData);
 
         // Obtener información envío actual del rastreador provista por la paquetería
-        const dbResult = await obtenerEnvioMasReciente();
-        if(shipmentInfo.success){
+        const dbResult = await obtenerEnvioMasReciente(trackerData.id);
+        if(dbResult.success){
             //Envio en curso
             if(!dbResult.result.delivery_date){
                 let statusInfo = {};
@@ -110,27 +112,25 @@ async function queryDHL(trackingCode, service) {
 }
 
 function processDHLResponse(dhlResponse, shipmentStatus){
+    console.log('processDHLResponse');
+    console.log('dhlResponse',dhlResponse);
+    console.log('shipmentStatus',shipmentStatus);
+    console.log('dhlResponse.shipments.status',dhlResponse.shipments[0].status);
     //Verificar si el estatus ya existe en la DB
-    const existe = shipmentStatus.some(item => item.timestamp === dhlResponse.status.timestamp);
+    const existe = shipmentStatus.some(item => item.timestamp === dhlResponse.shipments[0].status.timestamp);
     // Si no existe, extraer información a guardar
     if(!existe){
         let lastStatus = { 
-            timestamp: dhlResponse.status.timestamp, 
-            status_code: dhlResponse.status.statusCode,
-            description: `${traducirEstado(dhlResponse.status.statusCode)} | ${dhlResponse.status.description}`,
-            location: dhlResponse.status.location.address.addressLocality 
+            timestamp: dhlResponse.shipments[0].status.timestamp, 
+            status_code: dhlResponse.shipments[0].status.statusCode,
+            description: `${traducirEstado(dhlResponse.shipments[0].status.statusCode)} | ${dhlResponse.shipments[0].status.description}`,
+            location: dhlResponse.shipments[0].status.location.address.addressLocality 
         };
         return lastStatus
     } 
+    console.log('Estatus ya existe en la DB');
     return {};
 }
 
-function traducirEstado(estado) { 
-    const traducciones = { 
-        'delivered': 'Entregado', 
-        'transit': 'En tránsito', 
-        'failure': 'Error' 
-    }; 
-    return traducciones[estado] || 'Estado desconocido';
-}
+
 

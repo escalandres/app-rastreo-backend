@@ -42,3 +42,12 @@ export function formatDateToTimestamp(date) {
     const offsetMinutes = pad(Math.abs(offset) % 60); 
     return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}${sign}${offsetHours}:${offsetMinutes}`; 
 }
+
+export function traducirEstado(estado) { 
+    const traducciones = { 
+        'delivered': 'Entregado', 
+        'transit': 'En tránsito', 
+        'failure': 'Error' 
+    }; 
+    return traducciones[estado] || 'Estado desconocido';
+}

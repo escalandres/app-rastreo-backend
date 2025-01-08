@@ -32,6 +32,23 @@ router.post('/test-json', (req, res) => {
 router.post('/post-test', (req, res) => {
     console.log("----------------");
     if(req.body.datos !== "AT+CMGR=0ERROR" && req.body.datos !== "Enviando informacion de los rastreadores al servidor"){
+        const mensaje = req.body.datos;
+        console.log("req.body.datos", mensaje);
+        // const regex = /\+(CMT|CMGR):\s'REC UNREAD','(\+52\d{10,12})','','(\d{2}\/\d{2}\/\d{2},\d{2}:\d{2}:\d{2}-\d{2})'id:(\d+),latitud:([-\d.]+),longitud:([-\d.]+);/;
+
+        // const resultado = regex.exec(mensaje);
+        // console.log("resultado", resultado);
+
+        subirDatos(req,res);
+    }else{
+        console.log("Formato de mensaje no válido");
+        console.log("-------req.body.datos", req.body.datos);
+        res.status(400).send({success: false});
+    }
+});
+router.post('/upload-data', (req, res) => {
+    console.log("----------------");
+    if(req.body.datos !== "AT+CMGR=0ERROR" && req.body.datos !== "Enviando informacion de los rastreadores al servidor"){
         console.log("req.body.datos", req.body.datos);
         subirDatos(req,res);
     }else{

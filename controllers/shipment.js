@@ -14,6 +14,8 @@ export async function dhlTracking(req, res) {
     };
     const trackingCode = 2989923510;
     // const trackingCode = 1466833546;
+    //1087250391 Estafeta
+    //FedEx: 778600719309
     const service = "express";
     const language = "es";
     const limit = 2;

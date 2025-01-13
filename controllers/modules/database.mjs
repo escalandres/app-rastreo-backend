@@ -261,7 +261,7 @@ export async function authGithub(oauth) {
 export async function consultaEmpresasPaqueteria() {
   try {
     const client = await connect()
-    const collection = client.collection('empresas_paqueteria');
+    const collection = client.collection('shipment_companies');
     const dbResult = await collection.find({}).toArray();
 
     if (dbResult) {
@@ -272,7 +272,47 @@ export async function consultaEmpresasPaqueteria() {
     }
   } catch (error) {
     console.error('Error al obtener el catálogo. ',error);
+    return {success: false, catalogo: {}, error: error}
+  } finally {
+    disconnect();
+  }
+}
+
+export async function getUserContainers(userID) {
+  try {
+    const client = await connect()
+    const collection = client.collection('trackers');
+    const dbResult = await collection.find({ user_id: userID}).toArray();
+    if (dbResult) {
+      console.log("Documentos obtenidos:", dbResult);
+      return {success: true, results: dbResult, error: "" };
+    } else {
+      return {success: false, results: {}, error: "Usuario no encontrado"}
+    }
+  } catch (error) {
+    console.error('Error al obtener el catálogo. ',error);
     return {success: false, user: {}, error: error}
+  } finally {
+    disconnect();
+  }
+}
+
+export async function getAppInfo(userID) {
+  try {
+    const client = await connect();
+    const companiesCollection = client.collection('shipment_companies');
+    const trackerCollection = client.collection('trackers');
+
+    const companies = await companiesCollection.find({}).toArray();
+    const trackers = await trackerCollection.find({ user_id: userID}).toArray();
+    const response = {
+      shipment_companies: companies ?? {},
+      user_containers: trackers ?? {}
+    }
+    return {success: true, results: response, error: "" };
+  } catch (error) {
+    console.error('Error al obtener el catálogo. ',error);
+    return {success: false, results: {}, error: error}
   } finally {
     disconnect();
   }
@@ -321,25 +361,6 @@ export async function updateShipment(shipmentID, newLocation, newStatus) {
   } catch (error) {
     console.error('Ocurrió un error:', error);
     return {success: false, message: error};
-  } finally {
-    disconnect();
-  }
-}
-
-export async function getUserContainers(userID) {
-  try {
-    const client = await connect()
-    const collection = client.collection('trackers');
-    const dbResult = await collection.find({ user_id: userID}).toArray();
-    if (dbResult) {
-      console.log("Documentos obtenidos:", dbResult);
-      return {success: true, results: dbResult, error: "" };
-    } else {
-      return {success: false, results: {}, error: "Usuario no encontrado"}
-    }
-  } catch (error) {
-    console.error('Error al obtener el catálogo. ',error);
-    return {success: false, user: {}, error: error}
   } finally {
     disconnect();
   }

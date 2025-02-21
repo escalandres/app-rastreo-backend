@@ -1,0 +1,1088 @@
+<html lang="en"><head>
+<meta name="viewport" content="width=device-width, initial-scale=1" charset="utf-8">
+    <title>:: Rastreo ::</title>
+    <!--[if IE 8 ]>
+        <style>
+            body,hmtl{
+                font-family: 'pt_sans_narrowregular' !important;
+            }
+            textarea, input, select, button{
+                font-family: 'pt_sans_narrowregular' !important;
+            }
+        </style>
+    <![endif]-->
+    
+    <link href="/shared/css/bootstrap.min.css" rel="stylesheet">    
+    <link href="/shared/css/messi.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="/shared/css/jquery-ui.css">
+    <link href="/shared/css/EstilosEncapsulamieto.css" rel="stylesheet">
+      
+    
+    <script>
+        var gPath = '/';
+        var gEng = '0';
+    </script>
+    
+    <script src="/shared/js/jquery-2.2.3.min.js"></script>
+    
+    <script src="/shared/js/jquery-ui-1.10.4.custom.min.js"></script>
+     <script src="/shared/js/ui.datepicker-es.js"></script>
+     <script src="/shared/js/internaALL.js"></script>
+     <script src="/shared/js/messi.min.js"></script>
+    <script src="/shared/js/estafeta.js"></script>
+    <script src="/shared/js/bootstrap.min.js"></script>
+    
+    
+    
+    
+</head>
+<body>
+
+    <div id="wrap">
+
+        <div id="container">
+            <div id="wrapper">
+               
+                <div id="content">
+                    
+
+
+<style>
+    .resultsFreDivTr
+    {
+        background: #fff;
+        width: 100%;
+        overflow: hidden;
+        display: block;
+        padding: 15px 10px;
+        color: #7d7d7d;
+        font-size: 14px;
+        text-align: center;
+        vertical-align: middle;
+        margin: 0px 0px 5px 0px;
+    }
+
+    .results2FreDivTr
+    {
+        margin: 0px 0px 50px 0px;
+    }
+</style>
+<style>
+  /* Note: Try to remove the following lines to see the effect of CSS positioning */
+  .float {
+     position: fixed;
+min-height: 100px;
+top: 0px;
+left: 0px;
+z-index: 10;
+  }
+.float2 {
+     position: fixed;
+min-height: 50px;
+top: auto;
+left: 0px;
+z-index: 10;
+  }
+
+.findResultnormal {
+padding-top:50px;
+    }
+.findResultbanner {
+padding-top:100px;
+    }
+  </style>
+<script src="/shared/js/tracking.js"></script>
+<script>
+    var waybillType = '1';
+    var txtWayBill = '905871797990E70R008TGF';
+    var numClient = '';
+    var reference = '';
+    var dateIni = '';
+    var dateFin = '';
+    console.log('1');
+    var wayBillList = txtWayBill.split('.');
+    if (waybillType != 4) {
+        $(document).ready(function () {
+            $(wayBillList).each(function (index, entry) {
+                $('#wayBillOAja').val(entry);
+                $('#waybillType').val(waybillType);
+                var wayBillList2 = entry.split(',');
+                $.ajax({
+                    data: $('#frmWayBillAja').serialize(),
+                    url: '/Tracking/searchWayBill/',
+                    cache: false,
+                    type: 'post',
+                    beforeSend: function () {
+                        $(wayBillList2).each(function (index2, entry2) {
+                            $("#findResult").append("<div id='" + entry2 + "' class=\"resultsFreDivTr\">Cargando información de la guía: <strong>[" + entry2 + "]</strong><br /><img src='/shared/img/ajax-loader.gif' /></div>");
+                        });
+                    },
+                    success: function (response) {
+                        $(wayBillList2).each(function (index3, entry2) {
+                            $("#" + entry2).removeClass("resultsFreDivTr");
+                            $("#" + entry2).empty();
+                            //$("#" + entry2).addClass("results2FreDivTr")
+                        });
+                        $("#" + entry).empty();
+                        $("#" + entry).html(response);
+                    }
+                });
+            });
+        });
+    } else {
+        $(document).ready(function () {
+            $('#numClient').val(numClient);
+            $('#reference').val(reference);
+            $('#waybillType').val(waybillType);
+            $('#dateIni').val(dateIni);
+            $('#dateFin').val(dateFin);
+            $.ajax({
+                data: $('#frmWayBillAja').serialize(),
+                url: '/Tracking/searchWayBill/',
+                cache: false,
+                type: 'post',
+                beforeSend: function () {
+
+                    $("#findResult").append("<div id='" + numClient + "' class=\"resultsFreDivTr\">Cargando información de número de cliente: <strong>[" + numClient + "]</strong><br /><img src='/shared/img/ajax-loader.gif'/></div>");
+
+                },
+                success: function (response) {
+                    $("#" + numClient).removeClass("resultsFreDivTr");
+                    $("#" + numClient).empty();
+                    $("#" + numClient).html(response);
+                }
+            });
+        });
+    }
+</script>
+<form id="frmWayBillAja" action="/Rastreo/Resultados/" method="post">
+    <input id="wayBillOAja" name="wayBill" type="hidden" value="905871797990E70R008TGF">
+    <input id="waybillType" name="waybillType" type="hidden" value="1">
+    <input id="numClient" name="numClient" type="hidden" value="">
+    <input id="reference" name="reference" type="hidden" value="">
+    <input id="dateIni" name="dateIni" type="hidden" value="">
+    <input id="dateFin" name="dateFin" type="hidden" value="">
+    <input name="__RequestVerificationToken" type="hidden" value="Vv-RmC1kYh61A0P6YXgPaF5mc9-fJmI_ZgDo0A5ndoRJ9qNWxGPi9STGegaNMX9dn6-Sk_QJLhOzK1t955HqR6e17yCf3fvxU27fH6RQQe41">
+</form>
+<div id="contenidos">
+    <div id="rastreoNuevo">
+
+
+
+
+<div class="mainGrid" id="mainGrid"><table style="background-color: #f0f4f8;" id="tblFaqs2" class="float" width="100%" border="0" cellspacing="0" cellpadding="0"><tbody><tr><td width="100%" colspan="4" class="text-left" style="background-color:#FFF;"> <img width="255px" src="/shared/img/logotipo-estafeta.svg"></td> </tr><tr><td width="100%" colspan="4" class="text-left" style="background-color:#a41414;"></td></tr></tbody></table></div>
+                <table style="background-color: rgb(240, 244, 248); display: none;" id="tblFaqs" class="float2" width="100%" border="0" cellspacing="0" cellpadding="0">
+
+<tbody><tr>
+                        <td width="550">
+                           
+                        </td>
+                        <td width="5"></td>
+                        <td class="text-right">
+                          <div class="btn btn-primary" id="faq_pop" onclick="muestraPreguntas(0)" style="cursor: pointer;">
+                        
+                        <span>Preguntas Frecuentes</span>
+                         </div>
+                        </td>
+                        <td class="text-center">
+                           <a href="/Rastreo/" class="btn btn-primary" data-original-title="" title="">
+                                <div class="headModulo">
+                                    <span>Nueva consulta</span> 
+                                </div>
+                            </a>
+                        </td>
+                    </tr>
+                </tbody></table>
+
+
+
+    </div>
+<br>
+    <div id="findResult" class="findResultbanner"><div id="905871797990E70R008TGF" class="">
+
+ 
+<div class="container" style="background-color:#f0f4f8;"><!--Contenedor principal-->
+<style>
+.adaptar {
+border-collapse:collapse; table-layout:fixed; width:100%;
+}
+
+.adaptar2 {
+border:solid 1px #E5E8E8; width:100%; word-wrap:break-word;
+}
+
+body {
+background-color:#f0f4f8;
+}
+
+</style>
+
+<style>
+/* CSS used here will be applied after bootstrap.css */
+.res th
+    {
+      text-align:center; 
+      background-color:#D9EDF7; 
+      color:#000;
+      border: 1px solid #fff;
+
+    }
+
+    .res tr:nth-of-type(odd) { 
+      background: #FFF; 
+    }
+
+    .res tr:nth-of-type(even) { 
+      background: #f0f4f8; 
+    }
+
+    .res table {
+      border-collapse: collapse;
+    }
+    .res  td {
+      border: 1px solid #D9EDF7;
+      text-align:center; 
+    }
+    .res  tr:first-child th {
+      border-top: 0;
+    }
+    
+    .res  tr td:first-child,
+    .res  tr th:first-child {
+      border-left: 1px solid #D9EDF7;
+    }
+    .res  tr td:last-child,
+    .res  tr th:last-child {
+      border-right: 1px solid #D9EDF7;
+    }
+    .blue-tooltip + .tooltip > .tooltip-inner {background-color: White; color:#007ab7;font-weight: bold;}
+</style>
+   
+
+
+<div class="container" style="background-color:#f0f4f8;">
+<div class="panel panel-primary">
+    <div class="panel-body">
+
+<div id="rastreoContent">
+<div class="col-md-12 text-center">
+<div role="form" class="form-horizontal">               
+<div class="form-group">	
+                 <div class="col-md-6">                      
+                    <div class="text" for="Número de guía"><b>Número de guía</b>                 	
+               	<div class="form-control" readonly="">
+905871797990E70R008TGF
+				</div> 
+                    </div>  				
+                 </div>
+				 
+                  <div class="col-md-6">
+                 <div for="Código de rastreo"><b>Código de rastreo</b>
+                   	<div class="form-control" readonly="">3151344340</div>
+			    </div>
+                 </div>
+                 
+</div>	
+
+</div>
+</div>
+
+
+<div class="col-md-12 text-center">
+<div role="form" class="form-horizontal">               
+<div class="form-group">	
+                 
+                 <div class="col-md-4">                      
+                    <div for="Origen"><b>Origen </b>               	
+               	<div class="form-control" readonly="">MEXICO TEPOTZOTLAN</div>   
+                  </div>   				
+                 </div>
+				 
+                  <div class="col-md-4">
+                   <div for="Destino"> 
+
+                    <b>Destino</b>
+
+                <form id="frmCDD_905871797990E70R008TGF" action="/Tracking/cdd_cdf" method="post">
+                        <input id="wayBillCDD" name="wayBill" type="hidden" value="905871797990E70R008TGF">
+                        <input id="pwdCDD" name="pwd" type="hidden" value="">
+                        <input id="typeCDD" name="typeCDDF" type="hidden" value="">
+                        <input id="isExceptionD" name="isExceptionD" type="hidden" value="false">
+                        <input id="numcliente" name="numcliente" type="hidden" value="8717979">
+                        <input name="__RequestVerificationToken" type="hidden" value="KDmxmhbzpZFzj-1Z-qhNMerznFAamqP834FkOajdUx2_rjyOFHYQU619O2Uh74RK4OYcAdHwnQHpqIJjtecTMI6RdWLtFwLRpUQs5uzXkr81">
+                    </form>
+
+
+
+               <div class="form-control" readonly="" style="height:auto;">MEXICO PONIENTE</div>
+
+
+
+	           </div>             	
+    </div>
+		 <div class="col-md-4">
+          <div for="C.P.Destino"><b>C.P.Destino</b>
+             <div class="form-control" readonly="">01420</div>
+			 </div>
+          </div>
+                 
+</div>	
+</div>
+</div>
+
+<!--Estatus/Recibio-->
+
+<div class="col-md-12 text-center">
+<div role="form" class="form-horizontal">               
+<div class="form-group">	
+                 
+                 <div class="col-md-6">                      
+                    <div for="Estatus del servicio"><b>Estatus del servicio</b>                  	
+               <div class="form-control" readonly="" style="height:auto;">              
+             <div class="estatus" style="display:inline;">
+                     <img style="display:inline;" src="/shared/img/palomita.png" width="64" height="30" alt="">
+                            <h5 style="display:inline;"><b>ENTREGADO</b></h5>
+                                <h6>&nbsp;</h6>
+
+                        </div>
+
+               </div> 
+                   </div>   				
+                 </div>
+                 <div class="col-md-6">
+                 <div><b>Recibió</b>
+                   	<div class="form-control" readonly="" style="text-align:center;height:auto;" id="popFirma">
+                            <h5>ORI: ANDRES ESCALA&nbsp;</h5>
+                                                    <h6 onclick="muestraFirma('firmaPop_905871797990E70R008TGF')" style="cursor:pointer; text-decoration:underline;">Consulta firma</h6>
+
+                   	</div>
+					</div>
+                 </div>
+                 
+</div>	
+       
+<div class="form-group">	
+                 
+                 <div class="col-md-6">                      
+                    <div for="Servicio"><b>Servicio </b>                 	
+               	<div class="form-control" readonly="" style="height:auto;"> 
+                       Entrega garantizada al segundo día hábil
+
+               	</div>
+                    </div>  				
+                 </div>
+                  <div class="col-md-6">
+                  <div for="Fecha y hora de entrega"><b>Fecha y hora de entrega</b>
+                   	<div class="form-control" readonly=""> 
+11/02/2025 11:41 A. M.
+
+                   	</div>
+					</div>
+                 </div>
+                 
+</div>	
+<div class="form-group">	
+                 
+                 <div class="col-md-6">                      
+                    <div for="Tipo de envío"><b>Tipo de envío    </b>                 	
+               	<div class="form-control" readonly="">PAQUETE</div>
+                    </div> 				
+                 </div>
+                  <div class="col-md-6">
+                    <div for="Fecha programada de entrega">Fecha programada de entrega
+                        
+                        
+                    <form id="frmCDF_905871797990E70R008TGF" action="/Tracking/cdd_cdf" method="post">
+                        <input id="wayBillCDF" name="wayBill" type="hidden" value="905871797990E70R008TGF">
+                        <input id="pwdCDF" name="pwd" type="hidden" value="">
+                        <input id="typeCDF" name="typeCDDF" type="hidden" value="">
+                        <input id="isExceptionD" name="isExceptionD" type="hidden" value="false">
+                        <input name="__RequestVerificationToken" type="hidden" value="Pisk_KJ6BcEIgclBZBVFk_MvGCtTuJGXxuWnREFrIYspDlwMKo8if4QEVjmFMFRkmfd6Rxd_U7PVIgeXoYdIc6mCyz_Y_Qh2oxEDi0AjmRI1">
+                    </form>
+
+
+
+                   	<div class="form-control" readonly="" style="height:auto;">
+11/02/2025
+
+                   	</div>
+					</div>
+                 </div>
+                 
+</div>	
+     
+<div class="form-group">	
+                 
+                 <div class="col-md-6">                      
+                    <div for="Número de orden de recolección"><b>Número de orden de recolección</b>                      	
+               	<div class="form-control" readonly="">
+                            <form id="frmWayBillODR_905871797990E70R008TGF" action="/Rastreo/Resultados/" method="post" target="_blank">
+                                <input id="wayBillODR_905871797990E70R008TGF" name="wayBill" type="hidden" value="1022756740">
+                                <input id="waybillType" name="waybillType" type="hidden" value="2">
+                                <input name="__RequestVerificationToken" type="hidden" value="bGJacRTG-A5NbSrpu8FHqKHVCOwzHIj0BNwtOhAJMNOqaOuWkJyprJ0xHPeVOYFwpXKkEbTOvrq0jSjjTiLz1RtlG6b3ctbfKnxXwaf9DIE1">
+                            </form>
+                            <a href="#" onclick="sendForm('frmWayBillODR_905871797990E70R008TGF');" data-original-title="" title="">1022756740</a>
+
+
+               	</div> 
+                   </div>				
+                 </div>
+                  <div class="col-md-6">
+                 <div for="Fecha programada de entrega"><b>Fecha de recolección</b>
+                   <div class="form-control" readonly="">07/02/2025 04:14 P. M.</div>
+
+				</div>
+                 </div>
+                 
+</div>	
+
+</div>
+</div>
+
+
+<!--Estatus/Recibio-->
+
+<!--GuiasMultiples/GuiasDocret/GuiaInter-->
+
+<div class="col-md-12 text-center">
+<div role="form" class="form-horizontal">               
+<div class="form-group">	
+                 
+                 <div class="col-md-4">                      
+                    <div for="Guías de envíos múltiples"><b>Guías de envíos múltiples</b>                    	
+               	<div class="form-control" readonly="">
+
+
+               	</div> 
+                 </div> 				
+                 </div>
+
+
+                  <div class="col-md-4">
+                  <div for="Guía documento de retorno">Guía documento de retorno
+                   	<div class="form-control" readonly="">
+
+
+
+                   	</div>
+					</div>
+                 </div>
+				<div class="col-md-4">
+                   <div for="Guía Internacional"><b>Guía</b> Internacional
+                   	<div class="form-control" readonly="">
+
+
+
+
+                   	</div>
+					</div>
+                 </div>
+                 
+</div>	
+</div>
+</div>
+
+<!--GuiasMultiples/GuiasDocret/GuiaInter-->
+
+
+<!--TablaOrdenRastreo-->
+     <!--VALIDACION BANDERA CUSTSHIPMENTTRACKING SOLUCIONA APAGADO -->
+        
+            <span></span>
+                <br>
+            
+            
+        
+
+<!--BotonOrdenRastreo-->
+<!--BotonOrdenRastreo-->
+</div>
+<div id="iconografia">
+<div class="col-md-12 text-center" style="background-color:#EEEEEE;">
+<div role="form" class="form-horizontal">               
+<div class="form-group">	
+                 
+                 <div class="col-md-4">                      
+                  <div class="btnCaracteristicas" style="cursor:pointer;" onclick="showHideObject(this, 'features_905871797990E70R008TGF')">
+                   <img src="/shared/img/caracteristicasImg.png" alt="">
+                 </div>   				
+                 </div>
+                  <div class="col-md-4">
+                 
+
+        <div class="btnHistoria" style="cursor:pointer;" onclick="showHideObject(this, 'history_905871797990E70R008TGF')">
+            <img src="/shared/img/historiaImg.png" alt="">
+        </div>
+
+
+                 </div>
+            <form id="frmVoucher_905871797990E70R008TGF" action="/Tracking/voucherDelivery" method="post" target="_blank">
+                <input id="wayBillVoucher" name="wayBill" type="hidden" value="905871797990E70R008TGF">
+                <input name="__RequestVerificationToken" type="hidden" value="kHlxzVJP_4VbmdCvlkdM10mY93DWba5JN1E3hXbVtH-pT8o0AnlTPfMXL2wMk4hJJjTqQj3UyUOc7S5pagWXs9qiLn769iqpw1KDX-gtMxk1">
+            </form>
+		 <div class="col-md-4">
+           <div class="btnComprobante" style="cursor: pointer;">
+                <img src="/shared/img/comprobanteImg.png" onclick="sendForm('frmVoucher_905871797990E70R008TGF');" style="cursor:pointer" alt="">
+            </div>
+          </div>
+
+                 
+</div>	
+</div>
+</div>
+</div>
+ <!--BEGIN HANDLING FEATURES -->
+<div id="iconoEnvio" class="rastreo features_905871797990E70R008TGF" style="display:none;">
+
+    
+<!--+++++++++++++++ PANEL CARACTERISTICAS++++++++++++++++-->
+       <div class="panel" style="padding-top:0px;margin-top:0px ; padding-bottom:0px;margin-bottom:0px; ">
+          
+          <div id="CARACTERISTICAS_body" class="panel-body"> 
+          <table class="res text-center" id="tableCoverage11" style="width: 100%;">            
+                    <tbody><tr><td>
+                <div id="CARACTERISTICAS" style="background-color:#007ab7;  color: white;" class="panel-heading text-center"> <b>Características de envío</b>
+
+                    </div>
+
+                  </td></tr>
+
+              </tbody></table>
+               
+        <div class="tablaIconografica">
+
+        <table class="res text-center" id="tableCoverage1" style="width: 100%;">
+            <thead>
+            <tr>
+	            <th>Tipo de envío</th>
+	            <th>Dimensiones cm</th>
+	            <th>Peso kg</th>               
+            </tr>
+            </thead>
+            <tbody>
+            
+	            <tr>
+		            <td>PAQUETE</td>
+		            <td>
+51x32x10
+		            </td>
+		            <td>
+3.2
+		            </td>                    
+	            </tr>
+            </tbody>
+            <thead>
+                <tr>
+                    <th>Peso volumétrico kg</th>
+                    <th>Referencia Cliente</th>                
+                    <th>&nbsp;</th>                
+                </tr>
+            </thead>
+            <tbody>
+            
+	            <tr>		            
+                    <td>
+3.3
+                    </td>
+                    <td>
+88300602150000106333                    </td>
+                    <td>&nbsp;</td>
+                    
+	            </tr>
+            
+            </tbody>
+        </table>        
+      
+        </div>
+        
+        </div>
+        </div>
+</div>
+    <!--END HANDLING FEATURES-->
+    <!-- HISTORY-->
+<div id="iconoHistoria" class="rastreo history_905871797990E70R008TGF" style="">
+
+<!--+++++++++++++++ PANEL HISTORIA++++++++++++++++-->
+<div class="panel" style="padding-top:0px;margin-top:0px ; padding-bottom:0px;margin-bottom:0px; ">  
+  <div id="historia_body" class="panel-body"> 
+           
+       <table class="res text-center" id="tableCoverage112" style="width: 100%;">            
+                    <tbody><tr><td>
+                <div id="HISTORY" style="background-color:#007ab7; color: white;" class="panel-heading text-center"> <b>Historia</b>
+
+                    </div>
+
+                  </td></tr>
+
+              </tbody></table>
+        <div class="tablaIconografica2">
+              <table class="res" id="tableCoverage" style="width: 100%;">
+              
+                <thead>
+	                <tr>
+		                <th>Fecha - Hora</th>
+                        <th>Lugar - Movimiento</th>
+                        <th>Comentarios</th>
+	                </tr>
+                </thead>
+                <tbody>
+                    <tr class="bg-active">
+                        <td class="">11/02/2025 08:47 A. M.</td>
+                        <td class=""> MEXICO PONIENTE (MXP) En proceso para salir a reparto MEXICO PONIENTE     </td>
+                        <td class="">
+ 
+                        </td>
+                    </tr>
+                    <tr class="bg-active">
+                        <td class="">11/02/2025 08:14 A. M.</td>
+                        <td class=""> MEXICO PONIENTE (MXP) MOVIMIENTO EN CENTRO DE DISTRIBUCION</td>
+                        <td class="">ENTREGA A PLATAFORMA
+ 
+                        </td>
+                    </tr>
+                    <tr class="bg-active">
+                        <td class="">10/02/2025 11:28 A. M.</td>
+                        <td class=""> MEXICO PONIENTE (MXP) Movimiento en centro de distribución</td>
+                        <td class="">Envío pendiente de salida a ruta local
+ 
+                        </td>
+                    </tr>
+                    <tr class="bg-active">
+                        <td class="">08/02/2025 08:58 A. M.</td>
+                        <td class=""> MEXICO PONIENTE (MXP) Movimiento en centro de distribución</td>
+                        <td class="">Envío pendiente de salida a ruta local
+ 
+                        </td>
+                    </tr>
+                    <tr class="bg-active">
+                        <td class="">08/02/2025 08:57 A. M.</td>
+                        <td class=""> MEXICO PONIENTE (MXP) MOVIMIENTO EN CENTRO DE DISTRIBUCION</td>
+                        <td class="">ENTREGA A PLATAFORMA
+ 
+                        </td>
+                    </tr>
+                    <tr class="bg-active">
+                        <td class="">08/02/2025 08:57 A. M.</td>
+                        <td class=""> MEXICO PONIENTE (MXP) MOVIMIENTO LOCAL EN CENTRO DE DISTRIBUCION</td>
+                        <td class="">AUDITORIA
+ 
+                        </td>
+                    </tr>
+                    <tr class="bg-active">
+                        <td class="">08/02/2025 08:56 A. M.</td>
+                        <td class=""> MEXICO PONIENTE (MXP) Llegada a centro de distribución MEXICO PONIENTE     </td>
+                        <td class="">
+ 
+                        </td>
+                    </tr>
+                    <tr class="bg-active">
+                        <td class="">07/02/2025 07:45 P. M.</td>
+                        <td class=""> HUB MEX (HMX) En ruta foránea  hacia MEXICO PONIENTE     </td>
+                        <td class="">
+ 
+                        </td>
+                    </tr>
+                    <tr class="bg-active">
+                        <td class="">07/02/2025 07:24 P. M.</td>
+                        <td class=""> MEXICO TEPOTZOTLAN (MXT) Llegada a centro de distribución MEXICO TEPOTZOTLAN  </td>
+                        <td class="">
+ 
+                        </td>
+                    </tr>
+            </tbody>
+            </table>
+        </div>
+
+   </div>    
+    </div>  
+
+</div>    
+
+<!-- Modal -->
+<div class="modal fade" id="myModal_905871797990E70R008TGF" role="dialog" style=" margin-top:0px !important; ">
+<div class="modal-dialog modal-md">
+    <div class="modal-content">
+    <div class="modal-header bg-primary" style="height:30px; padding:0;">
+        <button type="button" id="closebtn" class="close white" data-dismiss="modal">×</button>
+        &nbsp;&nbsp;<img src="/shared/img/imgRastreo.png" alt="Rastreo de envios"><span>&nbsp;&nbsp;&nbsp;Orden de Servicio / Motivos</span>
+    </div>
+    <div class="modal-body" "="">
+        <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+            <div>
+    <div>
+	    <div id="">
+		    <table>
+			    <tbody><tr>
+				    <td colspan="2" align="center"><strong>Seleccione el motivo correspondiente</strong></td>
+			    </tr>                
+                        <tr>
+				            <td><input type="radio" name="odrReason" value="003"></td>
+				            <td><strong>Entrega incorrecta</strong></td>
+                              
+			            </tr>
+			            <tr>
+				            <td></td>
+				            <td class="gris">El cliente indica que no cuenta con el servicio y hay confirmación en sistema.</td>
+			            </tr>
+                        <tr>
+				            <td><input type="radio" name="odrReason" value="007"></td>
+				            <td><strong>Envio Dañado </strong></td>
+			            </tr>
+			            <tr>
+				            <td></td>
+				            <td class="gris">El cliente indica que el servicio llego dañado, indispensable contar con evidencias (fotos)</td>
+			            </tr>
+                        <tr>
+				            <td><input type="radio" name="odrReason" value="008"></td>
+				            <td><strong>Envio Con sustracción</strong></td>
+			            </tr>
+			            <tr>
+				            <td></td>
+				            <td class="gris">El cliente indica que el servicio llego con faltante, indispensable contar con evidencias (fotos)</td>
+			            </tr>
+
+			    <tr>
+				    <td colspan="2" style="text-align:center;">
+					    <div id="btnContinuarModal" class="btn btn-primary btn-sm" onclick="setformReason('905871797990E70R008TGF');">Continuar</div>
+				    </td>
+			    </tr>
+		    </tbody></table>
+	    </div>
+    </div>
+</div>
+        <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+
+    </div>  
+    </div>
+</div>
+</div>
+                            
+
+<script>
+
+    $(document).ready(function () {
+        //Verifica si se dio click al boton 1
+        $("#btn_905871797990E70R008TGF").click(function () {
+        $('#myModal_905871797990E70R008TGF').modal() //(no se puede cerrar al hacer click en el fondo)
+    });
+
+});
+
+</script>
+
+<!-- Modal -->
+<div class="modal fade" id="myModalPass_905871797990E70R008TGF" role="dialog">
+<div class="modal-dialog modal-md">
+    <div class="modal-content">
+    <div class="modal-header bg-primary" style="height:30px; padding:0;">
+        <button type="button" id="closebtn" class="close white" data-dismiss="modal">×</button>
+        &nbsp;&nbsp;<img src="/shared/img/imgRastreo.png" alt="Rastreo de envios"><span>Cambio de Información de Envíos</span>
+    </div>
+    <div class="modal-body">
+
+ <div id="wrapInfoPass">
+                <p>Se ha generado tu contraseña para el acceso al cambio de información de su envío, ésta fue enviada a su cuenta de <strong>correo electrónico.</strong></p>
+                <table width="100%" border="0" cellspacing="0" cellpadding="0" style="text-align:center;">
+                	<tbody><tr>
+                		<td style="text-align:center;" class="center"><img src="/shared/img/lock.png" alt=""><br><strong>Ingresa Contraseña:</strong></td>
+                	</tr>
+                	<tr>
+                		<td style="text-align:center;" class="center"><input type="password" class="pass" name="txtPwd" id="txtPwd_905871797990E70R008TGF"></td>
+                	</tr>
+                	<tr>
+                        
+                		<td style="text-align:center;" class="center"><br><div id="btnRastreo" class="btn btn-primary btn-sm" onclick="validaPwdWayBill('905871797990E70R008TGF');">Enviar</div></td>
+                	</tr>
+                    
+                </tbody></table>
+            </div>
+<div id="iinnerModal_905871797990E70R008TGF" style="top: -9999px;">
+    <div id="iwrapModal_905871797990E70R008TGF" style="display:none;">	
+           
+	</div>
+</div>
+    </div>  
+    </div>
+</div>
+</div>
+    <!--END HISTORY-->
+ <p></p>
+
+<!-- Modal -->
+  <div class="modal fade" id="firmaPop_905871797990E70R008TGF" role="dialog">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">×</button>
+          <h4 class="modal-title">Firma</h4>
+        </div>
+        <div class="modal-body">
+          <p>
+            <img src="data:image/jpg;base64,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" alt="Firma de Recibido" --="">
+          </p>
+        </div>
+        <div class="modal-footer">
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+   
+
+</div>
+  </div>
+  </div>
+
+ <p></p>
+
+<!--FinContainer-->
+   
+<script>
+    var id;
+    function validaPwdWayBill(wayBill) {
+        var idPwd = "txtPwd_" + wayBill;
+        var txtPwd = document.getElementById(idPwd).value;
+        console.log(txtPwd);
+        if (txtPwd.length > 7) {
+            $.ajax({
+                type: "POST",
+                data: { wayBill: wayBill, pwd: txtPwd },
+                url: '/wApi/validaPwdWayBill/',
+                success: function (data) {
+                    if (data.success) {
+                        //$("#pwdCDD").val(txtPwd);
+                        sendForm("frmCDD_" + wayBill);
+                    } else {
+                        showAlert('Error al validar los datos:' + data.error)
+                    }
+                    cierraCDDModal(wayBill);
+                },
+                error: function (err) { showAlert('Error al validar los datos:' + err); cierraCDDModal(wayBill); }
+            });
+        } else {
+            showAlert('Ingrese un password v&#225;lido');
+        }
+    }
+
+    function setformReason(wayBillR) {
+        if ($('input:radio[name=odrReason]:checked').is(':checked')) {
+            $("#reasonODR_" + wayBillR).val($('input:radio[name=odrReason]:checked').val());
+            sendForm("frmODR_" + wayBillR);
+        } else {
+            showAlert('Por favor seleccione una opci&#243;n v&#225;lida');
+        }
+        cierraModal(wayBillR);
+    }
+
+    function muestraCDDModal(wayBill, index) {
+        id = wayBill + "_" + index;
+        var password = document.getElementById(id).value;
+        muestraModalCCDActual(wayBill);
+        $.ajax({
+            type: "POST",
+            data: { wayBill: wayBill, password: password },
+            url: '/wApi/sendMailCDD/',
+            success: function (data) {
+                if (!data.success) {
+                    cierraCDDModal(wayBill);
+                }
+            },
+            error: function (err) { showAlert('Error al mandar el mail al cliente:' + err); cierraCDDModal(wayBill); }
+        });
+    }
+
+    function muestraModalCCDActual(wayBill) {
+        var toVCenter;
+        var winH = screen.height;
+        var innerObj = document.getElementById('iinnerModal_' + wayBill);
+        var obj = document.getElementById('iwrapModal_' + wayBill);
+        toVCenter = (winH / 2) - (obj.offsetHeight / 2);
+        innerObj.style.top = 0;
+        obj.style.marginTop = toVCenter + 'px';
+
+        $('#myModalPass_' + wayBill).modal() //(no se puede cerrar al hacer click en el fondo)
+    }
+
+    function cierraCDDModal(wayBill) {
+        var innerObj = document.getElementById('iinnerModal_' + wayBill);
+        innerObj.style.top = -9999 + 'px';
+    }
+
+    function muestraModal(wayBill) {
+        var toVCenter;
+        var winH = screen.height;
+        var innerObj = document.getElementById('innerModal_' + wayBill);
+        var obj = document.getElementById('wrapModal_' + wayBill);
+        toVCenter = (winH / 2) - (obj.offsetHeight / 2);
+        innerObj.style.top = 0;
+        obj.style.marginTop = toVCenter + 'px';
+    }
+
+    function cierraModal(wayBill) {
+        //Cierra el modal del wayBill dado
+        $('#myModal_' + wayBill).modal('hide');
+        
+    }
+
+    function sendWayBill(wayBillParent, wayBill) {
+        if (wayBill.length == 22) {
+            $("#wayBillGEM_" + wayBillParent).val(wayBill);
+            sendForm("frmWayBillGEM_" + wayBillParent);
+        }
+    }
+    function sendWayBillReturn(wayBillParent, wayBill) {
+        if (wayBill.length == 22) {
+            $("#wayBillReturn_" + wayBillParent).val(wayBill);
+            sendForm("frmWayBillReturn_" + wayBillParent);
+        }
+    }
+    cierraModal('905871797990E70R008TGF');
+    cierraCDDModal('905871797990E70R008TGF');
+</script>
+<script>
+    $(document).ready(function () {
+        $("a").tooltip();
+    });
+</script>  
+</div></div>
+<style>
+    .pregunta {
+        font-weight: bold;
+    }
+</style>
+<!-- Modal -->
+<div class="modal fade" id="myModalFAQS_ES" role="dialog">
+<div class="modal-dialog modal-md">
+    <div class="modal-content">
+    <div class="modal-header bg-primary" style="height:30px; padding:0;">
+        <button type="button" id="closebtn" class="close white" data-dismiss="modal">×</button>
+        &nbsp;&nbsp;<span>&nbsp;&nbsp;Preguntas Frecuentes</span>
+    </div>
+    <div class="modal-body">
+        <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+
+
+<div id="faqsPop">
+	<div id="wrapFaqs">		
+		<p class="pregunta">¿Qué es el número de guía?</p>
+		<p class="respuesta">Es el número de control que ampara el envío realizado. Con este número se pueden hacer rastreos en línea en el sistema Estafeta y se pueden levantar órdenes de localización y rastreo.</p>
+        <p class="pregunta">¿Por qué no hay información de este número de guía en el sistema?</p>
+        <p class="respuesta">El hecho de que en este momento no haya información en el sistema de rastreo no significa que el envío no esté en proceso de entrega.Hay varias razones por las cuales se puede dar esta situación:
+<br>- El envío no ha sido realizado aún.
+<br>- El envío se acaba de entregar o recoger y no ha ingresado al sistema aún.
+<br>- La guía física tuvo problemas en el código de barras y no pudo ser leída.
+<br>- Hubo problemas en la lectura de esta guía, en la transmisión de información o en la actualización de nuestro sistema
+        </p>
+        <p class="pregunta">¿Qué puedo hacer?</p>
+        <p class="respuesta">Siga estos pasos:
+<br>1. Verifique que tenga el número de guía correcto.
+<br>2. Verifique que la persona encargada de hacer el envío efectivamente lo hizo.
+<br>3. Espere 6 horas antes de hacer un nuevo rastreo.
+<br>4. Si esto no soluciona el problema, llame a los teléfonos que aparecen en nuestra forma de Contacto.
+        </p>
+        <p class="pregunta">¿Qué es una orden de rastreo?</p>
+        <p class="respuesta">Es una solicitud formal para rastrear y localizar un envío que, por diversas causas, no ha sido entregado dentro del tiempo de garantía.</p>
+        <p class="pregunta">¿Cuál es el horario de atención para estas órdenes?</p>
+        <p class="respuesta">Lunes a viernes, de 9:00 am a 6:00 pm.</p>
+        <p class="pregunta">¿Cuál es el tiempo de respuesta a una orden de rastreo generada por internet?</p>
+        <p class="respuesta">Dependiendo del motivo de la orden de rastreo el tiempo de repuesta es de 24 a 72hrs hábiles.</p>
+        <p class="pregunta">¿Por qué necesito un número de guía para levantar una orden?</p>
+        <p class="respuesta">Es el dato básico para realizar la búsqueda del envío en nuestros sistemas.</p>
+        <p class="pregunta">¿Cómo levanto una orden si no tengo el número de guía?</p>
+        <p class="respuesta">En este caso, deberá obtener el número de guía de la persona o empresa que realizó el envío.</p>
+        <p class="pregunta">¿Por qué tengo que saber el origen y el destino para levantar una orden?</p>
+        <p class="respuesta">Sólo con esa información se podrá dar una respuesta completa a la solicitud.</p>
+	</div>
+<div style="text-align:center;">
+        <div id="btnCerrarES" class="btn btn-primary btn-sm" onclick="CerrarFaqsEs();" );"="">Cerrar</div>
+</div>
+</div>
+
+
+        <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+
+    </div>  
+    </div>
+</div>
+</div>
+
+<!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+
+<div class="modal fade" id="myModalFAQS_EN" role="dialog">
+<div class="modal-dialog modal-md">
+    <div class="modal-content">
+    <div class="modal-header bg-primary" style="height:30px; padding:0;">
+        <button type="button" id="closebtn" class="close white" data-dismiss="modal">×</button>
+        &nbsp;&nbsp;<span>&nbsp;&nbsp;FAQs </span>
+    </div>
+    <div class="modal-body">
+        <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+
+<div id="faqsPope">
+    <div id="wrapFaqse">        
+        <p class="pregunta"> What is the guide number? </p>
+        <p class="respuesta"> is the number of control that covers the shipment made. This number can be made online at crawls Estafeta system and can be lifted localization and tracking orders. </p> 
+        <p class="pregunta"> Why there is no information in this guide number in the system </p> 
+        <p class="respuesta"> The fact that no information on the tracking system at this time does not mean that the shipment is not in process entrega.Hay several reasons for this situation can be given: - The submission has not been made ​​yet. - Shipping is just pick up and deliver or have not logged in yet. - The physical guidance struggled in the bar code and could not be read. - There were problems in reading this guide, in the transmission of information or update our system </p> 
+        <p class="pregunta"> What I can do? </p> 
+        <p class="respuesta"> Follow these steps: 1 Verify that you have the correct number of guide. 2 Verify that the person in charge of making the shipment actually did. 3 Wait 6 hours before making a new trace. 4 If this does not solve the problem, call the numbers listed on our Contact form. </p> 
+        <p class="pregunta"> What is an order tracking </p> 
+        <p class="respuesta"> is a formal application to track and locate a shipment that, for various reasons, has not been delivered within the warranty period. </p> 
+        <p class="pregunta"> What are the hours of operation for these orders? </p> 
+        <p class="respuesta"> Monday to Friday, 9:00 am to 6:00 pm. </p> 
+        <p class="pregunta"> What is the response time to a command generated by internet tracking </p> 
+        <p class="respuesta">Depending on the reason for the order tracking response time is 24 to working 72hrs.</p> 
+        <p class="pregunta"> Why do I need a tracking number to lift an order? </p> 
+        <p class="respuesta"> is the basic data to search the ships in our systems. </p> 
+        <p class="pregunta"> How do I raise an order if I do not have the tracking number? </p> 
+        <p class="respuesta"> In this case, you must obtain the guide number of the person or company that made shipping. </p> 
+        <p class="pregunta"> Why do I need to know the origin and destination to lift an order? </p> 
+        <p class="respuesta"> Only with this information can we give a complete answer to the request. </p> 
+    </div> 
+<div style="text-align:center;">
+        <div id="btnCerrarEN" class="btn btn-primary btn-sm" onclick="CerrarFaqsEn();" );"="">Close</div>
+</div>
+</div>
+
+
+        <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+
+    </div>  
+    </div>
+</div>
+</div>
+
+  
+</div>
+<script>
+    $( document ).ready(function() {
+        
+        if (top == self){
+            var header="<table style='background-color: #f0f4f8;' id='tblFaqs2' class='float' width='100%' border='0' cellspacing='0' cellpadding='0'><tr><td width='100%' colspan='4' class='text-left' style='background-color:#FFF;'> <img width='255px' src='/shared/img/logotipo-estafeta.svg' /></td> </tr><tr><td width='100%' colspan='4' class='text-left' style='background-color:#a41414;'></td></tr></table>";
+            $('#mainGrid').append(header);  
+            $( "#tblFaqs" ).hide();
+
+
+
+            $('#findResult').removeClass("findResultnormal");
+            $('#findResult').addClass("findResultbanner");             
+        }
+        else{
+       
+            $('#findResult').removeClass("findResultbanner");
+            $('#findResult').addClass("findResultnormal");             
+        }
+    });
+</script>
+                   
+                </div>
+            </div>
+        </div>
+    
+    </div>
+    
+
+
+
+</body></html>

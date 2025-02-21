@@ -15,6 +15,7 @@ export async function dhlTracking(req, res) {
     const trackingCode = 2989923510;
     // const trackingCode = 1466833546;
     //1087250391 Estafeta
+    //Número de guía: 905871797990E70R008TGF Código de rastreo: 3151344340 Estafeta
     //FedEx: 778600719309
     const service = "express";
     const language = "es";

@@ -1,0 +1,18 @@
+URL de Estafeta:
+https://rastreositecorecms.azurewebsites.net/Tracking/searchByGet/?wayBillType=1&wayBill=905871797990E70R008TGF
+
+https://rastreositecorecms.azurewebsites.net/Tracking/searchByGet/?wayBillType=1&wayBill=6055903016701706196130
+
+905871797990E70R008TGF
+6055903016701706196130
+
+
+
+URL FedEx
+
+https://www.fedex.com/fedextrack/?trknbr=778600719309&trkqual=2460569000~778600719309~FX
+Tracking ID
+778600719309
+
+https://www.fedex.com/fedextrack/?trknbr=778600719309&trkqual=2460569000~778600719309~FX
+Tracking ID

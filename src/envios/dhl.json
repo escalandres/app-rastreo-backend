@@ -1,0 +1,226 @@
+{
+  "message": "Shipment tracked successfully",
+  "result": {
+    "shipments": [
+      {
+        "id": "2989923510",
+        "service": "express",
+        "origin": {
+          "address": {
+            "addressLocality": "CELAYA - MEXICO"
+          },
+          "servicePoint": {
+            "url": "http://www.dhl.com.mx/en/country_profile.html",
+            "label": "Origin Service Area"
+          }
+        },
+        "destination": {
+          "address": {
+            "addressLocality": "MEXICO CITY - MEXICO"
+          },
+          "servicePoint": {
+            "url": "http://www.dhl.com.mx/en/country_profile.html",
+            "label": "Destination Service Area"
+          }
+        },
+        "status": {
+          "timestamp": "2024-12-19T17:09:00-06:00",
+          "location": {
+            "address": {
+              "addressLocality": "MEXICO CITY - MEXICO",
+              "countryCode": "MX"
+            }
+          },
+          "statusCode": "delivered",
+          "status": "101",
+          "description": "Envío entregado"
+        },
+        "returnFlag": false,
+        "details": {
+          "product": {
+            "productCode": "N",
+            "productName": "EXPRESS DOMESTIC"
+          },
+          "shipper": {
+            "@type": "Organization",
+            "address": {
+              "countryCode": "MX"
+            }
+          },
+          "consignee": {
+            "@type": "Organization",
+            "address": {
+              "countryCode": "MX"
+            }
+          },
+          "proofOfDelivery": {
+            "documentUrl": "https://webpod.dhl.com/webPOD/DHLePODRequest?hwb=HMzYWLZtGl4NYPZSm67YqA%3D%3D&pudate=VjEfGploVfoyBQpSXOmuoA%3D%3D&appuid=TKkCCS2XgbaOWzsgNqVkbA%3D%3D&language=es&country=",
+            "signatureUrl": "https://webpod.dhl.com/webPOD/DHLePODRequest?hwb=HMzYWLZtGl4NYPZSm67YqA%3D%3D&pudate=VjEfGploVfoyBQpSXOmuoA%3D%3D&appuid=TKkCCS2XgbaOWzsgNqVkbA%3D%3D&language=es&country="
+          },
+          "proofOfDeliverySignedAvailable": false,
+          "totalNumberOfPieces": 1,
+          "pieceIds": [
+            "JD014600011911253864"
+          ],
+          "controlledDataCodes": [
+            "shipper-city",
+            "consignee-city"
+          ],
+          "shipmentActivationDate": "2024-12-17T22:30:50"
+        },
+        "events": [
+          {
+            "timestamp": "2024-12-19T17:09:00-06:00",
+            "location": {
+              "address": {
+                "addressLocality": "MEXICO CITY - MEXICO",
+                "countryCode": "MX"
+              }
+            },
+            "statusCode": "delivered",
+            "status": "OK",
+            "description": "Envío entregado",
+            "pieceIds": [
+              "JD014600011911253864"
+            ]
+          },
+          {
+            "timestamp": "2024-12-19T10:30:00-06:00",
+            "location": {
+              "address": {
+                "addressLocality": "MEXICO CITY - MEXICO",
+                "countryCode": "MX"
+              }
+            },
+            "statusCode": "transit",
+            "status": "WC",
+            "description": "El envío está en manos del courier para su entrega",
+            "pieceIds": [
+              "JD014600011911253864"
+            ]
+          },
+          {
+            "timestamp": "2024-12-19T07:39:00-06:00",
+            "location": {
+              "address": {
+                "addressLocality": "MEXICO CITY - MEXICO",
+                "countryCode": "MX"
+              }
+            },
+            "statusCode": "transit",
+            "status": "AR",
+            "description": "Llegada al centro de entrega de DHL MEXICO CITY - MEXICO",
+            "pieceIds": [
+              "JD014600011911253864"
+            ]
+          },
+          {
+            "timestamp": "2024-12-19T04:43:00-06:00",
+            "location": {
+              "address": {
+                "addressLocality": "QUERETARO - MEXICO",
+                "countryCode": "MX"
+              }
+            },
+            "statusCode": "transit",
+            "status": "DF",
+            "description": "El envío ha salido de un centro de DHL QUERETARO - MEXICO",
+            "pieceIds": [
+              "JD014600011911253864"
+            ]
+          },
+          {
+            "timestamp": "2024-12-19T04:42:00-06:00",
+            "location": {
+              "address": {
+                "addressLocality": "QUERETARO - MEXICO",
+                "countryCode": "MX"
+              }
+            },
+            "statusCode": "transit",
+            "status": "PL",
+            "description": "Procesado en QUERETARO - MEXICO",
+            "pieceIds": [
+              "JD014600011911253864"
+            ]
+          },
+          {
+            "timestamp": "2024-12-18T23:05:00-06:00",
+            "location": {
+              "address": {
+                "addressLocality": "QUERETARO - MEXICO",
+                "countryCode": "MX"
+              }
+            },
+            "statusCode": "transit",
+            "status": "AF",
+            "description": "Llegada al centro de clasificación de DHL QUERETARO - MEXICO",
+            "pieceIds": [
+              "JD014600011911253864"
+            ]
+          },
+          {
+            "timestamp": "2024-12-18T21:19:00-06:00",
+            "location": {
+              "address": {
+                "addressLocality": "CELAYA - MEXICO",
+                "countryCode": "MX"
+              }
+            },
+            "statusCode": "transit",
+            "status": "DF",
+            "description": "El envío ha salido de un centro de DHL CELAYA - MEXICO",
+            "pieceIds": [
+              "JD014600011911253864"
+            ]
+          },
+          {
+            "timestamp": "2024-12-18T21:18:00-06:00",
+            "location": {
+              "address": {
+                "addressLocality": "CELAYA - MEXICO",
+                "countryCode": "MX"
+              }
+            },
+            "statusCode": "transit",
+            "status": "PL",
+            "description": "Procesado en CELAYA - MEXICO",
+            "pieceIds": [
+              "JD014600011911253864"
+            ]
+          },
+          {
+            "timestamp": "2024-12-18T18:54:00-06:00",
+            "location": {
+              "address": {
+                "addressLocality": "CELAYA - MEXICO",
+                "countryCode": "MX"
+              }
+            },
+            "statusCode": "transit",
+            "status": "PU",
+            "description": "Envío retirado/recolectado.",
+            "pieceIds": [
+              "JD014600011911253864"
+            ]
+          },
+          {
+            "timestamp": "2024-12-18T09:04:00-06:00",
+            "location": {
+              "address": {
+                "addressLocality": "CELAYA - MEXICO",
+                "countryCode": "MX"
+              }
+            },
+            "statusCode": "transit",
+            "status": "SA",
+            "description": "Retiro programado",
+            "pieceIds": [
+              "JD014600011911253864"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

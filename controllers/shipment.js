@@ -121,52 +121,9 @@ export async function obtenerEnvioMasReciente(req, res) {
     }
 }
 
-// export async function FedExTracking(req, res){
-
-
-//     let trackingCode = "778600719309";
-
-
-//     const url = `https://www.fedex.com/fedextrack/?trknbr=${trackingCode}&trkqual=2460569000~${trackingCode}~FX`;
-//     console.log('url', url);
-//     try{
-//         let response = await fetch(url);
-//         let body = await response.text();
-//         console.log('body', body);
-//         // Cargar el HTML con cheerio
-//         const $ = load(body);
-
-//         // Seleccionar la tabla con el id "tableCoverage"
-//         // const rows = $('#tableCoverage tbody tr');
-//         // console.log('rows', rows.length);
-//         // // Crear un array para almacenar los datos extraídos
-//         // const data = [];
-
-//         // // Iterar sobre cada fila y extraer los datos de los elementos <td>
-//         // rows.each((index, element) => {
-//         // const cells = $(element).find('td');
-//         // const rowData = {
-//         //     fechaHora: $(cells[0]).text().trim(),
-//         //     lugarMovimiento: $(cells[1]).text().trim(),
-//         //     comentarios: $(cells[2]).text().trim()
-//         // };
-//         // data.push(rowData);
-//         // });
-
-//         console.log(data);
-//         return res.status(200).json({ message: "Shipment tracked successfully", result: data, url: url });
-//     }
-//     catch(error){
-//         console.error('error', error);
-//         return res.status(400).json({ message: "Error", result: error });
-//     }
-
-// }
-
 export async function estafetaTracking(req, res){
     // let trackingCode = "905871797990E70R008TGF";
     let trackingCode = "6055903016701706196130";
-
 
     const url = `https://rastreositecorecms.azurewebsites.net/Tracking/searchByGet/?wayBillType=1&wayBill=${trackingCode}`;
     console.log('url', url);
@@ -186,49 +143,77 @@ export async function estafetaTracking(req, res){
             await page.goto(url, { waitUntil: 'networkidle2' });
         
             // Confirmar que se ha cargado la página
-            console.log('Página cargada:', page.url());
-         // Esperar explícitamente un tiempo adicional para permitir la carga del contenido dinámico
-    await new Promise(resolve => setTimeout(resolve, 6000)); // Esperar 6 segundos
+            // console.log('Página cargada:', page.url());
+            // Esperar explícitamente un tiempo adicional para permitir la carga del contenido dinámico
+            await new Promise(resolve => setTimeout(resolve, 6000)); // Esperar 6 segundos
 
             // Extraer el contenido de la etiqueta <b> dentro del div con clase "estatus"
-    const content = await page.evaluate(() => {
-        const element = document.querySelector('.estatus h5 b');
-        return element ? element.innerText.trim() : 'No se encontró el contenido';
-    });
+            const content = await page.evaluate(() => {
+                const element = document.querySelector('.estatus h5 b');
+                return element ? element.innerText.trim() : 'No se encontró el contenido';
+            });
 
-    console.log('Estatus del servicio:', content);
+            console.log('Estatus del servicio:', content);
         
             // Extraer el contenido del div
             const data = await page.evaluate(() => {
-              const rows = document.querySelectorAll('#tableCoverage tbody tr');
-              const extractedData = [];
-              rows.forEach(row => {
+                const rows = document.querySelectorAll('#tableCoverage tbody tr');
+                const extractedData = [];
+                rows.forEach(row => {
                 const cells = row.querySelectorAll('td');
                 const rowData = {
-                  fechaHora: cells[0].innerText.trim(),
-                  lugarMovimiento: cells[1].innerText.trim(),
-                  comentarios: cells[2].innerText.trim()
+                    fechaHora: cells[0].innerText.trim(),
+                    lugarMovimiento: cells[1].innerText.trim(),
+                    comentarios: cells[2].innerText.trim()
                 };
                 extractedData.push(rowData);
-              });
-              return extractedData;
+                });
+                return extractedData;
             });
         
             console.log(data);
             response = data;
-          } catch (error) {
+        } catch (error) {
             console.error('Ocurrió un error:', error);
-          } finally {
+        } finally {
             // Cerrar el navegador
             await browser.close();
-          }
+        }
 
         return res.status(200).json({ message: "Shipment tracked successfully", result: response, url: url });
-      })();
-
-
+    })();
 }
 
+function convertToISO(fecha, hora) {
+    if(!fecha || !hora) {
+        return '';
+    }
+    // Mapeo de nombres de días a números de mes y día
+    const meses = {
+        '1': '01', '2': '02', '3': '03', '4': '04', '5': '05', '6': '06', '7': '07',
+        '8': '08', '9': '09', '10': '10', '11': '11', '12': '12'
+    };
+    
+    // Extraer el mes, día y año de la fecha
+    const [, datePart] = fecha.split(', ');
+    const [mes, dia, año] = datePart.split('/');
+    const formattedDate = `20${año}-${meses[mes]}-${dia.padStart(2, '0')}`;
+    
+    // Convertir la hora al formato 24 horas
+    const [time, period] = hora.split(' ');
+    let [horas, minutos] = time.split(':');
+    horas = parseInt(horas, 10);
+    if (period === 'PM' && horas !== 12) {
+        horas += 12;
+    } else if (period === 'AM' && horas === 12) {
+        horas = 0;
+    }
+    
+    // Formatear la hora correctamente
+    const formattedTime = `${horas.toString().padStart(2, '0')}:${minutos.padStart(2, '0')}:00`;
+    
+    return `${formattedDate}T${formattedTime}`;
+}
 
 export async function fedExTracking(req, res){
     let trackingCode = "778600719309";
@@ -242,39 +227,39 @@ export async function fedExTracking(req, res){
         const browser = await puppeteer.launch({
             headless: false,
             args: [
-              '--disable-infobars',
-              '--no-sandbox',
-              '--disable-setuid-sandbox',
-              '--disable-dev-shm-usage',
-              '--disable-blink-features=AutomationControlled'
+                '--disable-infobars',
+                '--no-sandbox',
+                '--disable-setuid-sandbox',
+                '--disable-dev-shm-usage',
+                '--disable-blink-features=AutomationControlled'
             ]
-          });
-          const page = await browser.newPage();
+        });
+        const page = await browser.newPage();
         
-          // Establecer un agente de usuario que imite un navegador real
-          await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36');
-        
-          // Habilitar la interceptación de solicitudes
-          await page.setRequestInterception(true);
-        
-          // Desactivar la detección de automatización
-          await page.evaluateOnNewDocument(() => {
+        // Establecer un agente de usuario que imite un navegador real
+        await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36');
+    
+        // Habilitar la interceptación de solicitudes
+        await page.setRequestInterception(true);
+    
+        // Desactivar la detección de automatización
+        await page.evaluateOnNewDocument(() => {
             Object.defineProperty(navigator, 'webdriver', {
-              get: () => false,
+                get: () => false,
             });
-          });
+        });
         
-          // Interceptar las solicitudes de red
-          page.on('request', (request) => {
-            // Bloquear las solicitudes a logx.optimizely.com
-            if (request.url().includes('logx.optimizely.com')) {
-              request.abort();
-            } else {
-              request.continue();
-            }
-          });
+        // Interceptar las solicitudes de red
+        page.on('request', (request) => {
+        // Bloquear las solicitudes a logx.optimizely.com
+        if (request.url().includes('logx.optimizely.com')) {
+            request.abort();
+        } else {
+            request.continue();
+        }
+        });
 
-// Añadir una función para capturar errores de navegación
+        // Añadir una función para capturar errores de navegación
         page.on('error', error => {
             console.error('Error en la página:', error);
         });
@@ -284,15 +269,13 @@ export async function fedExTracking(req, res){
             await page.goto(url, { waitUntil: 'networkidle2' });
         
             // Confirmar que se ha cargado la página
-            console.log('Página cargada:', page.url());
-         // Esperar explícitamente un tiempo adicional para permitir la carga del contenido dinámico
-        await new Promise(resolve => setTimeout(resolve, 6000)); // Esperar 6 segundos
+            // console.log('Página cargada:', page.url());
+            // Esperar explícitamente un tiempo adicional para permitir la carga del contenido dinámico
+            await new Promise(resolve => setTimeout(resolve, 6000)); // Esperar 6 segundos
             
-                // Extraer el contenido de la tabla con los registros por día
-        const tableData = await page.evaluate(() => {
+            // Extraer el contenido de la tabla con los registros por día
+            const tableData = await page.evaluate(() => {
             const rows = document.querySelectorAll('#detail-view-sections-desktop .fdx-c-table__tbody__tr.travel-history-table__row');
-            console.log('rows', rows.length);
-            console.log('rows', rows);
             const extractedData = [];
             rows.forEach(row => {
                 const dateElement = row.querySelector('.travel-history-table__scan-event-date span');
@@ -318,15 +301,20 @@ export async function fedExTracking(req, res){
         
         console.log(tableData);
         console.log('tableData',tableData.length);
-    } catch (error) {
-        console.error('Ocurrió un error:', error);
-    } finally {
-        // Cerrar el navegador
-        await browser.close();
-    }
+        } catch (error) {
+            console.error('Ocurrió un error:', error);
+        } finally {
+            // Cerrar el navegador
+            await browser.close();
+        }
+        response.forEach(row => {
+            row.date = row.fecha ? convertToISO(row.fecha, row.hora || '12:00 AM') : null;
+        });
+        console.log('response', response);
 
         return res.status(200).json({ message: "Shipment tracked successfully", result: response, url: url });
     })();
 
 
 }
+

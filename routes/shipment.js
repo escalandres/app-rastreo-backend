@@ -1,9 +1,11 @@
 import express from 'express';
 import { dhlTracking, obtenerEmpresasPaqueteria, registrarNuevoEnvio, obtenerEnviosContenedor, 
-    obtenerEnvioMasReciente, estafetaTracking, fedExTracking } from '../controllers/shipment.js';
+    obtenerEnvioMasReciente, estafetaTracking, fedExTracking, processShipment } from '../controllers/shipment.js';
 
+    
 const router = express.Router();
 
+router.post('/process-shipment', processShipment);
 router.get('/dhl-tracking', dhlTracking);
 router.get('/estafeta-tracking', estafetaTracking);
 router.get('/fedex-tracking', fedExTracking);

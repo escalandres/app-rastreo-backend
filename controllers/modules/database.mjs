@@ -439,6 +439,36 @@ export async function getCurrentContainerShipment(containerID) {
   }
 }
 
+export async function db_startShipment(shipment) {
+  try {
+    const client = await connect()
+    const collection = client.collection('shipments');
+    await collection.createIndex({ id: 1 }, { unique: true });
+    // Crear un índice único en shipment_data.tracking_number
+    await collection.createIndex({ "shipment_data.tracking_number": 1 }, { unique: true });
+
+    // Verificar si el número de rastreo ya existe
+    const existingTracker = await collection.findOne({ "shipment_data.tracking_number": shipment.shipment_data.tracking_number });
+
+    if (existingTracker) {
+      return { success: false, result: "", error: "El número de rastreo ya existe. No se puede registrar el envío." };
+    }
+
+    const dbResult = await collection.insertOne(shipment);
+    if (dbResult.acknowledged) {
+      return { success: true, result: "¡Se ha registrado el envío!", error: "" };
+    } else {
+      return { success: false, result: "", error: "Ocurrió un error al registrar el envío. Inténtelo nuevamente!" }
+    }
+    
+  } catch (error) {
+    console.error('Ocurrió un error:', error);
+    return {success: false, message: error};
+  } finally {
+    disconnect();
+  }
+}
+
 // ----------------------- App Controller -----------------------
 
 

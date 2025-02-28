@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
-import { validateToken } from "./modules/utils.mjs";
-import { consultaEmpresasPaqueteria, registerNewShipment, getContainerShipments, getCurrentContainerShipment, getUserContainers, linkTracker, getAppInfo } from "./modules/database.mjs";
+import { generarOTP, validateToken } from "./modules/utils.mjs";
+import { consultaEmpresasPaqueteria, registerNewShipment, getContainerShipments, getCurrentContainerShipment, 
+    getUserContainers, linkTracker, getAppInfo, db_startShipment } from "./modules/database.mjs";
 
 export async function dhlTracking(req, res) {
     const myHeaders = new Headers();
@@ -129,6 +130,48 @@ export async function vincularRastreador(req, res) {
                     shipments: []
                 }
                 const result = await linkTracker(tracker);
+                console.log("result:", result);
+                if(!result.success){
+                    return res.status(200).json({success: false, message: result.error});
+                }else{
+                    return res.status(200).json({success: true, message: result.message});
+                }
+            }
+            return res.status(401).json({ success: false, message: 'No se proporcionó el token o no es válido' });
+        } else { 
+            res.status(401).json({ success: false, message: 'No se proporcionó el token o no es válido' });
+        }
+    }catch(error){
+        console.error("Error:", error);
+        res.status(500).json({ success: false, message: 'Ocurrió un error al vincular' });
+
+    }
+    
+}
+
+export async function startShipment(req, res) {
+    console.log("vinculado rastreador");
+    try{
+        const { trackerID, companyID, serviceID, trackingCode } = req.body;
+        const authHeader = req.headers['authorization']; 
+        if (authHeader) { 
+            const token = authHeader.split(' ')[1]; // Assuming 'Bearer <token>' 
+            const decodedToken = validateToken(token);
+            if(decodedToken){
+                const shipment = {
+                    id: generarOTP(),
+                    container_id: parseInt(trackerID),
+                    start_date: new Date().toISOString(),
+                    delivery_date: null,
+                    shipment_data: {
+                        company: companyID,
+                        service_id: serviceID,
+                        tracking_number: trackingCode
+                    },
+                    shipment_status: [],
+                    locations: []
+                }
+                const result = await db_startShipment(shipment);
                 console.log("result:", result);
                 if(!result.success){
                     return res.status(200).json({success: false, message: result.error});

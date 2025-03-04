@@ -46,7 +46,9 @@ export async function getUser(email) {
     console.error('Error al buscar el usuario. ',error);
     return {success: false, user: {}, error: error}
   } finally {
-    disconnect();
+    if (client) {
+      await disconnect();
+    }
   }
 }
 
@@ -69,7 +71,9 @@ export async function registerNewUser(user) {
     console.error('Ocurrió un error:', error);
     return {success: false, message: error};
   } finally {
-    disconnect();
+    if (client) {
+      await disconnect();
+    }
   }
 }
 
@@ -98,7 +102,9 @@ export async function registrarOTP(email) {
     console.error('Ocurrió un error:', error);
     return { success: false, user: {}, error: error }
   } finally {
-    disconnect();
+    if (client) {
+      await disconnect();
+    }
   }
 }
 
@@ -129,7 +135,9 @@ export async function getOTP(email) {
     console.error('Ocurrió un error:', error);
     return { success: false, user: {}, error: error }
   } finally {
-    disconnect();
+    if (client) {
+      await disconnect();
+    }
   }
 }
 
@@ -149,7 +157,9 @@ export async function changePassword(email,password) {
     console.error('Ocurrió un error:', error);
     return { success: false, user: {}, error: error }
   } finally {
-    disconnect();
+    if (client) {
+      await disconnect();
+    }
   }
 }
 
@@ -168,7 +178,9 @@ export async function guardarCoordenadas(coordenadas) {
     console.error('Ocurrió un error:', error);
     return {success: false, message: error};
   } finally {
-    disconnect();
+    if (client) {
+      await disconnect();
+    }
   }
 }
 
@@ -207,7 +219,9 @@ export async function authGoogle(oauth) {
     console.error('Error al buscar el usuario. ',error);
     return { success: false, user: {}, error: error }
   } finally {
-    disconnect();
+    if (client) {
+      await disconnect();
+    }
   }
 
 }
@@ -244,7 +258,9 @@ export async function authGithub(oauth) {
     console.error('Error al buscar el usuario. ',error);
     return { success: false, user: {}, error: error }
   } finally {
-    disconnect();
+    if (client) {
+      await disconnect();
+    }
   }
 
 }
@@ -274,7 +290,9 @@ export async function consultaEmpresasPaqueteria() {
     console.error('Error al obtener el catálogo. ',error);
     return {success: false, catalogo: {}, error: error}
   } finally {
-    disconnect();
+    if (client) {
+      await disconnect();
+    }
   }
 }
 
@@ -293,7 +311,9 @@ export async function getUserContainers(userID) {
     console.error('Error al obtener el catálogo. ',error);
     return {success: false, user: {}, error: error}
   } finally {
-    disconnect();
+    if (client) {
+      await disconnect();
+    }
   }
 }
 
@@ -314,7 +334,9 @@ export async function getAppInfo(userID) {
     console.error('Error al obtener el catálogo. ',error);
     return {success: false, results: {}, error: error}
   } finally {
-    disconnect();
+    if (client) {
+      await disconnect();
+    }
   }
 }
 
@@ -339,7 +361,9 @@ export async function registerNewShipment(shipment) {
     console.error('Ocurrió un error:', error);
     return {success: false, message: error};
   } finally {
-    disconnect();
+    if (client) {
+      await disconnect();
+    }
   }
 }
 
@@ -362,7 +386,9 @@ export async function updateShipment(shipmentID, newLocation, newStatus) {
     console.error('Ocurrió un error:', error);
     return {success: false, message: error};
   } finally {
-    disconnect();
+    if (client) {
+      await disconnect();
+    }
   }
 }
 
@@ -395,7 +421,9 @@ export async function linkTracker(tracker) {
     console.error('Ocurrió un error:', error);
     return {success: false, message: error};
   } finally {
-    disconnect();
+    if (client) {
+      await disconnect();
+    }
   }
 }
 
@@ -414,7 +442,9 @@ export async function getContainerShipments(containerID) {
     console.error('Error al obtener el catálogo. ',error);
     return {success: false, user: {}, error: error}
   } finally {
-    disconnect();
+    if (client) {
+      await disconnect();
+    }
   }
 }
 
@@ -435,7 +465,9 @@ export async function getCurrentContainerShipment(containerID) {
     console.error('Error al obtener el catálogo. ',error);
     return {success: false, user: {}, error: error}
   } finally {
-    disconnect();
+    if (client) {
+      await disconnect();
+    }
   }
 }
 
@@ -465,7 +497,9 @@ export async function db_startShipment(shipment) {
     console.error('Ocurrió un error:', error);
     return {success: false, message: error};
   } finally {
-    disconnect();
+    if (client) {
+      await disconnect();
+    }
   }
 }
 

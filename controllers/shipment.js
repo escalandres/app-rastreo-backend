@@ -1,7 +1,7 @@
 import puppeteer from 'puppeteer';
 import { consultaEmpresasPaqueteria, registerNewShipment, getContainerShipments, getCurrentContainerShipment, updateShipment } from "./modules/database.mjs";
 import { translateStatus, translateStatusCode, convertToISO, createStatusCodeFromDescription, convertToISOFromDDMMYYYY, extractDetailsFromEstafeta,
-    getMostRecentEntry
+    getMostRecentEntry, isEmptyObj, generarCoordenadasCiudadMexico, getOldestEntry
 } from "./modules/utils.mjs";
 
 /*
@@ -114,11 +114,13 @@ export async function processTracker(trackerData) {
 export async function processShipment(req, res) {
     try {
         console.log("req.body:", req.body);
+        let trackerData = req.body.trackerData; 
         // Obtener información envío actual del rastreador provista por la paquetería
-        const dbResult = await getCurrentShipment(req.body.trackerData.id);
+        const dbResult = await getCurrentShipment(trackerData.id);
         if(dbResult.success){
             //Envio en curso
-            if(dbResult.result.delivery_date){
+            if(!dbResult.result.delivery_date){
+            // if(dbResult.result.delivery_date){
                 let statusInfo = {};
                 switch(dbResult.result.shipment_data.company){
                     case "DHL":
@@ -128,15 +130,18 @@ export async function processShipment(req, res) {
 
                     case "Estafeta":
                         console.log('Estafeta');
-                        statusInfo = await Estafeta(dbResult.result.shipment_data.tracking_number);
+                        statusInfo = await Estafeta(dbResult.result);
                         break;
 
                     case "FedEx":
                         console.log('FedEx');
-                        statusInfo = await FedEx(dbResult.result.shipment_data.tracking_number);
+                        statusInfo = await FedEx(dbResult.result);
                         break;
                 }
-                return res.status(200).json({success: true, db: dbResult.result, trackerData, statusInfo});
+                if(isEmptyObj(statusInfo)){
+                    statusInfo = { message: "No hay cambios en el estatus del envío" };
+                }
+                return res.status(200).json({success: true, db: dbResult.result, tracker: trackerData, status: statusInfo});
             }
             return res.status(200).json({success: true, message: "El envío seleccionado ya terminó"});
         }
@@ -162,14 +167,16 @@ async function DHL(dbResult) {
     return processDHLResponse(response, dbResult.shipment_status);
 }
 
-async function Estafeta(trackingCode) {
-    let shipmentStatus = await queryEstafeta(trackingCode);
-    return processEstafetaResponse(shipmentStatus);
+async function Estafeta(dbResult) {
+    const trackingCode = dbResult.shipment_data.tracking_number;
+    let response = await queryEstafeta(trackingCode);
+    return processEstafetaResponse(response, dbResult.shipment_status);
 }
 
-async function FedEx(trackingCode) {
-    let shipmentStatus = await queryFedEx(trackingCode, service);
-    return processFedExResponse(shipmentStatus);
+async function FedEx(dbResult) {
+    const trackingCode = dbResult.shipment_data.tracking_number;
+    let response = await queryFedEx(trackingCode);
+    return processFedExResponse(response, dbResult.shipment_status);
 }
 
 // ---------------------- DHL ----------------------
@@ -635,6 +642,70 @@ export async function fedExTracking(req, res){
 }
 
 
+
+
+
+// ------------------------- Puerbaasa -------------------------------------------------------------
+
+export async function processShipmentManual(req, res) {
+    try {
+        console.log("---------------------processShipmentManual---------------------");
+        let trackerData = req.body.trackerData;
+        let shipmentData = req.body.shipmentData; 
+        // Obtener información envío actual del rastreador provista por la paquetería
+        const dbResult = await getCurrentShipment(trackerData.id);
+        if(dbResult.success){
+            //Envio en curso
+            console.log('dbResult.result.delivery_date',dbResult.result.delivery_date);
+            // if(!dbResult.result.delivery_date){
+            if(!dbResult.result.delivery_date){
+                let statusInfo = {};
+                console.log('dbResult.result.shipment_data.company',dbResult.result.shipment_data.company);
+                statusInfo = processResponse(shipmentData, dbResult.result.shipment_status);
+
+                if(isEmptyObj(statusInfo)){
+                    statusInfo = { message: "No hay cambios en el estatus del envío" };
+                    return res.status(200).json({success: true, db: dbResult.result, tracker: trackerData, status: statusInfo});
+                }
+                trackerData = generarCoordenadasCiudadMexico();
+                console.log('trackerData',trackerData);
+                const dbResponse = await updateShipment(dbResult.result.id, trackerData, statusInfo);
+                console.log(dbResponse);
+                if(!dbResponse.success){
+                    return res.status(200).json({success: false, message: "Error al actualizar el envío"});
+                }else{
+                    return res.status(200).json({success: true, message: "El envio se ha actualizado correctamente"});
+                }
+            }
+            return res.status(200).json({success: true, message: "El envío seleccionado ya terminó"});
+        }
+        return res.status(400).json({success: false, message: dbResult.error});
+    } catch (error) {
+        return res.status(500).json({success: false, message: "Error al guardar coordenadas"});
+    }
+
+}
+
+function processResponse(response, shipmentStatus){
+    const latestStatus = getOldestEntry(response);
+    console.log('latestStatus',latestStatus);
+    console.log('shipmentStatus',shipmentStatus);
+    //Verificar si el estatus ya existe en la DB
+    const existe = shipmentStatus.some(item => item.timestamp === latestStatus.timestamp);
+    // Si no existe, extraer información a guardar
+    if(!existe){
+        console.log('existen cambios');
+        let lastStatus = { 
+            timestamp: latestStatus.timestamp, 
+            status_code: latestStatus.statusCode,
+            description: `${translateStatus(latestStatus.statusCode)} | ${latestStatus.description}`,
+            location: latestStatus.location
+        };
+        return lastStatus
+    } 
+    console.log('Estatus ya existe en la DB');
+    return {};
+}
 
 
 

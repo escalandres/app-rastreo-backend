@@ -150,7 +150,6 @@ export async function vincularRastreador(req, res) {
 }
 
 export async function startShipment(req, res) {
-    console.log("vinculado rastreador");
     try{
         const { trackerID, companyID, serviceID, trackingCode } = req.body;
         const authHeader = req.headers['authorization']; 
@@ -172,7 +171,7 @@ export async function startShipment(req, res) {
                     locations: []
                 }
                 const result = await db_startShipment(shipment);
-                console.log("result:", result);
+                // console.log("result:", result);
                 if(!result.success){
                     return res.status(200).json({success: false, message: result.error});
                 }else{

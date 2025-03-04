@@ -96,7 +96,7 @@ export function convertToISOFromDDMMYYYY(dateString) {
     const [datePart, timePart, period] = dateString.split(' ');
 
     // Separar día, mes y año
-    const [month, day, year] = datePart.split('/');
+    const [day, month, year] = datePart.split('/');
 
     // Separar hora y minutos
     let [hours, minutes] = timePart.split(':');
@@ -135,4 +135,27 @@ export function getMostRecentEntry(array){
     array.reduce((latest, current) => {
         return new Date(current.timestamp) > new Date(latest.timestamp) ? current : latest;
     });
+}
+export function getOldestEntry(array) {
+    return array.reduce((oldest, current) => {
+        return new Date(current.timestamp) < new Date(oldest.timestamp) ? current : oldest;
+    });
+}
+
+
+export function generarCoordenadasCiudadMexico() {
+    const latMin = 19.000; // Latitud mínima aproximada de la Ciudad de México
+    const latMax = 19.600; // Latitud máxima aproximada de la Ciudad de México
+    const lonMin = -99.400; // Longitud mínima aproximada de la Ciudad de México
+    const lonMax = -98.800; // Longitud máxima aproximada de la Ciudad de México
+
+    const latitud = (Math.random() * (latMax - latMin) + latMin).toFixed(6);
+    const longitud = (Math.random() * (lonMax - lonMin) + lonMin).toFixed(6);
+    let fechaActual = new Date();
+    let fechaISO = fechaActual.toISOString();
+    return {
+        lat: latitud,
+        lng: longitud,
+        date: fechaISO
+    };
 }

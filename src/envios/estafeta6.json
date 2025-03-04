@@ -1,0 +1,60 @@
+{
+    "message": "Shipment tracked successfully",
+    "result": [
+        {
+            "fechaHora": "07/01/2025 09:07 A. M.",
+            "lugarMovimiento": "MEXICO PONIENTE (MXP) En proceso para salir a reparto MEXICO PONIENTE",
+            "comentarios": "",
+            "location": "MEXICO PONIENTE (MXP)",
+            "description": "En proceso para salir a reparto MEXICO PONIENTE",
+            "timestamp": "2025-07-01T09:07:00Z",
+            "statusCode": "delivered"
+        },
+        {
+            "fechaHora": "07/01/2025 08:21 A. M.",
+            "lugarMovimiento": "MEXICO PONIENTE (MXP) Llegada a centro de distribución MEXICO PONIENTE",
+            "comentarios": "",
+            "location": "MEXICO PONIENTE (MXP)",
+            "description": "Llegada a centro de distribución MEXICO PONIENTE",
+            "timestamp": "2025-07-01T08:21:00Z",
+            "statusCode": "transit"
+        },
+        {
+            "fechaHora": "07/01/2025 03:51 A. M.",
+            "lugarMovimiento": "HUB MEX (HMX) En ruta foránea  hacia MEXICO PONIENTE",
+            "comentarios": "",
+            "location": "HUB MEX (HMX)",
+            "description": "En ruta foránea  hacia MEXICO PONIENTE",
+            "timestamp": "2025-07-01T03:51:00Z",
+            "statusCode": "transit"
+        },
+        {
+            "fechaHora": "07/01/2025 03:47 A. M.",
+            "lugarMovimiento": "HUB MEX (HMX) Llegada a centro de distribución HUB MEX",
+            "comentarios": "",
+            "location": "HUB MEX (HMX)",
+            "description": "Llegada a centro de distribución HUB MEX",
+            "timestamp": "2025-07-01T03:47:00Z",
+            "statusCode": "transit"
+        },
+        {
+            "fechaHora": "06/01/2025 09:58 P. M.",
+            "lugarMovimiento": "León (LEN) Llegada a centro de distribución León",
+            "comentarios": "",
+            "location": "León (LEN)",
+            "description": "Llegada a centro de distribución León",
+            "timestamp": "2025-06-01T09:58:00Z",
+            "statusCode": "transit"
+        },
+        {
+            "fechaHora": "06/01/2025 05:18 P. M.",
+            "lugarMovimiento": "León (LEN) Recolección en oficina por ruta local",
+            "comentarios": "",
+            "location": "León (LEN)",
+            "description": "Recolección en oficina por ruta local",
+            "timestamp": "2025-06-01T05:18:00Z",
+            "statusCode": "transit"
+        }
+    ],
+    "url": "https://rastreositecorecms.azurewebsites.net/Tracking/searchByGet/?wayBillType=1&wayBill=6055903016701706196130"
+}

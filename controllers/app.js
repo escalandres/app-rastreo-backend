@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import { generarOTP, validateToken } from "./modules/utils.mjs";
 import { consultaEmpresasPaqueteria, registerNewShipment, getContainerShipments, getCurrentContainerShipment, 
-    getUserContainers, linkTracker, getAppInfo, db_startShipment } from "./modules/database.mjs";
+    getUserContainers, linkTracker, getAppInfo, db_startShipment, db_updateTracker } from "./modules/database.mjs";
 
 export async function dhlTracking(req, res) {
     const myHeaders = new Headers();
@@ -190,3 +190,29 @@ export async function startShipment(req, res) {
     
 }
 
+export async function updateTracker(req, res) {
+    console.log("updateTracker");
+    try{
+        const { trackerId, nickname, img } = req.body;
+        const authHeader = req.headers['authorization']; 
+        if (authHeader) { 
+            const token = authHeader.split(' ')[1]; // Assuming 'Bearer <token>' 
+            const decodedToken = validateToken(token);
+            if(decodedToken){
+                const result = await db_updateTracker(trackerId, nickname, img);
+                console.log("result:", result);
+                if(!result.success){
+                    return res.status(400).json({success: false, message: result.error});
+                }else{
+                    return res.status(200).json({success: true, message: result.message});
+                }
+            }
+        }
+        return res.status(401).json({ success: false, message: 'No se proporcionó el token o no es válido' });
+    }catch(error){
+        console.error("Error:", error);
+        return res.status(500).json({ success: false, message: 'Ocurrió un error al vincular' });
+
+    }
+    
+}

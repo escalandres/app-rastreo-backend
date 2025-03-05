@@ -503,6 +503,27 @@ export async function db_startShipment(shipment) {
   }
 }
 
+export async function db_updateTracker(trackerId, nickname, img) {
+  try {
+    const client = await connect()
+    const collection = client.collection('trackers');
+    const dbResult = await collection.updateOne({id: trackerId}, {$set: {nickname: nickname, img: img}});
+    if (dbResult.acknowledged) {
+      return { success: true, result: "¡Se ha actualizado el tracker!", error: "" };
+    } else {
+      return { success: false, result: "", error: "Ocurrió un error al actualizar el tracker. Inténtelo nuevamente!" }
+    }
+  } catch (error) {
+    console.error('Ocurrió un error:', error);
+    return {success: false, message: error};
+  } finally {
+    if (client) {
+      await disconnect();
+    }
+  }
+}
+
+
 // ----------------------- App Controller -----------------------
 
 

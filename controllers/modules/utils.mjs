@@ -131,11 +131,17 @@ export function extractDetailsFromEstafeta(entry) {
     return null;
 }
 
-export function getMostRecentEntry(array){
-    array.reduce((latest, current) => {
+export function getMostRecentEntry(array) {
+    if (array.length === 0) {
+        return null; // O el valor que desees para un array vacío
+    }
+
+    return array.reduce((latest, current) => {
         return new Date(current.timestamp) > new Date(latest.timestamp) ? current : latest;
     });
 }
+
+
 export function getOldestEntry(array) {
     return array.reduce((oldest, current) => {
         return new Date(current.timestamp) < new Date(oldest.timestamp) ? current : oldest;
@@ -154,8 +160,8 @@ export function generarCoordenadasCiudadMexico() {
     let fechaActual = new Date();
     let fechaISO = fechaActual.toISOString();
     return {
-        lat: latitud,
-        lng: longitud,
+        lat: parseFloat(latitud),
+        lng: parseFloat(longitud),
         date: fechaISO
     };
 }

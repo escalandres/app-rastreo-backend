@@ -126,7 +126,7 @@ export async function vincularRastreador(req, res) {
                     user_id: decodedToken.user.id,
                     nickname: `Rastreador ${trackerID}`,
                     linking_date: new Date(),
-                    img: '',
+                    img: { src: "/icons/send-box.png", alt: "Send box" },
                     shipments: []
                 }
                 const result = await linkTracker(tracker);

@@ -1,6 +1,7 @@
 import { MongoClient } from 'mongodb';
 import {generarOTP, generateTimestamp, isEmptyObj, formatDateToTimestamp} from './utils.mjs';
 import crypto from 'crypto';
+import { link } from 'fs';
 
 
 const uri = process.env.DATABASE_URL;
@@ -397,26 +398,30 @@ export async function linkTracker(tracker) {
     const client = await connect()
     const collection = client.collection('trackers');
 
-    // Verifica si el tracker ya está vinculado a otro usuario 
+    // Verifica si existe el rastreador 
     const existingTracker = await collection.findOne({ id: tracker.id });
+    if(!existingTracker) return { success: false, error: "El rastreador ingresado no existe. Ingrese otro número de serie" };
 
-    if(existingTracker){
+    // Verifica si el tracker ya está vinculado a otro usuario 
+    if(existingTracker.user_id) {
       if (existingTracker.user_id === tracker.user_id) { 
         return { success: false, error: "El tracker ya está vinculado a este usuario." }
       } 
       else { 
         return { success: false, error: "El tracker ya está vinculado a otro usuario." }
       }
-    }else{
-      await collection.createIndex({ id: 1 }, { unique: true });
-
-      const dbResult = await collection.insertOne(tracker);
-      if (dbResult.acknowledged) {
-        return { success: true, result: "¡Se ha vinculado el tracker a su cuenta!", error: "" };
-      } else {
-        return { success: false, result: "", error: "Ocurrió un error al vincular el tracker. Inténtelo nuevamente!" }
-      }
     }
+
+    // await collection.createIndex({ id: 1 }, { unique: true });
+
+    const dbResult = await collection.updateOne({id: tracker.id}, {$set: {user_id: tracker.user_id, nickname: tracker.nickname, 
+        img: tracker.img, linking_date: tracker.linking_date, shipments: tracker.shipments}});
+    if (dbResult.acknowledged) {
+      return { success: true, result: "¡Se ha vinculado el tracker a su cuenta!", error: "" };
+    } else {
+      return { success: false, result: "", error: "Ocurrió un error al vincular el tracker. Inténtelo nuevamente!" }
+    }
+    
   } catch (error) {
     console.error('Ocurrió un error:', error);
     return {success: false, message: error};

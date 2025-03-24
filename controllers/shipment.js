@@ -682,9 +682,73 @@ function processResponse(response, shipmentStatus){
 
 
 
+// ------------------------- OPEN CELL ID -------------------------------------------------------------
+async function _getCellTowerLocation(params) {
+    const { mcc, mnc, lac, cid } = params;
+    console.log('url', params);
+    let location = {};
+    try {
+        const response = await fetch('https://us1.unwiredlabs.com/v2/process.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                token: process.env.OPENCELLID_API_KEY,
+                radio: "gsm",
+                mcc: mcc,
+                mnc: mnc,
+                cells: [
+                    {
+                        lac: lac,
+                        cid: cid
+                    }
+                ],
+                address: 1
+            })
+        });
+        
+        let data = await response.json();
+        console.log('data',data);
+        location = data;
+    } catch (error) {
+        console.log('error', error);
+    }
+    return location;
+}
 
-
-
+export async function getCellTowerLocation(req, res) {
+    const { mcc, mnc, lac, cid } = req.body;
+    console.log('url', req.body);
+    try {
+        const response = await fetch('https://us1.unwiredlabs.com/v2/process.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                token: process.env.OPENCELLID_API_KEY,
+                radio: "gsm",
+                mcc: mcc,
+                mnc: mnc,
+                cells: [
+                    {
+                        lac: lac,
+                        cid: cid
+                    }
+                ],
+                address: 1
+            })
+        });
+        
+        let data = await response.json();
+        console.log('data',data);
+        return res.status(200).json({ message: "Location retrieved successfully", result: data });
+    } catch (error) {
+        console.log('error', error);
+        return res.status(400).json({ message: "Error retrieving location", error: error });
+    }
+}
 
 
 

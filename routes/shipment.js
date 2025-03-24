@@ -1,11 +1,13 @@
 import express from 'express';
 import { dhlTracking, obtenerEmpresasPaqueteria, registrarNuevoEnvio, obtenerEnviosContenedor, 
-    obtenerEnvioMasReciente, estafetaTracking, fedExTracking, processShipment, processShipmentManual } from '../controllers/shipment.js';
+    obtenerEnvioMasReciente, estafetaTracking, fedExTracking, processShipment, processShipmentManual,
+    getCellTowerLocation } from '../controllers/shipment.js';
 
     
 const router = express.Router();
 
 router.post('/process-shipment', processShipment);
+router.post('/cell-id', getCellTowerLocation);
 router.post('/process-shipment-manual', processShipmentManual);
 router.get('/dhl-tracking', dhlTracking);
 router.get('/estafeta-tracking', estafetaTracking);

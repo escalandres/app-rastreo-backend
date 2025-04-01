@@ -39,7 +39,7 @@ router.post('/post-test', (req, res) => {
         // const resultado = regex.exec(mensaje);
         // console.log("resultado", resultado);
 
-        subirDatos(req,res);
+        // subirDatos(req,res);
     }else{
         console.log("Formato de mensaje no válido");
         console.log("-------req.body.datos", req.body.datos);

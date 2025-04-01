@@ -3,6 +3,8 @@ import { generarOTP, validateToken } from "./modules/utils.mjs";
 import { consultaEmpresasPaqueteria, registerNewShipment, getContainerShipments, getCurrentContainerShipment, 
     getUserContainers, linkTracker, getAppInfo, db_startShipment, db_updateTracker } from "./modules/database.mjs";
 
+import { generarPDF } from "./modules/pdf.mjs";
+
 export async function dhlTracking(req, res) {
     const myHeaders = new Headers();
     myHeaders.append("DHL-API-Key", process.env.DHL_API_KEY);
@@ -215,4 +217,15 @@ export async function updateTracker(req, res) {
 
     }
     
+}
+
+export async function generateReport(req, res){
+    console.log("generateReport");
+    try{
+        const result = await generarPDF();
+        return res.status(200).json({success: true, message: result});
+    }catch(error){
+        console.error("Error:", error);
+        return res.status(500).json({ success: false, message: 'Ocurrió un error al generar el reporte' });
+    }
 }

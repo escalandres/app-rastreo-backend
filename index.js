@@ -27,6 +27,8 @@ const currentFilePath = fileURLToPath(currentFileURL);
 const __dirname = dirname(currentFilePath);
 global.__dirname = __dirname;
 global.TEMPLATES_PATH = path.join(__dirname, 'src', 'email_templates');
+global.PDF_TEMPLATES_PATH = path.join(__dirname, 'src', 'pdf_templates');
+global.PDF_PATH = path.join(__dirname, 'src', 'pdf');
 
 // -------------- settings --------------
 app.use(express.json());

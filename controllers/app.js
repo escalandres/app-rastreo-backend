@@ -3,7 +3,7 @@ import { generarOTP, validateToken } from "./modules/utils.mjs";
 import { consultaEmpresasPaqueteria, registerNewShipment, getContainerShipments, getCurrentContainerShipment, 
     getUserContainers, linkTracker, getAppInfo, db_startShipment, db_updateTracker } from "./modules/database.mjs";
 
-import { generarPDF } from "./modules/pdf.mjs";
+import { generarPDF, generarReporteSeguimiento } from "./modules/pdf.mjs";
 
 export async function dhlTracking(req, res) {
     const myHeaders = new Headers();
@@ -224,6 +224,20 @@ export async function generateReport(req, res){
     try{
         const result = await generarPDF();
         return res.status(200).json({success: true, message: result});
+    }catch(error){
+        console.error("Error:", error);
+        return res.status(500).json({ success: false, message: 'Ocurrió un error al generar el reporte' });
+    }
+}
+
+export async function generateReporteSeguimiento(req, res){
+    console.log("generateReporteSeguimiento");
+    const { containerID } = req.query;
+    console.log("containerID:", containerID);
+    try{
+        const result = await getCurrentContainerShipment(containerID);
+        const pdf = await generarReporteSeguimiento(result.result);
+        return res.status(200).json({success: true, file: pdf});
     }catch(error){
         console.error("Error:", error);
         return res.status(500).json({ success: false, message: 'Ocurrió un error al generar el reporte' });

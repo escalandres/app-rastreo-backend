@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporte de seguimiento</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+
+        /* Estilos para el header */
+        .header {
+            margin-bottom: 20px;
+        }
+
+        .container {
+            display: flex; /* Activa flexbox */
+            align-items: center; /* Alinea verticalmente */
+            justify-content: space-between; /* Espacia elementos */
+            border-bottom: 2px solid #ddd; /* Línea divisoria */
+            padding-bottom: 10px;
+        }
+        
+        .container__main-icon img {
+            margin-right: 10px;
+        }
+
+        .container__main-text {
+            text-align: left; /* Alinea el texto a la derecha */
+        }
+
+        .container__main-text p {
+            margin: 0;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .section{
+            margin: 40px 0;
+        }
+
+        .section__title{
+            padding: 8px 20px;
+            background: #e6e5e5;
+        }
+
+        .section__title h2 {
+            margin: 0;
+            font-size: 20px;
+            color: #333;
+        }
+
+
+        .info-container {
+        display: flex;  /* Activa flexbox */
+        gap: 100px;      /* Espacio entre elementos */
+        align-items: center; /* Alinea verticalmente */
+        padding: 0 20px;
+    }
+    </style>
+</head>
+<body>
+
+    <div class="main-container">
+        <div class="header">
+            <div class="container">
+                <div class="container__main-icon">
+                    <img src="https://res.cloudinary.com/deudksu4e/image/upload/v1730330521/dark-cosmos.png" 
+                        width="110" height="90" aria-hidden="true" alt="Cosmos">
+                </div>
+                <div class="container__main-text">
+                    <h1>Reporte de Seguimiento</h1>
+                    <p>Envío <%= datasource.id %> | Fecha de generación: <%= new Date().toLocaleDateString() %></p>
+                </div>
+            </div>
+        </div>
+        <div class="content">
+            <div class="section">
+                <div class="section__title">
+                    <h2>Detalles del envío</h2>
+                </div>
+                <div class="info-container">
+                    <p>Contenedor: <%= datasource.container_id %></p>
+                    <p>Fecha inicio: <%= datasource.start_date %></p>
+                    <p>Fecha fin: <%= datasource.delivery_date %></p>
+                </div>
+                
+            </div>
+            <div class="section">
+                <div class="section__title">
+                    <h2>Información de Paquetería</h2>
+                </div>
+                <div class="info-container">
+                    <p>Empresa: <%= datasource.shipment_data.company %></p>
+                    <p>Número de rastreo: <%= datasource.shipment_data.tracking_number %></p>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="text-align: center; width: 20%;">Estatus</th>
+                            <th style="text-align: center; width: 40%;">Descripción</th>
+                            <th style="text-align: center; width: 20%;">Lugar</th>
+                            <th style="text-align: center; width: 20%;">Fecha</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% datasource.shipment_status.forEach(status => { %>
+                            <tr>
+                                <td><%= status.status_code %></td>
+                                <td><%= status.description %></td>
+                                <td><%= status.location %></td>
+                                <td><%= status.timestamp %></td>
+                            </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+            </div>
+            <div class="section">
+                <div class="section__title">
+                    <h2>Registro de rastreo</h2>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="text-align: center; width: 20%;">Tipo</th>
+                            <th style="text-align: center; width: 20%;">Latitud</th>
+                            <th style="text-align: center; width: 20%;">Longitud</th>
+                            <th style="text-align: center; width: 20%;">Fecha</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% datasource.locations.forEach(location => { %>
+                            <tr>
+                                <td><%= location.isCellTower %> a <%= location.radius %> km</td>
+                                <td><%= location.lat %></td>
+                                <td><%= location.lng %></td>
+                                <td><%= location.date %></td>
+                            </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+            </div>
+            
+    </div>
+    </div>
+
+</body>
+</html>

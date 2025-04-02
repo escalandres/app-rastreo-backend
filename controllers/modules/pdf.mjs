@@ -29,3 +29,24 @@ export async function generarPDF() {
     }
 };
 
+export async function generarReporteSeguimiento(datasource) {
+    try {
+
+        console.log("Datasource:", datasource); // Verifica el contenido de datasource
+        const template = await fs.readFile(path.join(PDF_TEMPLATES_PATH, "reporte_seguimiento.ejs"), "utf-8");
+        const html = ejs.render(template, { datasource });
+
+        const browser = await puppeteer.launch();
+        const page = await browser.newPage();
+        await page.setContent(html);
+        const pdfBuffer = await page.pdf({ format: "A4" });
+
+        await browser.close();
+        await fs.writeFile(path.join(PDF_PATH, "reporte_seguimiento.pdf"), pdfBuffer);
+        console.log("PDF generado correctamente");
+        return pdfBuffer;
+    } catch (error) {
+        console.error("Error generando el PDF:", error);
+        throw error;
+    }
+};

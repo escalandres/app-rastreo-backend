@@ -459,7 +459,7 @@ export async function getCurrentContainerShipment(containerID) {
     const collection = client.collection('shipments');
     console.log("containerID", containerID);
     const dbResult = await collection.findOne({ container_id: parseInt(containerID) }, { sort: { start_date: -1 }}); // Ordena por fecha de inicio de envío de forma descendente. Obtener fecha más actual
-    console.log(dbResult)
+    console.log("dbResult",dbResult)
     if (dbResult) {
       // console.log("Documentos obtenidos:", dbResult);
       return {success: true, result: dbResult, error: "" };

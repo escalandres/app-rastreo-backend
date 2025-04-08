@@ -52,6 +52,15 @@ export function translateStatus(estado) {
     return traducciones[estado] || 'Estado desconocido';
 }
 
+export function colorStatus(estado) { 
+    const colores = {
+        delivered: 'color: green;',
+        transit: 'color: #FE7600;',
+        failure: 'color: red;'
+    };
+    return colores[estado] || 'color: gray;';
+}
+
 export function translateStatusCode(estado) { 
     const traducciones = { 
         'ENTREGADO':'delivered', 
@@ -59,6 +68,43 @@ export function translateStatusCode(estado) {
         'error': 'failure'
     }; 
     return traducciones[estado] || estado;
+}
+
+export function convertDateToReport (cadena = '') {
+    if (!cadena) return '';
+    const meses = [ "enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre" ];
+    const fecha = new Date(cadena);
+    const dia = fecha.getDate();
+    const mes = meses[fecha.getMonth()];
+    const año = fecha.getFullYear();
+    let hora = fecha.getHours();
+    const minutos = fecha.getMinutes();
+    const ampm = hora >= 12 ? 'pm' : 'am';
+    hora = hora % 12 || 12;
+    const strMinutos = minutos < 10 ? '0' + minutos : minutos;
+    return `${dia} ${mes} ${año}, ${hora}:${strMinutos} ${ampm}`;
+};
+
+export function generateDate(date = '') {
+    console.log('date', date);
+    const d = date === '' ? new Date() : new Date(date);
+    const day = d.getDate().toString().padStart(2, '0');
+    const month = (d.getMonth() + 1).toString().padStart(2, '0');
+    const year = d.getFullYear();
+    const hours = d.getHours().toString().padStart(2, '0');
+    const minutes = d.getMinutes().toString().padStart(2, '0');
+
+    return `${day}/${month}/${year} ${hours}:${minutes}`;
+}
+
+export function processLocation(isCellTower, radius) {
+    console.log('isCellTower', isCellTower);
+    console.log('radius', radius);
+    if (isCellTower) {
+        return `Aproximada, en un radio de ${radius / 1000} km`
+    } else {
+        return 'GPS, ubicación exacta'
+    }
 }
 
 export function convertToISO(fecha, hora) {

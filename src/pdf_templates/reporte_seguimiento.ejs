@@ -99,25 +99,25 @@
             border: 1px solid red;
         }
         @media print {
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        page-break-inside: auto;
-        padding-top: 20px; /* Asegura espacio al inicio de la tabla */
-    }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                page-break-inside: auto;
+                padding-top: 20px; /* Asegura espacio al inicio de la tabla */
+            }
 
-    thead {
-        display: table-header-group; /* Repite el encabezado en cada página */
-    }
+            thead {
+                display: table-header-group; /* Repite el encabezado en cada página */
+            }
 
-    tr {
-        page-break-inside: avoid; /* Evita que las filas se dividan */
-    }
-    tbody:first-of-type tr:first-child {
-        padding-top: 20px; /* Forzar espacio en la primera fila de la nueva página */
-    }
+            tr {
+                page-break-inside: avoid; /* Evita que las filas se dividan */
+            }
+            tbody:first-of-type tr:first-child {
+                padding-top: 20px; /* Forzar espacio en la primera fila de la nueva página */
+            }
 
-}
+        }
 
     </style>
 </head>

@@ -1,6 +1,6 @@
 import express from 'express';
 
-import { subirDatos } from '../controllers/tracker.js';
+import { subirDatos, subirDatos1 } from '../controllers/tracker.js';
 
 const router = express.Router();
 
@@ -40,6 +40,7 @@ router.post('/post-test', (req, res) => {
         // console.log("resultado", resultado);
 
         // subirDatos(req,res);
+        subirDatos1(req,res);
     }else{
         console.log("Formato de mensaje no válido");
         console.log("-------req.body.datos", req.body.datos);

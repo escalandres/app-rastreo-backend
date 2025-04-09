@@ -14,16 +14,15 @@
         }
         table {
             width: 100%;
-            border-collapse: collapse;
             margin-top: 20px;
-            page-break-inside: auto;
+            page-break-inside: avoid;
 
         }
         th, td {
             border: 1px solid #ddd;
             padding: 10px;
             text-align: left;
-            page-break-inside: auto;
+            page-break-inside: avoid;
 
         }
         th {
@@ -90,6 +89,9 @@
         .failure-color{
             color: red;
         }
+        .unknown-color{
+            color: rgb(105, 105, 105);
+        }
         .border-blue{
             border: 1px solid blue;
         }
@@ -121,7 +123,7 @@
 </head>
 <body>
     <div class="main-container">
-        <div class="header" style="border:1px solid red;">
+        <div class="header">
             <div class="container">
                 <div class="container__main-icon">
                     <img src="https://res.cloudinary.com/deudksu4e/image/upload/v1730330521/dark-cosmos.png" 
@@ -139,9 +141,9 @@
                     <h2>Detalles del envío</h2>
                 </div>
                 <div class="info-container">
-                    <p class="border-blue" style="color: red;">Contenedor: <b><%= datasource.container_id %></b></p>
-                    <p class="border-blue">Fecha inicio: <%= datasource.start_date %></p>
-                    <p class="border-blue">Fecha fin: <%= datasource.delivery_date %></p>
+                    <p class="border-blue.">Contenedor: <b><%= datasource.container_id %></b></p>
+                    <p class="border-blue.">Fecha inicio: <%= datasource.start_date %></p>
+                    <p class="border-blue.">Fecha fin: <%= datasource.delivery_date %></p>
                 </div>
             </div>
             <div class="section">
@@ -165,9 +167,23 @@
                         <% datasource.shipment_status.forEach(status => { %>
                             <tr>
                                 <td>
-                                    <p style="<%= status.status_color %>">
-                                        <b><%= status.translated_status %></b>
-                                    </p>
+                                    <% if (status.status_code === 'delivered') { %>
+                                        <p class="delivered-color">
+                                            <b><%= status.translated_status %></b>
+                                        </p>
+                                    <% } else if(status.status_code === 'transit') { %>
+                                        <p class="transit-color">
+                                            <b><%= status.translated_status %></b>
+                                        </p>
+                                    <% } else if(status.status_code === 'failure') { %>
+                                        <p class="failure-color">
+                                            <b><%= status.translated_status %></b>
+                                        </p>
+                                    <% } else { %>
+                                        <p class="unknown-color">
+                                            <b><%= status.translated_status %></b>
+                                        </p>
+                                    <% } %>
                                 </td>
                                 <td><%= status.description %></td>
                                 <td><%= status.location %></td>
@@ -207,6 +223,8 @@
             </div>
         </div>
     </div>
-
+    <script>
+        window.print();
+    </script>
 </body>
 </html>

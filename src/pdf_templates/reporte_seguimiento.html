@@ -7,7 +7,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 20px;
+            margin: 20px 40px;
         }
         h1 {
             color: #333;
@@ -23,7 +23,7 @@
             border: 1px solid #ddd;
             padding: 10px;
             text-align: left;
-            page-break-inside: avoid;
+            page-break-inside: avoid  ;
 
         }
         th {
@@ -57,23 +57,25 @@
         }
 
         .section {
-            margin: 40px 0;
+            margin: 30px 0;
         }
 
         .section__title {
-            padding: 8px 20px;
-            background: #e6e5e5;
+            padding: 8px 20px !important;
+            background: #e6e5e5 !important;
+            -webkit-print-color-adjust: exact;
         }
 
         .section__title h2 {
-            margin: 0;
-            font-size: 20px;
-            color: #333;
+            margin: 0 !important;
+            font-size: 20px !important;
+            color: #333 !important;
+            -webkit-print-color-adjust: exact;
         }
 
         .info-container {
             display: flex;
-            gap: 100px;
+            gap: 40px;
             align-items: center;
             padding: 0 20px;
         }
@@ -88,6 +90,36 @@
         .failure-color{
             color: red;
         }
+        .unknown-color{
+            color: rgb(105, 105, 105);
+        }
+        .border-blue{
+            border: 1px solid blue;
+        }
+        .border-red{
+            border: 1px solid red;
+        }
+        @media print {
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        page-break-inside: auto;
+        padding-top: 20px; /* Asegura espacio al inicio de la tabla */
+    }
+
+    thead {
+        display: table-header-group; /* Repite el encabezado en cada página */
+    }
+
+    tr {
+        page-break-inside: avoid; /* Evita que las filas se dividan */
+    }
+    tbody:first-of-type tr:first-child {
+        padding-top: 20px; /* Forzar espacio en la primera fila de la nueva página */
+    }
+
+}
+
     </style>
 </head>
 <body>
@@ -106,13 +138,13 @@
         </div>
         <div class="content">
             <div class="section">
-                <div class="section__title">
+                <div class="section__title" style="padding: 8px 20px !important;background: #e6e5e5 !important">
                     <h2>Detalles del envío</h2>
                 </div>
                 <div class="info-container">
-                    <p style="color: red;">Contenedor: <%= datasource.container_id %></p>
-                    <p>Fecha inicio: <%= datasource.start_date %></p>
-                    <p>Fecha fin: <%= datasource.delivery_date %></p>
+                    <p class="border-blue.">Contenedor: <b><%= datasource.container_id %></b></p>
+                    <p class="border-blue.">Fecha inicio: <%= datasource.start_date %></p>
+                    <p class="border-blue.">Fecha fin: <%= datasource.delivery_date %></p>
                 </div>
             </div>
             <div class="section">
@@ -136,9 +168,23 @@
                         <% datasource.shipment_status.forEach(status => { %>
                             <tr>
                                 <td>
-                                    <p style="<%= status.status_color %>">
-                                        <b><%= status.translated_status %></b>
-                                    </p>
+                                    <% if (status.status_code === 'delivered') { %>
+                                        <p class="delivered-color">
+                                            <b><%= status.translated_status %></b>
+                                        </p>
+                                    <% } else if(status.status_code === 'transit') { %>
+                                        <p class="transit-color">
+                                            <b><%= status.translated_status %></b>
+                                        </p>
+                                    <% } else if(status.status_code === 'failure') { %>
+                                        <p class="failure-color">
+                                            <b><%= status.translated_status %></b>
+                                        </p>
+                                    <% } else { %>
+                                        <p class="unknown-color">
+                                            <b><%= status.translated_status %></b>
+                                        </p>
+                                    <% } %>
                                 </td>
                                 <td><%= status.description %></td>
                                 <td><%= status.location %></td>
@@ -152,10 +198,12 @@
                 <div class="section__title">
                     <h2>Registro de rastreo</h2>
                 </div>
+                <div class="table-container">
+
                 <table>
                     <thead>
                         <tr>
-                            <th style="text-align: center; width: 20%;">Tipo</th>
+                            <th style="text-align: center; width: 20%;">Ubicación</th>
                             <th style="text-align: center; width: 20%;">Latitud</th>
                             <th style="text-align: center; width: 20%;">Longitud</th>
                             <th style="text-align: center; width: 20%;">Fecha</th>
@@ -164,17 +212,20 @@
                     <tbody>
                         <% datasource.locations.forEach(location => { %>
                             <tr>
-                                <td><%= location.isCellTower %> a <%= location.radius %> km</td>
+                                <td><%= location.location %></td>
                                 <td><%= location.lat %></td>
                                 <td><%= location.lng %></td>
-                                <td><%= location.date %></td>
+                                <td><%= location.formatted_timestamp %></td>
                             </tr>
                         <% }); %>
                     </tbody>
                 </table>
             </div>
+            </div>
         </div>
     </div>
-
+    <script>
+        window.print();
+    </script>
 </body>
 </html>

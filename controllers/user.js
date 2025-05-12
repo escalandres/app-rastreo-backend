@@ -45,28 +45,28 @@ export async function signup(req,res){
         const userID = crypto.randomBytes(16).toString('hex');
         const hashedPassword = await bcrypt.hash(password, 10);
         const fullName = name + " " + lastname;
-        let userInfo = {
+        let user = {
             id: userID, email: email, name: fullName, given_name:name, lastname: lastname, 
             password: hashedPassword, created_date: currentDate, last_login: currentDate, 
             profile_picture: "", contenedores: [], otp: []
         }
-        const response = await registerNewUser(userInfo);
+        const response = await registerNewUser(user);
         if(!response.success){
-            return res.status(401).json({success: false, message: "Error al crear su cuenta de usuario. Inténtelo nuevamente"})
+            return res.status(400).json({success: false, message: "Error al crear su cuenta de usuario. Inténtelo nuevamente"})
         }
         // Agregar una cookie con JWT para autenticar a los usuarios
         const token = jwt.sign({ user: {
-            id: result.user.id,
-            email: result.user.email,
-            name: result.user.name,
-            lastname: result.user.lastname
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            lastname: user.lastname
         }}, process.env.KEY, { expiresIn: '1m' });
         //req.session.user = {id: userID, email: email}
-        res.status(200).json({success: true, token: token})
+        return res.status(200).json({success: true, token: token})
     } catch (error) {
         console.error('Ocurrio un error:',error);
         // Enviar respuesta JSON indicando fallo
-        res.status(401).json({ success: false });
+        return res.status(400).json({ success: false });
     }
 }
 

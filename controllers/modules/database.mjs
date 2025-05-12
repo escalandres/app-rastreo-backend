@@ -433,10 +433,39 @@ export async function linkTracker(tracker) {
 }
 
 export async function getContainerShipments(containerID) {
+  let client; // Asegúrate de declarar client aquí
+  try {
+    client = await connect();
+    const collection = client.collection('shipments');
+    
+    // Corrige la proyección aquí
+    const dbResult = await collection.find(
+      { container_id: parseInt(containerID) },
+      { projection: { start_date: 1, delivery_date: 1, id: 1 } } // Usar 'projection'
+    ).toArray();
+    
+    if (dbResult.length > 0) { // Verifica si hay documentos
+      console.log("Documentos obtenidos:", dbResult);
+      return { success: true, results: dbResult, error: "" };
+    } else {
+      return { success: false, results: {}, error: "No se encontraron envíos para el contenedor" };
+    }
+  } catch (error) {
+    console.error('Error al obtener el catálogo.', error);
+    return { success: false, results: {}, error: error.message }; // Usa error.message para más claridad
+  } finally {
+    if (client) {
+      await disconnect();
+    }
+  }
+}
+
+
+export async function db_getShipmentInfo(id) {
   try {
     const client = await connect()
     const collection = client.collection('shipments');
-    const dbResult = await collection.find({ container_id: parseInt(containerID)}).toArray();
+    const dbResult = await collection.findOne({ id: parseInt(id)});
     if (dbResult) {
       console.log("Documentos obtenidos:", dbResult);
       return {success: true, results: dbResult, error: "" };

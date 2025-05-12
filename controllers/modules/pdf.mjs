@@ -50,8 +50,8 @@ export async function generarReporteSeguimiento(data) {
         const pdf = {
             extension: "pdf",
             nombre: `reporte_seguimiento_${datasource.id}_${new Date().toISOString().slice(0, 10)}.pdf`,
-            buffer: pdfBuffer,
             mimetype: "application/pdf",
+            buffer: pdfBuffer,
         }
         console.log("PDF generado correctamente");
         return pdf;
@@ -62,6 +62,7 @@ export async function generarReporteSeguimiento(data) {
 };
 
 function processDataSource(datasource) {
+    console.log("Datasource original:", datasource); // Verifica el contenido original
     datasource.generate_date = generateDate();
     datasource.start_date = generateDate(datasource.start_date);
     datasource.delivery_date = generateDate(datasource.delivery_date);

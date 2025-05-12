@@ -1,7 +1,8 @@
 import jwt from "jsonwebtoken";
 import { generarOTP, validateToken } from "./modules/utils.mjs";
-import { consultaEmpresasPaqueteria, registerNewShipment, getContainerShipments, getCurrentContainerShipment, 
-    getUserContainers, linkTracker, getAppInfo, db_startShipment, db_updateTracker } from "./modules/database.mjs";
+import { consultaEmpresasPaqueteria, registerNewShipment, getContainerShipments, 
+    getCurrentContainerShipment, getUserContainers, linkTracker, getAppInfo, 
+    db_startShipment, db_updateTracker, db_getShipmentInfo } from "./modules/database.mjs";
 
 import { generarPDF, generarReporteSeguimiento } from "./modules/pdf.mjs";
 
@@ -230,7 +231,7 @@ export async function generateReport(req, res){
     }
 }
 
-export async function generateReporteSeguimiento(req, res){
+export async function generateCurrentReporteSeguimiento(req, res){
     console.log("generateReporteSeguimiento");
     const { containerID } = req.query;
     console.log("containerID:", containerID);
@@ -238,6 +239,39 @@ export async function generateReporteSeguimiento(req, res){
         const result = await getCurrentContainerShipment(containerID);
         const pdf = await generarReporteSeguimiento(result.result);
         return res.status(200).json({success: true, file: pdf});
+    }catch(error){
+        console.error("Error:", error);
+        return res.status(500).json({ success: false, message: 'Ocurrió un error al generar el reporte' });
+    }
+}
+
+export async function generateReporteSeguimiento(req, res){
+    console.log("generateReporteSeguimiento");
+    const { shipmentId } = req.query;
+    console.log("shipmentId:", shipmentId);
+    console.log("shipmentId:", typeof(shipmentId));
+    try{
+        const result = await db_getShipmentInfo(parseInt(shipmentId));
+        console.log("result:", result);
+        const pdf = await generarReporteSeguimiento(result.results);
+        return res.status(200).json({success: true, file: pdf});
+    }catch(error){
+        console.error("Error:", error);
+        return res.status(500).json({ success: false, message: 'Ocurrió un error al generar el reporte' });
+    }
+}
+
+export async function getShipments(req, res){
+    console.log("getShipments");
+    const { containerId } = req.query;
+    console.log("containerId:", containerId);
+    try{
+        const result = await getContainerShipments(containerId);
+        console.log("result:", result);
+        if(!result.success){
+            return res.status(400).json({success: false, message: result.error});
+        }
+        return res.status(200).json({success: true, results: result});
     }catch(error){
         console.error("Error:", error);
         return res.status(500).json({ success: false, message: 'Ocurrió un error al generar el reporte' });

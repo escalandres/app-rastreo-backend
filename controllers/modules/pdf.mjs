@@ -16,7 +16,13 @@ export async function generarPDF() {
         const template = await fs.readFile(path.join(PDF_TEMPLATES_PATH, "plantilla.ejs"), "utf-8");
         const html = ejs.render(template, { datos });
 
-        const browser = await puppeteer.launch();
+        const browser = await puppeteer.launch({
+            headless: process.env.NODE_ENV === "production"
+            ? true : false,
+            executablePath: process.env.NODE_ENV === "production"
+            ? process.env.PUPPETEER_EXECUTABLE_PATH
+            : puppeteer.executablePath()
+        });
         const page = await browser.newPage();
         await page.setContent(html);
         const pdfBuffer = await page.pdf({ format: "A4" });

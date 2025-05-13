@@ -8,7 +8,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon --env-file .env index.js",
     "start": "node index.js",
-    "check-vulnerabilities": "npx is-my-node-vulnerable"
+    "check-vulnerabilities": "npx is-my-node-vulnerable",
+    "postinstall": "puppeteer install"
   },
   "author": "escalandres",
   "license": "ISC",

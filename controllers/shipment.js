@@ -233,7 +233,13 @@ async function queryEstafeta(trackingCode) {
     const url = `https://rastreositecorecms.azurewebsites.net/Tracking/searchByGet/?wayBillType=1&wayBill=${trackingCode}`;
 
     // Iniciar el navegador
-    const browser = await puppeteer.launch({ headless: false }); // Cambia a true para ejecutar en modo sin cabeza
+    const browser = await puppeteer.launch({ 
+        headless: process.env.NODE_ENV === "production"
+        ? true : false,
+        executablePath: process.env.NODE_ENV === "production"
+        ? process.env.PUPPETEER_EXECUTABLE_PATH
+        : puppeteer.executablePath()
+    });
     const page = await browser.newPage();
 
     // Añadir una función para capturar errores de navegación
@@ -319,7 +325,11 @@ async function queryFedEx(trackingCode) {
 
     // Iniciar el navegador
     const browser = await puppeteer.launch({
-        headless: false,
+        headless: process.env.NODE_ENV === "production"
+        ? true : false,
+        executablePath: process.env.NODE_ENV === "production"
+        ? process.env.PUPPETEER_EXECUTABLE_PATH
+        : puppeteer.executablePath(),
         args: [
             '--disable-infobars',
             '--no-sandbox',

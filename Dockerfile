@@ -1,22 +1,29 @@
-FROM ghcr.io/puppeteer/puppeteer:24.2.1
+FROM node:18-slim
 
-# Definir la ruta correcta de Chromium
-ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
-
-# Instalar dependencias necesarias
+# Install dependencies for Chrome
 RUN apt-get update && apt-get install -y \
-    libnss3 \
-    libatk1.0-0 \
-    libgtk-3-0 \
-    libgbm1
+    wget \
+    gnupg2 \
+    && wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add - \
+    && echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list \
+    && apt-get update && apt-get install -y google-chrome-stable \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
+# Set environment variables for Puppeteer
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome-stable
+
+# Set the working directory
 WORKDIR /usr/src/app
 
-# Copiar y configurar las dependencias
+# Copy package.json and package-lock.json
 COPY package*.json ./
+
+# Install dependencies
 RUN npm ci
 
+# Copy the rest of your application code
 COPY . .
 
-# Iniciar la aplicación
-CMD ["node", "index.js"]
+# Start the application
+CMD ["node", "dist/app.js"]

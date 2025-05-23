@@ -14,9 +14,12 @@ import appRoutes from './routes/app.js';
 import trackerRoutes from './routes/tracker.js';
 import shipmentRoutes from './routes/shipment.js';
 import sendMail from './controllers/modules/nodemailer.js';
-
+import dotenv from 'dotenv';
 // -------------- Variables modules --------------
 const app = express();
+
+dotenv.config();
+
 
 // -------------- Variables Globales --------------
 // Obtiene la URL del archivo actual

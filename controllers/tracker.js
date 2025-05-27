@@ -1,4 +1,5 @@
 import { processTracker } from "./shipment.js";
+import { sendOtpEmail, sendNotifyEmail } from "./modules/email.mjs";
 
 function formatDate(inputDate) {
     // Divide la fecha y la hora
@@ -16,6 +17,11 @@ function formatDate(inputDate) {
     return formattedDate;
 }
 
+function agregarCerosIzquierda(cadena) {
+    return cadena.toString().padStart(3, '0');
+}
+
+
 function extraerDatos(mensaje) {
     // mensaje.replace('AT+', '');
     console.log("mensaje", mensaje);
@@ -24,31 +30,29 @@ function extraerDatos(mensaje) {
     // const regex = /AT\+CMGR=\d+\+CMGR:\s'REC UNREAD','(\+52\d{10,12})','','(\d{2}\/\d{2}\/\d{2},\d{2}:\d{2}:\d{2}-\d{2})'id:(\d+),latitud:([-\d.]+),longitud:([-\d.]+);OK/;
     // const regex = /\+CMT:\s'(\+52\d{10,12})','','(\d{2}\/\d{2}\/\d{2},\d{2}:\d{2}:\d{2}-\d{2})'id:(\d+),latitud:([-\d.]+),longitud:([-\d.]+);/;
     // const regex = /\+(CMT|CMGR):\s'REC UNREAD','(\+52\d{10,12})','','(\d{2}\/\d{2}\/\d{2},\d{2}:\d{2}:\d{2}-\d{2})'id:(\d+),latitud:([-\d.]+),longitud:([-\d.]+);/;
-    const regex = /\+(CMT|CMGR):\s'REC UNREAD','(\+52\d{10,12})','','([\d\/:,]+)-([\d\/:,]+)'{'id':'(\d+)',[^}]*time':'([\d\-:T]+)','cti':{'lac':'(\d+)','cellid':'(\d+)','mcc':'(\d+)','mnc':'(\d+)'},'lat':'([-\d.]+)','lon':'([-\d.]+)'}OK/gm;
+    // const regex = /\+(CMT|CMGR):\s'REC UNREAD','(\+52\d{10,12})','','([\d\/:,]+)-([\d\/:,]+)'{'id':'(\d+)',[^}]*time':'([\d\-:T]+)','cti':{'lac':'(\d+)','cellid':'(\d+)','mcc':'(\d+)','mnc':'(\d+)'},'lat':'([-\d.]+)','lon':'([-\d.]+)'}OK/gm;
+    const regex = /\+(CMT|CMGR):\s'REC UNREAD','(\+52\d{10,12})','','([\d\/:,]+)-([\d\/:,]+)'id:(\d+),time:([\d\-:T]+),red:(\w+),mcc:(\d+),mnc:(\d+),lac:(\d+),cid:(\d+),nb:(\d+),lat:([-\d.]+),lon:([-\d.]+)OK/gm;
 
     const resultado = regex.exec(mensaje);
 
     console.log("resultado", resultado);
     if (resultado) {
-        const objetoDatos = {
-            num_cell: resultado[2],
-            cell_fecha: formatDate(resultado[3]),
-            tracker_id: resultado[5],
-            time: resultado[6],
-            cell_lac: resultado[7],
-            cell_id: resultado[8],
-            cell_mcc: resultado[9],
-            cell_mnc: resultado[10],
-            latitud: parseFloat(resultado[11]),
-            longitud: parseFloat(resultado[12])
-        };
-        console.log("objetoDatos", objetoDatos);
         const datosRastreador = {
-            id: "48273619",
-            date: formatDate(resultado[3]),
-            lat: parseFloat(resultado[5]),
-            lng: parseFloat(resultado[6])
+            numcell: resultado[2],
+            fecha: formatDate(resultado[3]),
+            id: resultado[5],
+            time: resultado[6],
+            network: resultado[7],
+            mcc: parseInt(resultado[8]),
+            mnc: agregarCerosIzquierda(resultado[9]),
+            lac: parseInt(resultado[10]),
+            cid: parseInt(resultado[11]),
+            batteryLevel: resultado[12],
+            lat: parseFloat(resultado[13]),
+            lng: parseFloat(resultado[14])
         };
+        console.log("datosRastreador", datosRastreador);
+
         return datosRastreador;
     } else {
         console.error("Formato de mensaje no válido");
@@ -63,10 +67,11 @@ export async function subirDatos(req, res){
         console.log("Coordenadas:",trackerData);
 
         const response = await processTracker(trackerData);
+        //let response = {success: true, message: "Datos procesados correctamente"};
         if(!response.success){
-            return res.status(400).json({success: false, message: "Error al guardar coordenadas"})
+            return res.status(400).json(response)
         }else{
-            return res.status(200).json({success: true, message: "Coordenadas guardadas correctamente"})
+            return res.status(200).json(response);
         }
             
         

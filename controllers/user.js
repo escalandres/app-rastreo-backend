@@ -1,6 +1,6 @@
 import { getUser, registerNewUser, changePassword, getOTP, registrarOTP,authGoogle, authGithub } from "./modules/database.mjs";
 import { sendRecoverEmail } from "./modules/resend.mjs";
-import { sendOtpEmail } from "./modules/email.mjs";
+import { sendOtpEmail, sendNotifyEmail } from "./modules/email.mjs";
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';

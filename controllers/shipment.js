@@ -1,8 +1,9 @@
 import puppeteer from 'puppeteer';
 import { consultaEmpresasPaqueteria, registerNewShipment, getContainerShipments, getCurrentContainerShipment, updateShipment } from "./modules/database.mjs";
 import { translateStatus, translateStatusCode, convertToISO, createStatusCodeFromDescription, convertToISOFromDDMMYYYY, extractDetailsFromEstafeta,
-    getMostRecentEntry, isEmptyObj, generarCoordenadasCiudadMexico, getOldestEntry
+    getMostRecentEntry, isEmptyObj, generarCoordenadasCiudadMexico, getOldestEntry, processLocation
 } from "./modules/utils.mjs";
+import { sendOtpEmail, sendNotifyEmail } from "./modules/email.mjs";
 
 /*
 const trackingCode = 2989923510; DHL
@@ -76,15 +77,19 @@ export async function obtenerEnvioMasReciente(req, res) {
 
 export async function processTracker(trackerData) {
     try {
-        // Obtener información envío actual del rastreador provista por la paquetería
+        // Obtener numero de rastreo del envío actual del rastreador provista por la paquetería
         const dbResult = await getCurrentShipment(trackerData.id);
+        console.log('dbResult', dbResult);
         if(dbResult.success){
             //Envio en curso
-            if(!dbResult.result.delivery_date){
+            // Obtener información envío actual del rastreador provista por la paquetería
+            console.log('dbResult.result.delivery_date', dbResult.result.delivery_date);
+            if(dbResult.result.delivery_date){
                 let statusInfo = {};
                 switch(dbResult.result.shipment_data.company){
                     case "DHL":
-                        statusInfo = await DHL(dbResult.result.shipment_data.tracking_number, dbResult.result.shipment_data.service_id);
+                        console.log('DHL');
+                        statusInfo = await DHL(dbResult.result);
                         break;
 
                     case "Estafeta":
@@ -95,15 +100,53 @@ export async function processTracker(trackerData) {
                         statusInfo = await FedEx(dbResult.result.shipment_data.tracking_number);
                         break;
                 }
+                console.log('statusInfo', statusInfo);
+                let locationData = {};
 
-                const dbResponse = await updateShipment(dbResult.result.id, trackerData, statusInfo);
+                //Verificar si hay datos del GPS del rastreador
+                if(trackerData.lat != 0  || trackerData.lng != 0){
+                    locationData = {
+                        date: trackerData.time,
+                        lat: trackerData.lat,
+                        lng: trackerData.lng,
+                        isCellTower: false,
+                        radius: 0,
+                        batteryLevel: trackerData.batteryLevel
+                    };
+                }
+                else{
+                    let openCellIdData = await _getCellTowerLocation(trackerData);
+                    console.log('openCellIdData', openCellIdData);
+                    if(openCellIdData.status === "error") throw new Error("Ocurrió un error al obtener la ubicación de la torre celular");
+                    locationData = {
+                        date: trackerData.time,
+                        lat: openCellIdData.lat,
+                        lng: openCellIdData.lon,
+                        isCellTower: true,
+                        radius: openCellIdData.accuracy,
+                        batteryLevel: trackerData.batteryLevel
+                    };
+
+                }
+
+
+                const dbResponse = await updateShipment(dbResult.result.id, locationData, statusInfo);
                 console.log(dbResponse);
                 if(!dbResponse.success){
                     return {success: false, message: "Error al guardar coordenadas"};
                 }else{
+                    locationData.tracker = trackerData.id;
+                    locationData.network = trackerData.network;
+                    locationData.mcc = trackerData.mcc;
+                    locationData.mnc = trackerData.mnc;
+                    locationData.lac = trackerData.lac;
+                    locationData.cid = trackerData.cid;
+                    locationData.location = processLocation(locationData.isCellTower, locationData.radius)
+                    await sendNotifyEmail(locationData);
                     return {success: true, message: "Coordenadas guardadas correctamente"};
                 }
             }
+            return {success: false, message: "El envío seleccionado ya terminó"};
         }
     } catch (error) {
         return {success: false, message: "Error al guardar coordenadas"};
@@ -205,6 +248,7 @@ async function queryDHL(trackingCode, service) {
 }
 
 function processDHLResponse(dhlResponse, shipmentStatus){
+    if(dhlResponse.status === 404) return {};
     console.log('processDHLResponse');
     console.log('dhlResponse',dhlResponse);
     console.log('shipmentStatus',shipmentStatus);
@@ -669,6 +713,47 @@ export async function processShipmentManual(req, res) {
 
 }
 
+export async function processShipmentManual1(req, res) {
+    try {
+        console.log("---------------------processShipmentManual---------------------");
+        let trackerData = req.body.trackerData;
+        let shipmentData = req.body.shipmentData; 
+        // Obtener información envío actual del rastreador provista por la paquetería
+        const dbResult = await getCurrentShipment(trackerData.id);
+        if(dbResult.success){
+            //Envio en curso
+            console.log('dbResult.result.delivery_date',dbResult.result.delivery_date);
+            // if(!dbResult.result.delivery_date){
+            if(!dbResult.result.delivery_date){
+                let statusInfo = {};
+                console.log('dbResult.result.shipment_data.company',dbResult.result.shipment_data.company);
+                statusInfo = processResponse(shipmentData, dbResult.result.shipment_status);
+
+                if(isEmptyObj(statusInfo)){
+                    const a = generarCoordenadasCiudadMexico();
+                    console.log('a',a);
+                    statusInfo = { message: "No hay cambios en el estatus del envío" };
+                    return res.status(200).json({success: true, db: dbResult.result, tracker: trackerData, status: statusInfo});
+                }
+                trackerData = generarCoordenadasCiudadMexico();
+                console.log('trackerData',trackerData);
+                const dbResponse = await updateShipment(dbResult.result.id, trackerData, statusInfo);
+                console.log(dbResponse);
+                if(!dbResponse.success){
+                    return res.status(200).json({success: false, message: "Error al actualizar el envío"});
+                }else{
+                    return res.status(200).json({success: true, message: "El envio se ha actualizado correctamente"});
+                }
+            }
+            return res.status(200).json({success: true, message: "El envío seleccionado ya terminó"});
+        }
+        return res.status(400).json({success: false, message: dbResult.error});
+    } catch (error) {
+        return res.status(500).json({success: false, message: "Error al guardar coordenadas"});
+    }
+
+}
+
 function processResponse(response, shipmentStatus){
     const latestStatus = getOldestEntry(response);
     console.log('latestStatus',latestStatus);
@@ -694,8 +779,9 @@ function processResponse(response, shipmentStatus){
 
 // ------------------------- OPEN CELL ID -------------------------------------------------------------
 async function _getCellTowerLocation(params) {
-    const { mcc, mnc, lac, cid } = params;
+    const { mcc, mnc, lac, cid, network } = params;
     console.log('url', params);
+    console.log(`mcc: ${mcc}, mnc: ${mnc}, lac: ${lac}, cid: ${cid}, network: ${network}`);
     let location = {};
     try {
         const response = await fetch('https://us1.unwiredlabs.com/v2/process.php', {
@@ -705,7 +791,7 @@ async function _getCellTowerLocation(params) {
             },
             body: JSON.stringify({
                 token: process.env.OPENCELLID_API_KEY,
-                radio: "gsm",
+                radio: network,
                 mcc: mcc,
                 mnc: mnc,
                 cells: [

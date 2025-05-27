@@ -5,8 +5,6 @@ import path from "path";
 export default async function sendMail(to,subject,template) {
     try {
         console.log("Enviando correo");
-        console.log("user email", process.env.USER_EMAIL);
-        console.log("pass email", process.env.PASS_EMAIL);
         // Create a transporter
         const transporter = nodemailer.createTransport({
             service: "gmail",

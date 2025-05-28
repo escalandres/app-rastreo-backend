@@ -20,7 +20,8 @@ export const PLANTILLAS = {
 
 export async function sendOtpEmail(email,otp) {
     try{
-        const templatePath = path.join(TEMPLATES_PATH, `${PLANTILLAS.otp.file}`);
+        const templateFolder = process.env.NODE_ENV === 'production' ? PROD_EMAIL_TEMPLATES_PATH : DEV_EMAIL_TEMPLATES_PATH;
+        const templatePath = path.join(templateFolder, `${PLANTILLAS.otp.file}`);
         let template = fs.readFileSync(templatePath, 'utf8');
         console.log("template");
         const variables = {
@@ -47,7 +48,8 @@ export async function sendNotifyEmail(data) {
     try{
         console.log("enviando correo de notificacion");
         console.log("data", data);
-        const templatePath = path.join(TEMPLATES_PATH, `${PLANTILLAS.notify.file}`);
+        const templateFolder = process.env.NODE_ENV === 'production' ? PROD_EMAIL_TEMPLATES_PATH : DEV_EMAIL_TEMPLATES_PATH;
+        const templatePath = path.join(templateFolder, `${PLANTILLAS.notify.file}`);
         let template = fs.readFileSync(templatePath, 'utf8');
         console.log("template");
         const variables = data;

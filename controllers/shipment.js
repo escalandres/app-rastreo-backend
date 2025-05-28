@@ -84,7 +84,7 @@ export async function processTracker(trackerData) {
             //Envio en curso
             // Obtener información envío actual del rastreador provista por la paquetería
             console.log('dbResult.result.delivery_date', dbResult.result.delivery_date);
-            if(dbResult.result.delivery_date){
+            if(!dbResult.result.delivery_date){
                 let statusInfo = {};
                 switch(dbResult.result.shipment_data.company){
                     case "DHL":

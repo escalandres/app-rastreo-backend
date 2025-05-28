@@ -62,6 +62,11 @@ function extraerDatos(mensaje) {
 
 export async function subirDatos(req, res){
     try {
+        const token = req.headers.authorization.replace("Bearer ", "");
+        console.log("Token recibido:", token);
+        if (!token || token !== process.env.TOKEN) {
+            return res.status(401).json({ success: false, message: "Token de autorización inválido" });
+        }
         // Extraer datos del mensaje enviado por el rastreador
         const trackerData = extraerDatos(req.body.datos);
         console.log("Coordenadas:",trackerData);

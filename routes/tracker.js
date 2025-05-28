@@ -31,6 +31,8 @@ router.post('/test-json', (req, res) => {
 
 router.post('/post-test', (req, res) => {
     console.log("----------------");
+    console.log("auth", req.headers.authorization);
+    console.log("Datlos del receptor", req.body.datos);
     if(req.body.datos !== "AT+CMGR=0ERROR" && req.body.datos !== "Enviando informacion de los rastreadores al servidor"){
         const mensaje = req.body.datos;
         console.log("req.body.datos", mensaje);

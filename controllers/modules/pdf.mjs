@@ -12,8 +12,9 @@ export async function generarPDF() {
             { id: 2, nombre: "Ana López", email: "ana.lopez@example.com" },
             { id: 3, nombre: "Carlos García", email: "carlos.garcia@example.com" }
         ];
-        
-        const template = await fs.readFile(path.join(PDF_TEMPLATES_PATH, "plantilla.ejs"), "utf-8");
+        const templateFolder = process.env.NODE_ENV === 'production' ? PROD_EMAIL_TEMPLATES_PATH : DEV_EMAIL_TEMPLATES_PATH;
+        const templatePath = path.join(templateFolder, `${PLANTILLAS.notify.file}`);
+        const template = await fs.readFile(path.join(templatePath, "plantilla.ejs"), "utf-8");
         const html = ejs.render(template, { datos });
 
         const browser = await puppeteer.launch({

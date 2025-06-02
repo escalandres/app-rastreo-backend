@@ -1,5 +1,6 @@
 import { processTracker } from "./shipment.js";
 import { sendOtpEmail, sendNotifyEmail } from "./modules/email.mjs";
+import { consoleLog } from "./modules/utils.mjs";
 
 function formatDate(inputDate) {
     // Divide la fecha y la hora
@@ -23,19 +24,11 @@ function agregarCerosIzquierda(cadena) {
 
 
 function extraerDatos(mensaje) {
-    // mensaje.replace('AT+', '');
-    console.log("mensaje", mensaje);
     // Expresión regular para extraer los datos
-    // const regex = /\+CMGR:\s'REC UNREAD','(\+52\d{10,12})','','(\d{2}\/\d{2}\/\d{2},\d{2}:\d{2}:\d{2}-\d{2})'id:(\d+),latitud:([-\d.]+),longitud:([-\d.]+);/;
-    // const regex = /AT\+CMGR=\d+\+CMGR:\s'REC UNREAD','(\+52\d{10,12})','','(\d{2}\/\d{2}\/\d{2},\d{2}:\d{2}:\d{2}-\d{2})'id:(\d+),latitud:([-\d.]+),longitud:([-\d.]+);OK/;
-    // const regex = /\+CMT:\s'(\+52\d{10,12})','','(\d{2}\/\d{2}\/\d{2},\d{2}:\d{2}:\d{2}-\d{2})'id:(\d+),latitud:([-\d.]+),longitud:([-\d.]+);/;
-    // const regex = /\+(CMT|CMGR):\s'REC UNREAD','(\+52\d{10,12})','','(\d{2}\/\d{2}\/\d{2},\d{2}:\d{2}:\d{2}-\d{2})'id:(\d+),latitud:([-\d.]+),longitud:([-\d.]+);/;
-    // const regex = /\+(CMT|CMGR):\s'REC UNREAD','(\+52\d{10,12})','','([\d\/:,]+)-([\d\/:,]+)'{'id':'(\d+)',[^}]*time':'([\d\-:T]+)','cti':{'lac':'(\d+)','cellid':'(\d+)','mcc':'(\d+)','mnc':'(\d+)'},'lat':'([-\d.]+)','lon':'([-\d.]+)'}OK/gm;
     const regex = /\+(CMT|CMGR):\s'REC UNREAD','(\+52\d{10,12})','','([\d\/:,]+)-([\d\/:,]+)'id:(\d+),time:([\d\-:T]+),red:(\w+),mcc:(\d+),mnc:(\d+),lac:(\d+),cid:(\d+),nb:(\d+),lat:([-\d.]+),lon:([-\d.]+)OK/gm;
 
     const resultado = regex.exec(mensaje);
 
-    console.log("resultado", resultado);
     if (resultado) {
         const datosRastreador = {
             numcell: resultado[2],
@@ -51,35 +44,36 @@ function extraerDatos(mensaje) {
             lat: parseFloat(resultado[13]),
             lng: parseFloat(resultado[14])
         };
-        console.log("datosRastreador", datosRastreador);
-
         return datosRastreador;
     } else {
-        console.error("Formato de mensaje no válido");
+        console.error("Formato de mensaje no válido", true);
         return {};
     }
 }
 
 export async function subirDatos(req, res){
     try {
+        let mensajeReceptor = req.body.datos;
+        consoleLog("Mensaje del receptor:", mensajeReceptor, true)
         const token = req.headers.authorization.replace("Bearer ", "");
-        console.log("Token recibido:", token);
+
         if (!token || token !== process.env.TOKEN) {
             return res.status(401).json({ success: false, message: "Token de autorización inválido" });
         }
         // Extraer datos del mensaje enviado por el rastreador
-        const trackerData = extraerDatos(req.body.datos);
-        console.log("Coordenadas:",trackerData);
-
-        const response = await processTracker(trackerData);
-        //let response = {success: true, message: "Datos procesados correctamente"};
-        if(!response.success){
-            return res.status(400).json(response)
-        }else{
-            return res.status(200).json(response);
-        }
-            
+        const trackerData = extraerDatos(mensajeReceptor);
+        consoleLog("datosRastreador", trackerData, true);
         
+        if(trackerData != {}){
+            const response = await processTracker(trackerData);
+            if(!response.success){
+                return res.status(400).json(response)
+            }else{
+                return res.status(200).json(response);
+            }
+        }
+        
+        return res.status(400).json({ success: false, message: "El mensaje no tiene un formato válido" })
         
     } catch (error) {
         console.error('Ocurrio un error:',error);
@@ -92,7 +86,7 @@ export async function subirDatos1(req, res){
     try {
         // Extraer datos del mensaje enviado por el rastreador
         const trackerData = extraerDatos(req.body.datos);
-        console.log("Coordenadas:",trackerData);
+        consoleLog("Coordenadas:",trackerData);
         res.status(200).json({ success: true , message: "Extraccion"});
     } catch (error) {
         console.error('Ocurrio un error:',error);

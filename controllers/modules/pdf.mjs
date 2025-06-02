@@ -3,7 +3,7 @@ import puppeteer from "puppeteer";
 import fs from "fs/promises";
 import path from "path";
 import { buffer } from "stream/consumers";
-import { translateStatus, colorStatus, translateStatusCode, convertDateToReport, generateDate, processLocation } from "./utils.mjs";
+import { consoleLog, translateStatus, colorStatus, translateStatusCode, convertDateToReport, generateDate, processLocation } from "./utils.mjs";
 
 export async function generarPDF() {
     try {
@@ -18,8 +18,7 @@ export async function generarPDF() {
         const html = ejs.render(template, { datos });
 
         const browser = await puppeteer.launch({
-            headless: process.env.NODE_ENV === "production"
-            ? true : false,
+            headless: process.env.NODE_ENV === "production",
             executablePath: process.env.NODE_ENV === "production"
             ? process.env.PUPPETEER_EXECUTABLE_PATH
             : puppeteer.executablePath()
@@ -30,7 +29,7 @@ export async function generarPDF() {
 
         await browser.close();
         await fs.writeFile(path.join(PDF_PATH, "reporte.pdf"), pdfBuffer);
-        console.log("PDF generado correctamente");
+        consoleLog("PDF generado correctamente");
         return pdfBuffer;
     } catch (error) {
         console.error("Error generando el PDF:", error);
@@ -44,7 +43,7 @@ export async function generarReporteSeguimiento(data) {
         // datasource
         const template = await fs.readFile(path.join(PDF_TEMPLATES_PATH, "reporte_seguimiento.ejs"), "utf-8");
         const datasource = processDataSource(data);
-        console.log("Datasource:", datasource); // Verifica el contenido de datasource
+        consoleLog("Datasource:", datasource); // Verifica el contenido de datasource
         const html = ejs.render(template, { datasource });
 
         const browser = await puppeteer.launch();
@@ -60,7 +59,7 @@ export async function generarReporteSeguimiento(data) {
             mimetype: "application/pdf",
             buffer: pdfBuffer,
         }
-        console.log("PDF generado correctamente");
+        consoleLog("PDF generado correctamente");
         return pdf;
     } catch (error) {
         console.error("Error generando el PDF:", error);
@@ -69,7 +68,7 @@ export async function generarReporteSeguimiento(data) {
 };
 
 function processDataSource(datasource) {
-    console.log("Datasource original:", datasource); // Verifica el contenido original
+    consoleLog("Datasource original:", datasource); // Verifica el contenido original
     datasource.generate_date = generateDate();
     datasource.start_date = generateDate(datasource.start_date);
     datasource.delivery_date = generateDate(datasource.delivery_date);

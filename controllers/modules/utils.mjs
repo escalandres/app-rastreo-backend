@@ -1,6 +1,25 @@
 import jwt from 'jsonwebtoken';
 
 
+// export const consoleLog = {
+//     prod: function(title, message){
+//         console.log()
+//     }
+// }
+
+export function consoleLog(title, message = "", showOnProd = false) {
+    const isProd = process.env.NODE_ENV === "production";
+
+    if (isProd) {
+        if (showOnProd) {
+            console.log(title, message);
+        }
+    } else {
+        // Siempre muestra en development
+        console.log(title, message);
+    }
+}
+
 export function validateToken(token) { 
     try { 
         const decodedToken = jwt.verify(token, process.env.KEY); 

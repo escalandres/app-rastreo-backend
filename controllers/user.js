@@ -5,7 +5,7 @@ import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import { OAuth2Client } from "google-auth-library";
-
+import { consoleLog } from "./modules/utils.mjs";
 
 
 export async function login(req, res){
@@ -13,7 +13,7 @@ export async function login(req, res){
         const { email, password } = req.body;
         const result = await getUser(email)
 
-        // console.log(result)
+        // consoleLog(result)
 
         if(!result.success){
             return res.status(404).json({success: false, message: "The user does not exist"})
@@ -84,7 +84,7 @@ export async function logout(req,res){
 
 export async function changeUserPassword(req,res){
     try {
-        console.log("-----Cambiando contraseña-----");
+        consoleLog("-----Cambiando contraseña-----");
         const { password, email } = req.body;
         const hashedPassword = await bcrypt.hash(password, 10);
         const response = await changePassword(email, hashedPassword)
@@ -172,7 +172,7 @@ export function validateChangeToken(req, res, next) {
 
 export async function googleAuth(req, res){
     try {
-        console.log("-------------Autenticando con Google-------------");
+        consoleLog("-------------Autenticando con Google-------------");
         const oAuth2Client = new OAuth2Client(
             process.env.GOOGLE_CLIENT_ID,
             process.env.GOOGLE_CLIENT_SECRET,
@@ -188,7 +188,7 @@ export async function googleAuth(req, res){
         const googleResponse = await oAuth2Client.request({ url });
         const userInfoGoogle = googleResponse.data;
         // Imprime la información del usuario
-        //console.log("user google", userInfoGoogle);
+        //consoleLog("user google", userInfoGoogle);
         const response = await authGoogle(userInfoGoogle);
         if(!response.success){
             return res.status(401).json({success: false, message: "Error al crear su cuenta de usuario. Inténtelo nuevamente"})
@@ -210,14 +210,14 @@ export async function googleAuth(req, res){
 
 export async function githubAuth(req, res){
     try {
-        console.log("-------------Autenticando con GitHub-------------");
+        consoleLog("-------------Autenticando con GitHub-------------");
         const code = req.body.code;
-        // console.log("------code",code)
+        // consoleLog("------code",code)
         const githubToken = await getGithubToken(code);
         if(githubToken === undefined) return res.status(401).json({ success: false });
-        ///console.log("githubToken",githubToken)
+        ///consoleLog("githubToken",githubToken)
         const githubUser = await getGithubUser(githubToken);
-        //console.log("githubUser",githubUser)
+        //consoleLog("githubUser",githubUser)
         const response = await authGithub(githubUser);
         // const result = await getUser(oauth.email)
 
@@ -234,7 +234,7 @@ export async function githubAuth(req, res){
             name: response.user.name,
             profile_picture: response.user.profile_picture
         }}, process.env.KEY, { expiresIn: '1h' });
-        // console.log("token",token);
+        // consoleLog("token",token);
         // res.cookie('AuthToken', token, { maxAge: 3 * 24 * 60 * 60 * 1000 });
         //req.session.user = { id: result.user.id, email: result.user.email };
         return res.status(200).json({ success: true, token: token });
@@ -247,13 +247,13 @@ export async function githubAuth(req, res){
 
 export async function linkedinAuth(req, res){
     try {
-        console.log("-------------Autenticando con LinkedIn-------------");
+        consoleLog("-------------Autenticando con LinkedIn-------------");
         const code = req.body.code;
 
         const githubToken = await getGithubToken(code);
-        ///console.log("githubToken",githubToken)
+        ///consoleLog("githubToken",githubToken)
         const githubUser = await getGithubUser(githubToken);
-        //console.log("githubUser",githubUser)
+        //consoleLog("githubUser",githubUser)
         const response = await authGithub(githubUser);
         // const result = await getUser(oauth.email)
 
@@ -270,7 +270,7 @@ export async function linkedinAuth(req, res){
             name: response.user.name,
             profile_picture: response.user.profile_picture
         }}, process.env.KEY, { expiresIn: '1h' });
-        //console.log("token",token);
+        //consoleLog("token",token);
         // res.cookie('AuthToken', token, { maxAge: 3 * 24 * 60 * 60 * 1000 });
         //req.session.user = { id: result.user.id, email: result.user.email };
         return res.status(200).json({ success: true, token: token });
@@ -286,7 +286,7 @@ export async function linkedinAuth(req, res){
 async function getGithubToken(code){
     let token = '';
     const params = `?client_id=${process.env.GITHUB_CLIENT_ID}&client_secret=${process.env.GITHUB_CLIENT_SECRET}&code=${code}`;
-    //console.log("-------params",params);
+    //consoleLog("-------params",params);
     await fetch(`https://github.com/login/oauth/access_token${params}`, {
         method: 'POST',
         headers: {
@@ -295,8 +295,8 @@ async function getGithubToken(code){
     }).then((response) => { 
         return response.json()
     }).then((data) => {
-        //console.log(data)
-        console.log("getGithubToken",data.access_token);
+        //consoleLog(data)
+        consoleLog("getGithubToken",data.access_token);
         token = data.access_token;
     }).catch((error) => {
         console.error('Error:', error);
@@ -314,7 +314,7 @@ async function getGithubUser(token){
     }).then((response) => {
         return response.json()
     }).then((data) => {
-        console.log("user", data)
+        consoleLog("user", data)
         user = data;
     }).catch((error) => {
         console.error('Error:', error);
@@ -331,7 +331,7 @@ async function getLinkedinUser(token){
     }).then((response) => {
         return response.json()
     }).then((data) => {
-        //console.log("user", data)
+        //consoleLog("user", data)
         user = data;
     }).catch((error) => {
         console.error('Error:', error);

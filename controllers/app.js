@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import { generarOTP, validateToken } from "./modules/utils.mjs";
+import { generarOTP, validateToken, consoleLog } from "./modules/utils.mjs";
 import { consultaEmpresasPaqueteria, registerNewShipment, getContainerShipments, 
     getCurrentContainerShipment, getUserContainers, linkTracker, getAppInfo, 
     db_startShipment, db_updateTracker, db_getShipmentInfo } from "./modules/database.mjs";
@@ -10,7 +10,7 @@ export async function dhlTracking(req, res) {
     const myHeaders = new Headers();
     myHeaders.append("DHL-API-Key", process.env.DHL_API_KEY);
 
-    // console.log(process.env.DHL_API_KEY);
+    // consoleLog(process.env.DHL_API_KEY);
     
     const requestOptions = {
         method: "GET",
@@ -22,23 +22,23 @@ export async function dhlTracking(req, res) {
     const service = "express";
     const language = "it";
     const limit = 2;
-    console.log(`service: ${service}, language: ${language}, limit: ${limit}`);
+    consoleLog(`service: ${service}, language: ${language}, limit: ${limit}`);
     fetch(`https://api-eu.dhl.com/track/shipments?trackingNumber=${trackingCode}&service=${service}&language=${language}&limit=${limit}`, requestOptions)
         .then((response) => response.text())
-        .then((result) => console.log(result))
+        .then((result) => consoleLog(result))
         .catch((error) => console.error(error));
     return res.status(200).json({ message: "Shipment tracked successfully" });
 }
 
 export async function obtenerInfo(req, res) {
-    console.log("Obteniendo Info");
+    consoleLog("Obteniendo Info");
     const authHeader = req.headers['authorization']; 
     if (authHeader) { 
         const token = authHeader.split(' ')[1]; // Assuming 'Bearer <token>' 
         const decodedToken = validateToken(token);
         if(decodedToken){
             let response = await getAppInfo(decodedToken.user.id);
-            console.log(response);
+            consoleLog(response);
             return res.status(200).json({success: response.success, results: response.results, error: response.error});
         }
     } else { 
@@ -67,7 +67,7 @@ export async function registrarNuevoEnvio(req, res) {
 }
 
 export async function obtenerContenedoresUsuario(req, res) {
-    console.log("Obteniendo contenedores de usuario");
+    consoleLog("Obteniendo contenedores de usuario");
     const authHeader = req.headers['authorization']; 
     if (authHeader) { 
         const token = authHeader.split(' ')[1]; // Assuming 'Bearer <token>' 
@@ -87,9 +87,9 @@ export async function obtenerContenedoresUsuario(req, res) {
 }
 
 export async function obtenerEnviosContenedor(req, res) {
-    console.log("req.query:", req.query);
+    consoleLog("req.query:", req.query);
     const { containerID } = req.query;
-    console.log("containerID:", containerID);
+    consoleLog("containerID:", containerID);
     const result = await getContainerShipments(containerID);
     if(!result.success){
         return res.status(400).json({success: false, message: result.error});
@@ -99,7 +99,7 @@ export async function obtenerEnviosContenedor(req, res) {
 }
 
 export async function obtenerEnvioMasReciente(req, res) {
-    console.log("Obteniendo envío más reciente");
+    consoleLog("Obteniendo envío más reciente");
     const { trackerID } = req.query;
     const authHeader = req.headers['authorization']; 
     const token = authHeader.split(' ')[1]; // Assuming 'Bearer <token>' 
@@ -116,7 +116,7 @@ export async function obtenerEnvioMasReciente(req, res) {
 }
 
 export async function vincularRastreador(req, res) {
-    console.log("vinculado rastreador");
+    consoleLog("vinculado rastreador");
     try{
         const { trackerID } = req.body;
         const authHeader = req.headers['authorization']; 
@@ -133,7 +133,7 @@ export async function vincularRastreador(req, res) {
                     shipments: []
                 }
                 const result = await linkTracker(tracker);
-                console.log("result:", result);
+                consoleLog("result:", result);
                 if(!result.success){
                     return res.status(200).json({success: false, message: result.error});
                 }else{
@@ -174,7 +174,7 @@ export async function startShipment(req, res) {
                     locations: []
                 }
                 const result = await db_startShipment(shipment);
-                // console.log("result:", result);
+                // consoleLog("result:", result);
                 if(!result.success){
                     return res.status(200).json({success: false, message: result.error});
                 }else{
@@ -194,7 +194,7 @@ export async function startShipment(req, res) {
 }
 
 export async function updateTracker(req, res) {
-    console.log("updateTracker");
+    consoleLog("updateTracker");
     try{
         const { trackerId, nickname, img } = req.body;
         const authHeader = req.headers['authorization']; 
@@ -203,7 +203,7 @@ export async function updateTracker(req, res) {
             const decodedToken = validateToken(token);
             if(decodedToken){
                 const result = await db_updateTracker(trackerId, nickname, img);
-                console.log("result:", result);
+                consoleLog("result:", result);
                 if(!result.success){
                     return res.status(400).json({success: false, message: result.error});
                 }else{
@@ -221,7 +221,7 @@ export async function updateTracker(req, res) {
 }
 
 export async function generateReport(req, res){
-    console.log("generateReport");
+    consoleLog("generateReport");
     try{
         const result = await generarPDF();
         return res.status(200).json({success: true, message: result});
@@ -232,9 +232,9 @@ export async function generateReport(req, res){
 }
 
 export async function generateCurrentReporteSeguimiento(req, res){
-    console.log("generateReporteSeguimiento");
+    consoleLog("generateReporteSeguimiento");
     const { containerID } = req.query;
-    console.log("containerID:", containerID);
+    consoleLog("containerID:", containerID);
     try{
         const result = await getCurrentContainerShipment(containerID);
         const pdf = await generarReporteSeguimiento(result.result);
@@ -246,13 +246,13 @@ export async function generateCurrentReporteSeguimiento(req, res){
 }
 
 export async function generateReporteSeguimiento(req, res){
-    console.log("generateReporteSeguimiento");
+    consoleLog("generateReporteSeguimiento");
     const { shipmentId } = req.query;
-    console.log("shipmentId:", shipmentId);
-    console.log("shipmentId:", typeof(shipmentId));
+    consoleLog("shipmentId:", shipmentId);
+    consoleLog("shipmentId:", typeof(shipmentId));
     try{
         const result = await db_getShipmentInfo(parseInt(shipmentId));
-        console.log("result:", result);
+        consoleLog("result:", result);
         const pdf = await generarReporteSeguimiento(result.results);
         return res.status(200).json({success: true, file: pdf});
     }catch(error){
@@ -262,12 +262,12 @@ export async function generateReporteSeguimiento(req, res){
 }
 
 export async function getShipments(req, res){
-    console.log("getShipments");
+    consoleLog("getShipments");
     const { containerId } = req.query;
-    console.log("containerId:", containerId);
+    consoleLog("containerId:", containerId);
     try{
         const result = await getContainerShipments(containerId);
-        console.log("result:", result);
+        consoleLog("result:", result);
         if(!result.success){
             return res.status(400).json({success: false, message: result.error});
         }

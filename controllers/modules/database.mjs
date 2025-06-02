@@ -2,7 +2,7 @@ import { MongoClient } from 'mongodb';
 import {generarOTP, generateTimestamp, isEmptyObj, formatDateToTimestamp} from './utils.mjs';
 import crypto from 'crypto';
 import { link } from 'fs';
-
+import { consoleLog } from './utils.mjs';
 
 const uri = process.env.DATABASE_URL;
 // const client = new MongoClient(uri, {useNewUrlParser: true, useUnifiedTopology: true});
@@ -11,7 +11,7 @@ const client = new MongoClient(uri, {});
 async function connect() {
   try {
     await client.connect();
-    console.log('Connected to MongoDB Atlas');
+    consoleLog('Connected to MongoDB Atlas');
     const db = client.db('app-rastreo');
     return db;
   } catch (err) {
@@ -22,7 +22,7 @@ async function connect() {
 async function disconnect() {
   try {
     await client.close();
-    console.log('Disconnected from MongoDB Atlas');
+    consoleLog('Disconnected from MongoDB Atlas');
   } catch (err) {
     console.error('Error disconnecting from MongoDB Atlas:', err);
   }
@@ -37,7 +37,7 @@ export async function getUser(email) {
     const dbResult = await usersCollection.findOne({email: email});
 
     if (dbResult) {
-      console.log("Usuario encontrado:", dbResult);
+      consoleLog("Usuario encontrado:", dbResult);
       await usersCollection.updateOne({email: email}, {$set: {last_login: new Date()}});
       return {success: true, user: dbResult, error: "" };
     } else {
@@ -82,15 +82,15 @@ export async function registrarOTP(email) {
   try {
     const client = await connect();
     let dbResult = await client.collection("users").findOne({email: email});
-    console.log(dbResult)
+    consoleLog(dbResult)
     if(dbResult){
       const otp = generarOTP();
       const timeStamp = generateTimestamp();
-      console.log("otp", otp);
-      console.log("timeStamp", timeStamp);
-      console.log("email", email);
+      consoleLog("otp", otp);
+      consoleLog("timeStamp", timeStamp);
+      consoleLog("email", email);
       
-      console.log("------conectado----------");
+      consoleLog("------conectado----------");
       dbResult = await client.collection("otp").insertOne({otp: otp,email:email, timestamp: timeStamp});
 
       if (dbResult.acknowledged) {
@@ -110,7 +110,7 @@ export async function registrarOTP(email) {
 }
 
 export async function getOTP(email) {
-  console.log('getOTP')
+  consoleLog('getOTP')
   try {
     let otp = ""
     const client = await connect()
@@ -121,12 +121,12 @@ export async function getOTP(email) {
     .toArray();
 
     if (dbResult.length > 0) {
-      console.log('Documento más reciente:', dbResult[0]);
+      consoleLog('Documento más reciente:', dbResult[0]);
       otp = dbResult[0];
     } else {
-      console.log('La colección está vacía.');
+      consoleLog('La colección está vacía.');
     }
-    console.log(dbResult)
+    consoleLog(dbResult)
     if (otp !== "") {      
       return { success: true, result: otp, error: "" };
     } else {
@@ -148,7 +148,7 @@ export async function changePassword(email,password) {
     const usersCollection = client.collection('users');
     const dbResult = await usersCollection.updateOne({email: email}, {$set: {password: password}});
 
-    console.log(dbResult)
+    consoleLog(dbResult)
     if (dbResult.acknowledged) {
       return { success: true, result: "Articulo modificado!", error: "" };
     } else {
@@ -188,14 +188,14 @@ export async function guardarCoordenadas(coordenadas) {
 export async function authGoogle(oauth) {
   try {
 
-    // console.log("oauth",oauth)
+    // consoleLog("oauth",oauth)
 
     const client = await connect()
     const collection = client.collection('users');
     const dbResult = await collection.findOne({email: oauth.email});
 
     if (dbResult) {
-      // console.log("Usuario encontrado:", dbResult);
+      // consoleLog("Usuario encontrado:", dbResult);
       await collection.updateOne({email: oauth.email}, {$set: {last_login: new Date()}});
       return { success: true, user: dbResult, error: "" };
     } else {
@@ -234,7 +234,7 @@ export async function authGithub(oauth) {
     const dbResult = await collection.findOne({email: oauth.email});
 
     if (dbResult) {
-      // console.log("Usuario encontrado:", dbResult);
+      // consoleLog("Usuario encontrado:", dbResult);
       await collection.updateOne({email: oauth.email}, {$set: {last_login: new Date()}});
       return { success: true, user: dbResult, error: "" };
     } else {
@@ -282,7 +282,7 @@ export async function consultaEmpresasPaqueteria() {
     const dbResult = await collection.find({}).toArray();
 
     if (dbResult) {
-      console.log("Documentos obtenidos:", dbResult);
+      consoleLog("Documentos obtenidos:", dbResult);
       return {success: true, catalogo: dbResult, error: "" };
     } else {
       return {success: false, catalogo: {}, error: "Usuario no encontrado"}
@@ -303,7 +303,7 @@ export async function getUserContainers(userID) {
     const collection = client.collection('trackers');
     const dbResult = await collection.find({ user_id: userID}).toArray();
     if (dbResult) {
-      console.log("Documentos obtenidos:", dbResult);
+      consoleLog("Documentos obtenidos:", dbResult);
       return {success: true, results: dbResult, error: "" };
     } else {
       return {success: false, results: {}, error: "Usuario no encontrado"}
@@ -346,9 +346,9 @@ export async function registerNewShipment(shipment) {
     const client = await connect()
     const shipmentCollection = client.collection('shipments');
     const shipmentID = generarOTP();
-    console.log("shipmentID", shipmentID);
+    consoleLog("shipmentID", shipmentID);
     shipment.id = shipmentID;
-    console.log("shipment", shipment);
+    consoleLog("shipment", shipment);
     // Crear índices únicos en email y userId
     await shipmentCollection.createIndex({ id: 1 }, { unique: true });
 
@@ -372,9 +372,9 @@ export async function updateShipment(shipmentID, newLocation, newStatus) {
   try {
     const client = await connect()
     const shipmentCollection = client.collection('shipments');
-    console.log("shipmentID", shipmentID);
-    console.log("newLocation", newLocation);
-    console.log("newStatus", newStatus);
+    consoleLog("shipmentID", shipmentID);
+    consoleLog("newLocation", newLocation);
+    consoleLog("newStatus", newStatus);
     if(!isEmptyObj(newLocation)) await shipmentCollection.updateOne({id: shipmentID}, {$push: { locations: newLocation }});
     if(!isEmptyObj(newStatus)) await shipmentCollection.updateOne({id: shipmentID}, {$push: { shipment_status: newStatus}});
     if(newStatus.status_code === "delivered"){
@@ -445,7 +445,7 @@ export async function getContainerShipments(containerID) {
     ).toArray();
     
     if (dbResult.length > 0) { // Verifica si hay documentos
-      console.log("Documentos obtenidos:", dbResult);
+      consoleLog("Documentos obtenidos:", dbResult);
       return { success: true, results: dbResult, error: "" };
     } else {
       return { success: false, results: {}, error: "No se encontraron envíos para el contenedor" };
@@ -467,7 +467,7 @@ export async function db_getShipmentInfo(id) {
     const collection = client.collection('shipments');
     const dbResult = await collection.findOne({ id: parseInt(id)});
     if (dbResult) {
-      console.log("Documentos obtenidos:", dbResult);
+      consoleLog("Documentos obtenidos:", dbResult);
       return {success: true, results: dbResult, error: "" };
     } else {
       return {success: false, results: {}, error: "Usuario no encontrado"}
@@ -486,11 +486,11 @@ export async function getCurrentContainerShipment(containerID) {
   try {
     const client = await connect()
     const collection = client.collection('shipments');
-    console.log("containerID", containerID);
+    consoleLog("containerID", containerID);
     const dbResult = await collection.findOne({ container_id: parseInt(containerID) }, { sort: { start_date: -1 }}); // Ordena por fecha de inicio de envío de forma descendente. Obtener fecha más actual
-    console.log("dbResult",dbResult)
+    consoleLog("dbResult",dbResult)
     if (dbResult) {
-      // console.log("Documentos obtenidos:", dbResult);
+      // consoleLog("Documentos obtenidos:", dbResult);
       return {success: true, result: dbResult, error: "" };
     } else {
       return {success: false, result: {}, error: "Usuario no encontrado"}

@@ -4,6 +4,7 @@ import { translateStatus, translateStatusCode, convertToISO, createStatusCodeFro
     getMostRecentEntry, isEmptyObj, generarCoordenadasCiudadMexico, getOldestEntry, processLocation
 } from "./modules/utils.mjs";
 import { sendOtpEmail, sendNotifyEmail } from "./modules/email.mjs";
+import { consoleLog } from './modules/utils.mjs';
 
 /*
 const trackingCode = 2989923510; DHL
@@ -40,9 +41,9 @@ export async function registrarNuevoEnvio(req, res) {
 }
 
 export async function obtenerContenedoresUsuario(req, res) {
-    console.log("req.query:", req.query);
+    consoleLog("req.query:", req.query);
     const { userID } = req.query;
-    console.log("containerID:", containerID);
+    consoleLog("containerID:", containerID);
     const result = await getContainerShipments(containerID);
     if(!result.success){
         return res.status(400).json({success: false, message: result.error});
@@ -52,9 +53,9 @@ export async function obtenerContenedoresUsuario(req, res) {
 }
 
 export async function obtenerEnviosContenedor(req, res) {
-    console.log("req.query:", req.query);
+    consoleLog("req.query:", req.query);
     const { containerID } = req.query;
-    console.log("containerID:", containerID);
+    consoleLog("containerID:", containerID);
     const result = await getContainerShipments(containerID);
     if(!result.success){
         return res.status(400).json({success: false, message: result.error});
@@ -64,9 +65,9 @@ export async function obtenerEnviosContenedor(req, res) {
 }
 
 export async function obtenerEnvioMasReciente(req, res) {
-    console.log("req.query:", req.query);
+    consoleLog("req.query:", req.query);
     const { containerID } = req.query;
-    console.log("containerID:", containerID);
+    consoleLog("containerID:", containerID);
     const result = await getCurrentContainerShipment(containerID);
     if(!result.success){
         return res.status(400).json({success: false, message: result.error});
@@ -79,16 +80,16 @@ export async function processTracker(trackerData) {
     try {
         // Obtener numero de rastreo del envío actual del rastreador provista por la paquetería
         const dbResult = await getCurrentShipment(trackerData.id);
-        console.log('dbResult', dbResult);
+        consoleLog('dbResult', dbResult);
         if(dbResult.success){
             //Envio en curso
             // Obtener información envío actual del rastreador provista por la paquetería
-            console.log('dbResult.result.delivery_date', dbResult.result.delivery_date);
+            consoleLog('dbResult.result.delivery_date', dbResult.result.delivery_date);
             if(!dbResult.result.delivery_date){
                 let statusInfo = {};
                 switch(dbResult.result.shipment_data.company){
                     case "DHL":
-                        console.log('DHL');
+                        consoleLog('DHL');
                         statusInfo = await DHL(dbResult.result);
                         break;
 
@@ -100,7 +101,7 @@ export async function processTracker(trackerData) {
                         statusInfo = await FedEx(dbResult.result.shipment_data.tracking_number);
                         break;
                 }
-                console.log('statusInfo', statusInfo);
+                consoleLog('statusInfo', statusInfo);
                 let locationData = {};
 
                 //Verificar si hay datos del GPS del rastreador
@@ -116,7 +117,7 @@ export async function processTracker(trackerData) {
                 }
                 else{
                     let openCellIdData = await _getCellTowerLocation(trackerData);
-                    console.log('openCellIdData', openCellIdData);
+                    consoleLog('openCellIdData', openCellIdData);
                     if(openCellIdData.status === "error") throw new Error("Ocurrió un error al obtener la ubicación de la torre celular");
                     locationData = {
                         date: trackerData.time,
@@ -131,7 +132,7 @@ export async function processTracker(trackerData) {
 
 
                 const dbResponse = await updateShipment(dbResult.result.id, locationData, statusInfo);
-                console.log(dbResponse);
+                consoleLog(dbResponse);
                 if(!dbResponse.success){
                     return {success: false, message: "Error al guardar coordenadas"};
                 }else{
@@ -156,7 +157,7 @@ export async function processTracker(trackerData) {
 
 export async function processShipment(req, res) {
     try {
-        console.log("req.body:", req.body);
+        consoleLog("req.body:", req.body);
         let trackerData = req.body.trackerData; 
         // Obtener información envío actual del rastreador provista por la paquetería
         const dbResult = await getCurrentShipment(trackerData.id);
@@ -165,22 +166,22 @@ export async function processShipment(req, res) {
             if(!dbResult.result.delivery_date){
             // if(dbResult.result.delivery_date){
                 let statusInfo = {};
-                switch(dbResult.result.shipment_data.company){
-                    case "DHL":
-                        console.log('DHL');
-                        statusInfo = await DHL(dbResult.result);
-                        break;
+                // switch(dbResult.result.shipment_data.company){
+                //     case "DHL":
+                //         consoleLog('DHL');
+                //         statusInfo = await DHL(dbResult.result);
+                //         break;
 
-                    case "Estafeta":
-                        console.log('Estafeta');
-                        statusInfo = await Estafeta(dbResult.result);
-                        break;
+                //     case "Estafeta":
+                //         consoleLog('Estafeta');
+                //         statusInfo = await Estafeta(dbResult.result);
+                //         break;
 
-                    case "FedEx":
-                        console.log('FedEx');
-                        statusInfo = await FedEx(dbResult.result);
-                        break;
-                }
+                //     case "FedEx":
+                //         consoleLog('FedEx');
+                //         statusInfo = await FedEx(dbResult.result);
+                //         break;
+                // }
                 if(isEmptyObj(statusInfo)){
                     statusInfo = { message: "No hay cambios en el estatus del envío" };
                 }
@@ -202,11 +203,11 @@ async function getCurrentShipment(trackerID) {
 }
 
 async function DHL(dbResult) {
-    console.log('dbResult',dbResult);
+    consoleLog('dbResult',dbResult);
     const trackingCode = dbResult.shipment_data.tracking_number;
     const service = dbResult.shipment_data.service_id;
     let response = await queryDHL(trackingCode, service);
-    console.log('response',response);
+    consoleLog('response',response);
     return processDHLResponse(response, dbResult.shipment_status);
 }
 
@@ -235,7 +236,7 @@ async function queryDHL(trackingCode, service) {
     };
     const language = "es";
     const limit = 1;
-    console.log(`service: ${service}, language: ${language}, limit: ${limit}`);
+    consoleLog(`service: ${service}, language: ${language}, limit: ${limit}`);
     try{
         let response = await fetch(`https://api-eu.dhl.com/track/shipments?trackingNumber=${trackingCode}&service=${service}&language=${language}&limit=${limit}`, requestOptions);
         let data = await response.text();
@@ -249,10 +250,10 @@ async function queryDHL(trackingCode, service) {
 
 function processDHLResponse(dhlResponse, shipmentStatus){
     if(dhlResponse.status === 404) return {};
-    console.log('processDHLResponse');
-    console.log('dhlResponse',dhlResponse);
-    console.log('shipmentStatus',shipmentStatus);
-    console.log('dhlResponse.shipments.status',dhlResponse.shipments[0].status);
+    consoleLog('processDHLResponse');
+    consoleLog('dhlResponse',dhlResponse);
+    consoleLog('shipmentStatus',shipmentStatus);
+    consoleLog('dhlResponse.shipments.status',dhlResponse.shipments[0].status);
     //Verificar si el estatus ya existe en la DB
     const existe = shipmentStatus.some(item => item.timestamp === dhlResponse.shipments[0].status.timestamp);
     // Si no existe, extraer información a guardar
@@ -265,7 +266,7 @@ function processDHLResponse(dhlResponse, shipmentStatus){
         };
         return lastStatus
     } 
-    console.log('Estatus ya existe en la DB');
+    consoleLog('Estatus ya existe en la DB');
     return {};
 }
 
@@ -341,11 +342,11 @@ async function queryEstafeta(trackingCode) {
 }
 
 function processEstafetaFedexResponse(response, shipmentStatus){
-    console.log('processEstafetaFedexResponse');
-    console.log('EstafetaFedexResponse',response);
-    console.log('shipmentStatus',shipmentStatus);
+    consoleLog('processEstafetaFedexResponse');
+    consoleLog('EstafetaFedexResponse',response);
+    consoleLog('shipmentStatus',shipmentStatus);
     const latestStatus = getMostRecentEntry(response);
-    console.log('latestStatus',latestStatus);
+    consoleLog('latestStatus',latestStatus);
     //Verificar si el estatus ya existe en la DB
     const existe = shipmentStatus.some(item => item.timestamp === latestStatus.timestamp);
     // Si no existe, extraer información a guardar
@@ -358,14 +359,14 @@ function processEstafetaFedexResponse(response, shipmentStatus){
         };
         return lastStatus
     } 
-    console.log('Estatus ya existe en la DB');
+    consoleLog('Estatus ya existe en la DB');
     return {};
 }
 
 async function queryFedEx(trackingCode) {
     let serviceInfo = [];
     const url = `https://www.fedex.com/fedextrack/?trknbr=${trackingCode}&trkqual=2460569000~${trackingCode}~FX`;
-    console.log('url', url);
+    consoleLog('url', url);
 
     // Iniciar el navegador
     const browser = await puppeteer.launch({
@@ -450,7 +451,7 @@ async function queryFedEx(trackingCode) {
             row.timestamp = row.date ? convertToISO(row.date, row.time || '12:00 AM') : null;
         });
 
-        console.log('serviceInfo', serviceInfo);
+        consoleLog('serviceInfo', serviceInfo);
     } catch (error) {
         console.error('Ocurrió un error:', error);
     } finally {
@@ -467,7 +468,7 @@ export async function dhlTracking(req, res) {
     const myHeaders = new Headers();
     myHeaders.append("DHL-API-Key", process.env.DHL_API_KEY);
     let serviceInfo = {};
-    // console.log(process.env.DHL_API_KEY);
+    // consoleLog(process.env.DHL_API_KEY);
     
     const requestOptions = {
         method: "GET",
@@ -482,7 +483,7 @@ export async function dhlTracking(req, res) {
     const service = "express";
     const language = "es";
     const limit = 2;
-    console.log(`service: ${service}, language: ${language}, limit: ${limit}`);
+    consoleLog(`service: ${service}, language: ${language}, limit: ${limit}`);
     try{
         let response = await fetch(`https://api-eu.dhl.com/track/shipments?trackingNumber=${trackingCode}&service=${service}&language=${language}&limit=${limit}`, requestOptions);
         let data = await response.text();
@@ -492,7 +493,7 @@ export async function dhlTracking(req, res) {
         console.error('error', error);
     }
 
-    console.log('serviceInfo',serviceInfo);
+    consoleLog('serviceInfo',serviceInfo);
     return res.status(200).json({ message: "Shipment tracked successfully", result: serviceInfo });
 }
 
@@ -501,7 +502,7 @@ export async function estafetaTracking(req, res){
     let trackingCode = "6055903016701706196130";
     let shipmentStatus = "";
     const url = `https://rastreositecorecms.azurewebsites.net/Tracking/searchByGet/?wayBillType=1&wayBill=${trackingCode}`;
-    console.log('url', url);
+    consoleLog('url', url);
 
     (async () => {
         /// Iniciar el navegador
@@ -518,7 +519,7 @@ export async function estafetaTracking(req, res){
             await page.goto(url, { waitUntil: 'networkidle2' });
         
             // Confirmar que se ha cargado la página
-            // console.log('Página cargada:', page.url());
+            // consoleLog('Página cargada:', page.url());
             // Esperar explícitamente un tiempo adicional para permitir la carga del contenido dinámico
             await new Promise(resolve => setTimeout(resolve, 6000)); // Esperar 6 segundos
 
@@ -528,7 +529,7 @@ export async function estafetaTracking(req, res){
                 return element ? element.innerText.trim() : 'No se encontró el contenido';
             });
             shipmentStatus = content;
-            console.log('Estatus del servicio:', shipmentStatus);
+            consoleLog('Estatus del servicio:', shipmentStatus);
         
             // Extraer el contenido del div
             const data = await page.evaluate(() => {
@@ -546,7 +547,7 @@ export async function estafetaTracking(req, res){
                 return extractedData;
             });
         
-            console.log(data);
+            consoleLog(data);
             response = data;
         } catch (error) {
             console.error('Ocurrió un error:', error);
@@ -570,7 +571,7 @@ export async function fedExTracking(req, res){
     let serviceInfo = {};
 
     const url = `https://www.fedex.com/fedextrack/?trknbr=${trackingCode}&trkqual=2460569000~${trackingCode}~FX`;
-    console.log('url', url);
+    consoleLog('url', url);
 
     (async () => {
         /// Iniciar el navegador
@@ -619,7 +620,7 @@ export async function fedExTracking(req, res){
             await page.goto(url, { waitUntil: 'networkidle2' });
         
             // Confirmar que se ha cargado la página
-            // console.log('Página cargada:', page.url());
+            // consoleLog('Página cargada:', page.url());
             // Esperar explícitamente un tiempo adicional para permitir la carga del contenido dinámico
             await new Promise(resolve => setTimeout(resolve, 6000)); // Esperar 6 segundos
             
@@ -649,8 +650,8 @@ export async function fedExTracking(req, res){
         });
         serviceInfo = tableData;
         
-        // console.log(tableData);
-        // console.log('tableData',tableData.length);
+        // consoleLog(tableData);
+        // consoleLog('tableData',tableData.length);
         } catch (error) {
             console.error('Ocurrió un error:', error);
         } finally {
@@ -660,7 +661,7 @@ export async function fedExTracking(req, res){
         serviceInfo.forEach(row => {
             row.timestamp = row.date ? convertToISO(row.date, row.time || '12:00 AM') : null;
         });
-        console.log('response', serviceInfo);
+        consoleLog('response', serviceInfo);
 
         return res.status(200).json({ message: "Shipment tracked successfully", result: serviceInfo, url: url });
     })();
@@ -674,30 +675,30 @@ export async function fedExTracking(req, res){
 
 export async function processShipmentManual(req, res) {
     try {
-        console.log("---------------------processShipmentManual---------------------");
+        consoleLog("---------------------processShipmentManual---------------------");
         let trackerData = req.body.trackerData;
         let shipmentData = req.body.shipmentData; 
         // Obtener información envío actual del rastreador provista por la paquetería
         const dbResult = await getCurrentShipment(trackerData.id);
         if(dbResult.success){
             //Envio en curso
-            console.log('dbResult.result.delivery_date',dbResult.result.delivery_date);
+            consoleLog('dbResult.result.delivery_date',dbResult.result.delivery_date);
             // if(!dbResult.result.delivery_date){
             if(!dbResult.result.delivery_date){
                 let statusInfo = {};
-                console.log('dbResult.result.shipment_data.company',dbResult.result.shipment_data.company);
+                consoleLog('dbResult.result.shipment_data.company',dbResult.result.shipment_data.company);
                 statusInfo = processResponse(shipmentData, dbResult.result.shipment_status);
 
                 if(isEmptyObj(statusInfo)){
                     const a = generarCoordenadasCiudadMexico();
-                    console.log('a',a);
+                    consoleLog('a',a);
                     statusInfo = { message: "No hay cambios en el estatus del envío" };
                     return res.status(200).json({success: true, db: dbResult.result, tracker: trackerData, status: statusInfo});
                 }
                 trackerData = generarCoordenadasCiudadMexico();
-                console.log('trackerData',trackerData);
+                consoleLog('trackerData',trackerData);
                 const dbResponse = await updateShipment(dbResult.result.id, trackerData, statusInfo);
-                console.log(dbResponse);
+                consoleLog(dbResponse);
                 if(!dbResponse.success){
                     return res.status(200).json({success: false, message: "Error al actualizar el envío"});
                 }else{
@@ -715,30 +716,30 @@ export async function processShipmentManual(req, res) {
 
 export async function processShipmentManual1(req, res) {
     try {
-        console.log("---------------------processShipmentManual---------------------");
+        consoleLog("---------------------processShipmentManual---------------------");
         let trackerData = req.body.trackerData;
         let shipmentData = req.body.shipmentData; 
         // Obtener información envío actual del rastreador provista por la paquetería
         const dbResult = await getCurrentShipment(trackerData.id);
         if(dbResult.success){
             //Envio en curso
-            console.log('dbResult.result.delivery_date',dbResult.result.delivery_date);
+            consoleLog('dbResult.result.delivery_date',dbResult.result.delivery_date);
             // if(!dbResult.result.delivery_date){
             if(!dbResult.result.delivery_date){
                 let statusInfo = {};
-                console.log('dbResult.result.shipment_data.company',dbResult.result.shipment_data.company);
+                consoleLog('dbResult.result.shipment_data.company',dbResult.result.shipment_data.company);
                 statusInfo = processResponse(shipmentData, dbResult.result.shipment_status);
 
                 if(isEmptyObj(statusInfo)){
                     const a = generarCoordenadasCiudadMexico();
-                    console.log('a',a);
+                    consoleLog('a',a);
                     statusInfo = { message: "No hay cambios en el estatus del envío" };
                     return res.status(200).json({success: true, db: dbResult.result, tracker: trackerData, status: statusInfo});
                 }
                 trackerData = generarCoordenadasCiudadMexico();
-                console.log('trackerData',trackerData);
+                consoleLog('trackerData',trackerData);
                 const dbResponse = await updateShipment(dbResult.result.id, trackerData, statusInfo);
-                console.log(dbResponse);
+                consoleLog(dbResponse);
                 if(!dbResponse.success){
                     return res.status(200).json({success: false, message: "Error al actualizar el envío"});
                 }else{
@@ -756,13 +757,13 @@ export async function processShipmentManual1(req, res) {
 
 function processResponse(response, shipmentStatus){
     const latestStatus = getOldestEntry(response);
-    console.log('latestStatus',latestStatus);
-    console.log('shipmentStatus',shipmentStatus);
+    consoleLog('latestStatus',latestStatus);
+    consoleLog('shipmentStatus',shipmentStatus);
     //Verificar si el estatus ya existe en la DB
     const existe = shipmentStatus.some(item => item.timestamp === latestStatus.timestamp);
     // Si no existe, extraer información a guardar
     if(!existe){
-        console.log('existen cambios');
+        consoleLog('existen cambios');
         let lastStatus = { 
             timestamp: latestStatus.timestamp, 
             status_code: latestStatus.statusCode,
@@ -771,7 +772,7 @@ function processResponse(response, shipmentStatus){
         };
         return lastStatus
     } 
-    console.log('Estatus ya existe en la DB');
+    consoleLog('Estatus ya existe en la DB');
     return {};
 }
 
@@ -780,8 +781,8 @@ function processResponse(response, shipmentStatus){
 // ------------------------- OPEN CELL ID -------------------------------------------------------------
 async function _getCellTowerLocation(params) {
     const { mcc, mnc, lac, cid, network } = params;
-    console.log('url', params);
-    console.log(`mcc: ${mcc}, mnc: ${mnc}, lac: ${lac}, cid: ${cid}, network: ${network}`);
+    consoleLog('url', params);
+    consoleLog(`mcc: ${mcc}, mnc: ${mnc}, lac: ${lac}, cid: ${cid}, network: ${network}`);
     let location = {};
     try {
         const response = await fetch('https://us1.unwiredlabs.com/v2/process.php', {
@@ -805,17 +806,17 @@ async function _getCellTowerLocation(params) {
         });
         
         let data = await response.json();
-        console.log('data',data);
+        consoleLog('data',data);
         location = data;
     } catch (error) {
-        console.log('error', error);
+        consoleLog('error', error);
     }
     return location;
 }
 
 export async function getCellTowerLocation(req, res) {
     const { mcc, mnc, lac, cid } = req.body;
-    console.log('url', req.body);
+    consoleLog('url', req.body);
     try {
         const response = await fetch('https://us1.unwiredlabs.com/v2/process.php', {
             method: 'POST',
@@ -838,10 +839,10 @@ export async function getCellTowerLocation(req, res) {
         });
         
         let data = await response.json();
-        console.log('data',data);
+        consoleLog('data',data);
         return res.status(200).json({ message: "Location retrieved successfully", result: data });
     } catch (error) {
-        console.log('error', error);
+        consoleLog('error', error);
         return res.status(400).json({ message: "Error retrieving location", error: error });
     }
 }

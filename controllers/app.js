@@ -277,3 +277,48 @@ export async function getShipments(req, res){
         return res.status(500).json({ success: false, message: 'Ocurrió un error al generar el reporte' });
     }
 }
+
+export async function endShipment(req, res) {
+    consoleLog("endShipment", "", true);
+    try{
+        const { trackerId } = req.body;
+        const authHeader = req.headers['authorization']; 
+        if (authHeader) { 
+            const token = authHeader.split(' ')[1]; // Assuming 'Bearer <token>' 
+            const decodedToken = validateToken(token);
+            if(decodedToken){
+                let endDate = getCurrentTime();
+                const result = await db_updateTracker(trackerId, endDate);
+                consoleLog("result:", result);
+                if(!result.success){
+                    return res.status(400).json({success: false, message: result.error});
+                }else{
+                    return res.status(200).json({success: true, message: result.message});
+                }
+            }
+        }
+        return res.status(401).json({ success: false, message: 'No se proporcionó el token o no es válido' });
+    }catch(error){
+        console.error("Error:", error);
+        return res.status(500).json({ success: false, message: 'Ocurrió un error al vincular' });
+
+    }
+    
+}
+
+function getCurrentTime(){
+    let nowInMexico = new Date().toLocaleString("en-US", { timeZone: "America/Mexico_City" });
+    let dateInMexico = new Date(nowInMexico);
+
+    let yyyy = dateInMexico.getFullYear();
+    let MM = String(dateInMexico.getMonth() + 1).padStart(2, '0');
+    let dd = String(dateInMexico.getDate()).padStart(2, '0');
+    let hh = String(dateInMexico.getHours()).padStart(2, '0');
+    let mm = String(dateInMexico.getMinutes()).padStart(2, '0');
+    let ss = String(dateInMexico.getSeconds()).padStart(2, '0');
+
+    let formattedDate = `${yyyy}-${MM}-${dd}T${hh}:${mm}:${ss}`;
+
+    consoleLog("current time", formattedDate, true);
+    return formattedDate;
+}

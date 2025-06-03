@@ -1,7 +1,7 @@
 import express from 'express';
 import { obtenerContenedoresUsuario, vincularRastreador, obtenerEnvioMasReciente, 
     obtenerInfo, startShipment, updateTracker, generateReport, generateCurrentReporteSeguimiento,
-    generateReporteSeguimiento, getShipments
+    generateReporteSeguimiento, getShipments, endShipment
 } from '../controllers/app.js';
 
 const router = express.Router();
@@ -16,5 +16,6 @@ router.get('/generate-pdf', generateReport);
 router.get('/generate-current-reporte-seguimiento', generateCurrentReporteSeguimiento);
 router.get('/generate-reporte-seguimiento', generateReporteSeguimiento);
 router.get('/shipments', getShipments);
+router.delete('/end-shipment', endShipment);
 
 export default router;

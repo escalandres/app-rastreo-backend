@@ -87,20 +87,20 @@ export async function processTracker(trackerData) {
             consoleLog('dbResult.result.delivery_date', dbResult.result.delivery_date);
             if(!dbResult.result.delivery_date){
                 let statusInfo = {};
-                switch(dbResult.result.shipment_data.company){
-                    case "DHL":
-                        consoleLog('DHL');
-                        statusInfo = await DHL(dbResult.result);
-                        break;
+                // switch(dbResult.result.shipment_data.company){
+                //     case "DHL":
+                //         consoleLog('DHL');
+                //         statusInfo = await DHL(dbResult.result);
+                //         break;
 
-                    case "Estafeta":
-                        statusInfo = await Estafeta(dbResult.result.shipment_data.tracking_number);
-                        break;
+                //     case "Estafeta":
+                //         statusInfo = await Estafeta(dbResult.result.shipment_data.tracking_number);
+                //         break;
 
-                    case "FedEx":
-                        statusInfo = await FedEx(dbResult.result.shipment_data.tracking_number);
-                        break;
-                }
+                //     case "FedEx":
+                //         statusInfo = await FedEx(dbResult.result.shipment_data.tracking_number);
+                //         break;
+                // }
                 consoleLog('statusInfo', statusInfo);
                 let locationData = {};
 
@@ -118,7 +118,8 @@ export async function processTracker(trackerData) {
                 else{
                     let openCellIdData = await _getCellTowerLocation(trackerData);
                     consoleLog('openCellIdData', openCellIdData);
-                    if(openCellIdData.status === "error") throw new Error("Ocurrió un error al obtener la ubicación de la torre celular");
+                    if(openCellIdData.status === "error") return {success: false, message:  "Ocurrió un error al obtener la ubicación de la torre celular"}; 
+
                     locationData = {
                         date: trackerData.time,
                         lat: openCellIdData.lat,
@@ -127,10 +128,7 @@ export async function processTracker(trackerData) {
                         radius: openCellIdData.accuracy,
                         batteryLevel: trackerData.batteryLevel
                     };
-
                 }
-
-
                 const dbResponse = await updateShipment(dbResult.result.id, locationData, statusInfo);
                 consoleLog(dbResponse);
                 if(!dbResponse.success){

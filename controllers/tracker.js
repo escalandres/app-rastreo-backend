@@ -46,7 +46,7 @@ function extraerDatos(mensaje) {
         };
         return datosRastreador;
     } else {
-        console.error("Formato de mensaje no válido", true);
+        consoleLog("Formato de mensaje no válido", "", true);
         return {};
     }
 }

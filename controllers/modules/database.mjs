@@ -557,11 +557,13 @@ export async function db_updateTracker(trackerId, nickname, img) {
   }
 }
 
-export async function db_endShipment(trackerId, endDate) {
+export async function db_endShipment(shipmentId, endDate) {
   try {
+    consoleLog("db_endShipment", endDate, true);
     const client = await connect()
-    const collection = client.collection('trackers');
-    const dbResult = await collection.updateOne({id: trackerId}, {$set: {nickname: nickname, img: img}});
+    const collection = client.collection('shipments');
+    const dbResult = await collection.updateOne({id: shipmentId}, {$set: {delivery_date: endDate}});
+    consoleLog("dbResult", dbResult);
     if (dbResult.acknowledged) {
       return { success: true, result: "¡Se ha actualizado el tracker!", error: "" };
     } else {

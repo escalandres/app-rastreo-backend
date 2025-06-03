@@ -1,6 +1,6 @@
 import { processTracker } from "./shipment.js";
 import { sendOtpEmail, sendNotifyEmail } from "./modules/email.mjs";
-import { consoleLog } from "./modules/utils.mjs";
+import { consoleLog, convertirUTCAMexico } from "./modules/utils.mjs";
 
 function formatDate(inputDate) {
     // Divide la fecha y la hora
@@ -34,7 +34,7 @@ function extraerDatos(mensaje) {
             numcell: resultado[2],
             fecha: formatDate(resultado[3]),
             id: resultado[5],
-            time: resultado[6],
+            time: convertirUTCAMexico(resultado[6]),
             network: resultado[7],
             mcc: parseInt(resultado[8]),
             mnc: agregarCerosIzquierda(resultado[9]),

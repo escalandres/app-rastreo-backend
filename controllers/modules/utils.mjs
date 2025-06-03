@@ -230,3 +230,19 @@ export function generarCoordenadasCiudadMexico() {
         date: fechaISO
     };
 }
+
+export function convertirUTCAMexico(fechaUTC) {
+    let fechaMexico = new Date(fechaUTC+"Z").toLocaleString('en-US', { timeZone: 'America/Mexico_City' });
+    let fecha = new Date(fechaMexico);
+    
+    let año = fecha.getFullYear();
+    let mes = String(fecha.getMonth() + 1).padStart(2, '0'); // Meses en JS van de 0-11
+    let dia = String(fecha.getDate()).padStart(2, '0');
+    let horas = String(fecha.getHours()).padStart(2, '0');
+    let minutos = String(fecha.getMinutes()).padStart(2, '0');
+    let segundos = String(fecha.getSeconds()).padStart(2, '0');
+
+    return `${año}-${mes}-${dia}T${horas}:${minutos}:${segundos}`;
+}
+
+

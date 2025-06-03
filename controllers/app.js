@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 import { generarOTP, validateToken, consoleLog } from "./modules/utils.mjs";
 import { consultaEmpresasPaqueteria, registerNewShipment, getContainerShipments, 
     getCurrentContainerShipment, getUserContainers, linkTracker, getAppInfo, 
-    db_startShipment, db_updateTracker, db_getShipmentInfo } from "./modules/database.mjs";
+    db_startShipment, db_updateTracker, db_getShipmentInfo, db_endShipment } from "./modules/database.mjs";
 
 import { generarPDF, generarReporteSeguimiento } from "./modules/pdf.mjs";
 
@@ -281,14 +281,15 @@ export async function getShipments(req, res){
 export async function endShipment(req, res) {
     consoleLog("endShipment", "", true);
     try{
-        const { trackerId } = req.body;
+        const { shipmentId } = req.query;
+        consoleLog("shipmentId:", shipmentId);
         const authHeader = req.headers['authorization']; 
         if (authHeader) { 
             const token = authHeader.split(' ')[1]; // Assuming 'Bearer <token>' 
             const decodedToken = validateToken(token);
             if(decodedToken){
                 let endDate = getCurrentTime();
-                const result = await db_updateTracker(trackerId, endDate);
+                const result = await db_endShipment(parseInt(shipmentId), endDate);
                 consoleLog("result:", result);
                 if(!result.success){
                     return res.status(400).json({success: false, message: result.error});

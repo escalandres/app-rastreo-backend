@@ -5,11 +5,13 @@ import { consoleLog, convertirUTCAMexico } from "./modules/utils.mjs";
 function formatDate(inputDate) {
     // Divide la fecha y la hora
     const [datePart, timePart] = inputDate.split(',');
-
+    consoleLog("inputDate", inputDate);
+    consoleLog("datePart", datePart);
+    consoleLog("timePart", timePart);
     // Divide los componentes de la fecha
-    const [yy, MM, dd] = datePart.split('/');
+    const [dd, MM, yy] = datePart.split('/');
 
-    // Divide los componentes de la hora
+    // Divide los componentes de la hora (ignorando los segundos y la zona horaria)
     const [hh, mm] = timePart.split(':');
 
     // Formatea la nueva fecha
@@ -18,6 +20,7 @@ function formatDate(inputDate) {
     return formattedDate;
 }
 
+
 function agregarCerosIzquierda(cadena) {
     return cadena.toString().padStart(3, '0');
 }
@@ -25,35 +28,80 @@ function agregarCerosIzquierda(cadena) {
 
 function extraerDatos(mensaje) {
     let regex = ""
+    let datosRastreador = {};
     if(mensaje.includes("+CMGR: 'REC UNREAD'")){
         // Expresión regular para extraer los datos
         regex = /\+(CMT|CMGR):\s'REC UNREAD','(\+52\d{10,12})','','([\d\/:,]+)-([\d\/:,]+)'id:(\d+),time:([\d\-:T]+),red:(\w+),mcc:(\d+),mnc:(\d+),lac:(\d+),cid:(\d+),nb:(\d+),lat:([-\d.]+),lon:([-\d.]+)OK/gm;
+
+        const resultado = regex.exec(mensaje);
+
+        if (resultado) {
+            datosRastreador = {
+                numcell: resultado[2],
+                fecha: formatDate(resultado[3]),
+                id: resultado[5],
+                time: convertirUTCAMexico(resultado[6]),
+                network: resultado[7],
+                mcc: parseInt(resultado[8]),
+                mnc: agregarCerosIzquierda(resultado[9]),
+                lac: parseInt(resultado[10]),
+                cid: parseInt(resultado[11]),
+                batteryLevel: resultado[12],
+                lat: parseFloat(resultado[13]),
+                lng: parseFloat(resultado[14])
+            };
+        } else {
+            consoleLog("Formato de mensaje no válido", "", true);
+            return {};
+        }
     }else if(mensaje.includes("+CMT: ")){
         regex = /\+CMT:\s'(\+52\d{10,12})','','([\d\/:,]+)-([\d\/:,]+)'id:(\d+),time:([\d\-:T]+),red:(\w+),mcc:(\d+),mnc:(\d+),lac:(\d+),cid:(\d+),nb:(\d+),lat:([-\d.]+),lon:([-\d.]+)/gm
-    }
+        const resultado = regex.exec(mensaje);
+        if (resultado) {
+            datosRastreador = {
+                numcell: resultado[1],
+                fecha: formatDate(resultado[2]),
+                id: resultado[4],
+                time: convertirUTCAMexico(resultado[5]),
+                network: resultado[6],
+                mcc: parseInt(resultado[7]),
+                mnc: agregarCerosIzquierda(resultado[8]),
+                lac: parseInt(resultado[9]),
+                cid: parseInt(resultado[10]),
+                batteryLevel: resultado[11],
+                lat: parseFloat(resultado[12]),
+                lng: parseFloat(resultado[13])
+            };
+            
+        } else {
+            consoleLog("Formato de mensaje no válido", "", true);
+            return {};
+        }
 
-    const resultado = regex.exec(mensaje);
-
-    if (resultado) {
-        const datosRastreador = {
-            numcell: resultado[2],
-            fecha: formatDate(resultado[3]),
-            id: resultado[5],
-            time: convertirUTCAMexico(resultado[6]),
-            network: resultado[7],
-            mcc: parseInt(resultado[8]),
-            mnc: agregarCerosIzquierda(resultado[9]),
-            lac: parseInt(resultado[10]),
-            cid: parseInt(resultado[11]),
-            batteryLevel: resultado[12],
-            lat: parseFloat(resultado[13]),
-            lng: parseFloat(resultado[14])
-        };
-        return datosRastreador;
-    } else {
-        consoleLog("Formato de mensaje no válido", "", true);
-        return {};
     }
+    return datosRastreador;
+    // const resultado = regex.exec(mensaje);
+
+    // if (resultado) {
+    //     const datosRastreador = {
+    //         numcell: resultado[2],
+    //         fecha: formatDate(resultado[3]),
+    //         id: resultado[5],
+    //         time: convertirUTCAMexico(resultado[6]),
+    //         network: resultado[7],
+    //         mcc: parseInt(resultado[8]),
+    //         mnc: agregarCerosIzquierda(resultado[9]),
+    //         lac: parseInt(resultado[10]),
+    //         cid: parseInt(resultado[11]),
+    //         batteryLevel: resultado[12],
+    //         lat: parseFloat(resultado[13]),
+    //         lng: parseFloat(resultado[14])
+    //     };
+    //     return datosRastreador;
+    // } else {
+    //     consoleLog("Formato de mensaje no válido", "", true);
+    //     return {};
+    // }
 }
 
 export async function subirDatos(req, res){

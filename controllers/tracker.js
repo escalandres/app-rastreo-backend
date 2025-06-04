@@ -24,9 +24,15 @@ function agregarCerosIzquierda(cadena) {
 
 
 function extraerDatos(mensaje) {
-    // Expresión regular para extraer los datos
-    const regex = /\+(CMT|CMGR):\s'REC UNREAD','(\+52\d{10,12})','','([\d\/:,]+)-([\d\/:,]+)'id:(\d+),time:([\d\-:T]+),red:(\w+),mcc:(\d+),mnc:(\d+),lac:(\d+),cid:(\d+),nb:(\d+),lat:([-\d.]+),lon:([-\d.]+)OK/gm;
-
+    let regex = ""
+    if(mensaje.includes("CMT: 'REC UNREAD'")){
+        mensaje = mensaje.replace("CMT: 'REC UNREAD'", "+CMT: 'REC UNREAD'");
+        // Expresión regular para extraer los datos
+        regex = /\+(CMT|CMGR):\s'REC UNREAD','(\+52\d{10,12})','','([\d\/:,]+)-([\d\/:,]+)'id:(\d+),time:([\d\-:T]+),red:(\w+),mcc:(\d+),mnc:(\d+),lac:(\d+),cid:(\d+),nb:(\d+),lat:([-\d.]+),lon:([-\d.]+)OK/gm;
+    }else if(mensaje.includes("CMT: 'REC READ'")){
+        regex = /\+CMT:\s'(\+52\d{10,12})','','([\d\/:,]+)-([\d\/:,]+)'id:(\d+),time:([\d\-:T]+),red:(\w+),mcc:(\d+),mnc:(\d+),lac:(\d+),cid:(\d+),nb:(\d+),lat:([-\d.]+),lon:([-\d.]+)/gm
+    }
+    
     const resultado = regex.exec(mensaje);
 
     if (resultado) {

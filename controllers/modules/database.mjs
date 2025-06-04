@@ -3,7 +3,7 @@ import {generarOTP, generateTimestamp, isEmptyObj, formatDateToTimestamp} from '
 import crypto from 'crypto';
 import { link } from 'fs';
 import { consoleLog } from './utils.mjs';
-import MongoStore from "connect-mongo";
+//import MongoStore from "connect-mongo";
 
 const uri = process.env.DATABASE_URL;
 // const client = new MongoClient(uri, {useNewUrlParser: true, useUnifiedTopology: true});
@@ -18,16 +18,16 @@ const uri = process.env.DATABASE_URL;
 const client = new MongoClient(uri, {});
 
 
-let db;
+//let db;
 
 async function connect() {
-  consoleLog("db",db,true);
-  if (db){  return db; } // Si ya está conectada, reutilizarla
+  //consoleLog("db",db,true);
+  //if (db){  return db; } // Si ya está conectada, reutilizarla
 
   try {
       await client.connect();
       console.log("Connected to MongoDB Atlas");
-      db = client.db("app-rastreo");
+      const db = client.db("app-rastreo");
       return db;
   } catch (err) {
       console.error("Error connecting to MongoDB Atlas:", err);

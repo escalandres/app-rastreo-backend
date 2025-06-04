@@ -3,28 +3,49 @@ import {generarOTP, generateTimestamp, isEmptyObj, formatDateToTimestamp} from '
 import crypto from 'crypto';
 import { link } from 'fs';
 import { consoleLog } from './utils.mjs';
+import MongoStore from "connect-mongo";
 
 const uri = process.env.DATABASE_URL;
 // const client = new MongoClient(uri, {useNewUrlParser: true, useUnifiedTopology: true});
-const client = new MongoClient(uri, {});
+let client;
+if(process.env.NODE_ENV === 'production') {
+  client = new MongoClient(uri, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      serverSelectionTimeoutMS: 5000, // Tiempo de espera para seleccionar el servidor
+      connectTimeoutMS: 10000, // Tiempo de espera para establecer conexión
+  });
+}
+else{
+  client = new MongoClient(uri, {});
+}
+
+let db;
 
 async function connect() {
+  if (db) return db; // Si ya está conectada, reutilizarla
+
   try {
-    await client.connect();
-    consoleLog('Connected to MongoDB Atlas');
-    const db = client.db('app-rastreo');
-    return db;
+      await client.connect();
+      console.log("Connected to MongoDB Atlas");
+      db = client.db("app-rastreo");
+      return db;
   } catch (err) {
-    console.error('Error connecting to MongoDB Atlas:', err);
+      console.error("Error connecting to MongoDB Atlas:", err);
   }
 }
 
+
 async function disconnect() {
   try {
-    await client.close();
-    consoleLog('Disconnected from MongoDB Atlas');
+      if (client) {
+          await client.close();
+          console.log("Disconnected from MongoDB Atlas");
+      } else {
+          console.warn("No active connection to MongoDB Atlas.");
+      }
   } catch (err) {
-    console.error('Error disconnecting from MongoDB Atlas:', err);
+      console.error("Error disconnecting from MongoDB Atlas:", err);
   }
 }
 

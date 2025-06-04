@@ -7,23 +7,22 @@ import MongoStore from "connect-mongo";
 
 const uri = process.env.DATABASE_URL;
 // const client = new MongoClient(uri, {useNewUrlParser: true, useUnifiedTopology: true});
-let client;
-if(process.env.NODE_ENV === 'production') {
-  client = new MongoClient(uri, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      serverSelectionTimeoutMS: 5000, // Tiempo de espera para seleccionar el servidor
-      connectTimeoutMS: 10000, // Tiempo de espera para establecer conexión
-  });
-}
-else{
-  client = new MongoClient(uri, {});
-}
+// let client;
+// if(process.env.NODE_ENV === 'production') {
+//   client = new MongoClient(uri, {
+//       serverSelectionTimeoutMS: 5000, // Tiempo de espera para seleccionar el servidor
+//       connectTimeoutMS: 10000, // Tiempo de espera para establecer conexión
+//   });
+// }
+// else{
+const client = new MongoClient(uri, {});
+
 
 let db;
 
 async function connect() {
-  if (db) return db; // Si ya está conectada, reutilizarla
+  consoleLog("db",db,true);
+  if (db){  return db; } // Si ya está conectada, reutilizarla
 
   try {
       await client.connect();

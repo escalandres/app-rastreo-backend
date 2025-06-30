@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 import { generarOTP, validateToken, consoleLog } from "./modules/utils.mjs";
 import { consultaEmpresasPaqueteria, registerNewShipment, getContainerShipments, 
     getCurrentContainerShipment, getUserContainers, linkTracker, getAppInfo, 
-    db_startShipment, db_updateTracker, db_getShipmentInfo, db_endShipment } from "./modules/database.mjs";
+    db_startShipment, db_updateTracker, db_getShipmentInfo, db_endShipment, db_updateBatteryPercentage } from "./modules/database.mjs";
 
 import { generarPDF, generarReporteSeguimiento } from "./modules/pdf.mjs";
 
@@ -281,7 +281,7 @@ export async function getShipments(req, res){
 export async function endShipment(req, res) {
     consoleLog("endShipment", "", true);
     try{
-        const { shipmentId } = req.query;
+        const { shipmentId, trackerId } = req.query;
         consoleLog("shipmentId:", shipmentId);
         const authHeader = req.headers['authorization']; 
         if (authHeader) { 
@@ -294,6 +294,7 @@ export async function endShipment(req, res) {
                 if(!result.success){
                     return res.status(400).json({success: false, message: result.error});
                 }else{
+                    db_updateBatteryPercentage(trackerId, 0, true);
                     return res.status(200).json({success: true, message: result.message});
                 }
             }

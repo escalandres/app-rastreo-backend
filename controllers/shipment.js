@@ -1,5 +1,5 @@
 import puppeteer from 'puppeteer';
-import { consultaEmpresasPaqueteria, registerNewShipment, getContainerShipments, getCurrentContainerShipment, updateShipment } from "./modules/database.mjs";
+import { consultaEmpresasPaqueteria, registerNewShipment, getContainerShipments, getCurrentContainerShipment, updateShipment, db_updateBatteryPercentage } from "./modules/database.mjs";
 import { translateStatus, translateStatusCode, convertToISO, createStatusCodeFromDescription, convertToISOFromDDMMYYYY, extractDetailsFromEstafeta,
     getMostRecentEntry, isEmptyObj, generarCoordenadasCiudadMexico, getOldestEntry, processLocation
 } from "./modules/utils.mjs";
@@ -132,6 +132,7 @@ export async function processTracker(trackerData) {
                 const dbResponse = await updateShipment(dbResult.result.id, locationData, statusInfo);
                 consoleLog(dbResponse);
                 if(!dbResponse.success){
+                    db_updateBatteryPercentage(dbResult.result.tracker_id, trackerData.batteryLevel);
                     return {success: false, message: "Error al guardar coordenadas"};
                 }else{
                     locationData.tracker = trackerData.id;
@@ -142,6 +143,7 @@ export async function processTracker(trackerData) {
                     locationData.cid = trackerData.cid;
                     locationData.location = processLocation(locationData.isCellTower, locationData.radius)
                     await sendNotifyEmail(locationData);
+                    db_updateBatteryPercentage(dbResult.result.tracker_id, trackerData.batteryLevel);
                     return {success: true, message: "Coordenadas guardadas correctamente"};
                 }
             }
@@ -460,8 +462,6 @@ async function queryFedEx(trackingCode) {
     return serviceInfo;
 }
 
-
-
 export async function dhlTracking(req, res) {
     const myHeaders = new Headers();
     myHeaders.append("DHL-API-Key", process.env.DHL_API_KEY);
@@ -666,10 +666,7 @@ export async function fedExTracking(req, res){
 }
 
 
-
-
-
-// ------------------------- Puerbaasa -------------------------------------------------------------
+// --------------------- Pruebas -------------------------------------------------------------
 
 export async function processShipmentManual(req, res) {
     try {

@@ -3,6 +3,7 @@ import {generarOTP, generateTimestamp, isEmptyObj, formatDateToTimestamp} from '
 import crypto from 'crypto';
 import { link } from 'fs';
 import { consoleLog } from './utils.mjs';
+import e from 'cors';
 //import MongoStore from "connect-mongo";
 
 const uri = process.env.DATABASE_URL;
@@ -599,6 +600,40 @@ export async function db_endShipment(shipmentId, endDate) {
   }
 }
 
+export async function db_updateBatteryPercentage(trackerId, batteryPercentage = 0, endShipment = false) {
+  try {
+    let battery = {
+      percentage: batteryPercentage,
+      allow_change: false,
+      last_update: new Date()
+    }
+    const client = await connect()
+    const collection = client.collection('trackers');
+    let dbResult = await collection.findOne({id: trackerId});
+    if (!dbResult) {
+      return { success: false, result: "", error: "El tracker no existe." };
+    }
+
+    if(endShipment) {
+      // Si se está finalizando el envío, se permite cambiar el porcentaje de batería
+      battery.allow_change = true;
+      batteryPercentage = dbResult.battery_percentage.percentage; // Mantener el porcentaje actual
+      await collection.updateOne({id: trackerId}, {$set: {battery_percentage: battery}});
+    }
+
+    if (dbResult.battery_percentage.percentage < batteryPercentage && dbResult.battery_percentage.allow_change) {
+      await collection.updateOne({id: trackerId}, {$set: {battery_percentage: battery}});
+    }else if(dbResult.battery_percentage.percentage >= batteryPercentage) {
+      await collection.updateOne({id: trackerId}, {$set: {battery_percentage: battery}});
+    }
+  } catch (error) {
+    consoleLog('db_updateBatteryPercentage - Ocurrió un error:', error);
+  } finally {
+    if (client) {
+      await disconnect();
+    }
+  }
+}
 
 // ----------------------- App Controller -----------------------
 

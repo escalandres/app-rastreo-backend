@@ -87,20 +87,22 @@ export async function processTracker(trackerData) {
             consoleLog('dbResult.result.delivery_date', dbResult.result.delivery_date);
             if(!dbResult.result.delivery_date){
                 let statusInfo = {};
-                // switch(dbResult.result.shipment_data.company){
-                //     case "DHL":
-                //         consoleLog('DHL');
-                //         statusInfo = await DHL(dbResult.result);
-                //         break;
+                if(dbResult.result.shipment_data.company){
+                    switch(dbResult.result.shipment_data.company != ''){
+                        case "DHL":
+                            consoleLog('DHL');
+                            statusInfo = await DHL(dbResult.result);
+                            break;
 
-                //     case "Estafeta":
-                //         statusInfo = await Estafeta(dbResult.result.shipment_data.tracking_number);
-                //         break;
+                        case "Estafeta":
+                            statusInfo = await Estafeta(dbResult.result.shipment_data.tracking_number);
+                            break;
 
-                //     case "FedEx":
-                //         statusInfo = await FedEx(dbResult.result.shipment_data.tracking_number);
-                //         break;
-                // }
+                        case "FedEx":
+                            statusInfo = await FedEx(dbResult.result.shipment_data.tracking_number);
+                            break;
+                    }
+                }
                 consoleLog('statusInfo', statusInfo);
                 let locationData = {};
 

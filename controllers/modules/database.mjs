@@ -600,6 +600,27 @@ export async function db_endShipment(shipmentId, endDate) {
   }
 }
 
+export async function db_changeTrackingCode(shipmentId, shipmentData){
+  try {
+    const client = await connect()
+    const collection = client.collection('shipments');
+    const dbResult = await collection.updateOne({id: shipmentId}, {$set: {shipment_data: shipmentData}});
+    consoleLog("dbResult", dbResult);
+    if (dbResult.acknowledged) {
+      return { success: true, result: "¡Se ha actualizado el tracker!", error: "" };
+    } else {
+      return { success: false, result: "", error: "Ocurrió un error al actualizar el tracker. Inténtelo nuevamente!" }
+    }
+  } catch (error) {
+    console.error('Ocurrió un error:', error);
+    return {success: false, message: error};
+  } finally {
+    if (client) {
+      await disconnect();
+    }
+  }
+}
+
 export async function db_updateBatteryPercentage(trackerId, batteryPercentage = 0, endShipment = false) {
   try {
     let battery = {

@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 import { generarOTP, validateToken, consoleLog } from "./modules/utils.mjs";
 import { consultaEmpresasPaqueteria, registerNewShipment, getContainerShipments, 
     getCurrentContainerShipment, getUserContainers, linkTracker, getAppInfo, 
-    db_startShipment, db_updateTracker, db_getShipmentInfo, db_endShipment, db_updateBatteryPercentage } from "./modules/database.mjs";
+    db_startShipment, db_updateTracker, db_getShipmentInfo, db_endShipment, db_updateBatteryPercentage, db_changeTrackingCode } from "./modules/database.mjs";
 
 import { generarPDF, generarReporteSeguimiento } from "./modules/pdf.mjs";
 
@@ -159,7 +159,7 @@ export async function startShipment(req, res) {
         if (authHeader) { 
             const token = authHeader.split(' ')[1]; // Assuming 'Bearer <token>' 
             const decodedToken = validateToken(token);
-            if(decodedToken){
+            if(decodedToken){ 
                 const shipment = {
                     id: generarOTP(),
                     container_id: parseInt(trackerID),
@@ -173,6 +173,7 @@ export async function startShipment(req, res) {
                     shipment_status: [],
                     locations: []
                 }
+                console.log("shipment:", shipment);
                 const result = await db_startShipment(shipment);
                 // consoleLog("result:", result);
                 if(!result.success){
@@ -295,6 +296,40 @@ export async function endShipment(req, res) {
                     return res.status(400).json({success: false, message: result.error});
                 }else{
                     db_updateBatteryPercentage(trackerId, 0, true);
+                    return res.status(200).json({success: true, message: result.message});
+                }
+            }
+        }
+        return res.status(401).json({ success: false, message: 'No se proporcionó el token o no es válido' });
+    }catch(error){
+        console.error("Error:", error);
+        return res.status(500).json({ success: false, message: 'Ocurrió un error al vincular' });
+
+    }
+    
+}
+
+export async function changeTrackingCode(req, res) {
+    consoleLog("changeTrackingCode", "", true);
+    try{
+        const { shipmentId, company, newTrackingCode } = req.query;
+        consoleLog("shipmentId:", shipmentId);
+        const authHeader = req.headers['authorization']; 
+        if (authHeader) { 
+            const token = authHeader.split(' ')[1]; // Assuming 'Bearer <token>' 
+            const decodedToken = validateToken(token);
+            if(decodedToken){
+                const shipmentData = {
+                    company: company,
+                    tracking_number: newTrackingCode,
+                    service_id: company === "DHL" ? "express" : ""
+                }
+                consoleLog("shipmentData:", shipmentData);
+                const result = await db_changeTrackingCode(parseInt(shipmentId), shipmentData);
+                consoleLog("result:", result);
+                if(!result.success){
+                    return res.status(400).json({success: false, message: result.error});
+                }else{
                     return res.status(200).json({success: true, message: result.message});
                 }
             }

@@ -85,7 +85,7 @@ export async function processTracker(trackerData) {
             //Envio en curso
             // Obtener información envío actual del rastreador provista por la paquetería
             consoleLog('dbResult.result.delivery_date', dbResult.result.delivery_date);
-            if(!dbResult.result.delivery_date){
+            //if(!dbResult.result.delivery_date){
                 let statusInfo = {};
                 if(dbResult.result.shipment_data.company !== ''){
                     switch(dbResult.result.shipment_data.company){
@@ -148,8 +148,8 @@ export async function processTracker(trackerData) {
                     await db_updateBatteryPercentage(dbResult.result.tracker_id, trackerData.batteryLevel);
                     return {success: true, message: "Coordenadas guardadas correctamente"};
                 }
-            }
-            return {success: false, message: "El envío seleccionado ya terminó"};
+            // }
+            // return {success: false, message: "El envío seleccionado ya terminó"};
         }
     } catch (error) {
         return {success: false, message: "Error al guardar coordenadas"};

@@ -622,6 +622,7 @@ export async function db_changeTrackingCode(shipmentId, shipmentData){
 }
 
 export async function db_updateBatteryPercentage(trackerId, batteryPercentage = 0, endShipment = false) {
+  consoleLog('db_updateBatteryPercentage', "empieza", true);
   try {
     let battery = {
       percentage: batteryPercentage,
@@ -648,7 +649,7 @@ export async function db_updateBatteryPercentage(trackerId, batteryPercentage = 
       await collection.updateOne({id: trackerId}, {$set: {battery_percentage: battery}});
     }
   } catch (error) {
-    consoleLog('db_updateBatteryPercentage - Ocurrió un error:', error);
+    consoleLog('db_updateBatteryPercentage - Ocurrió un error:', error, true);
   } finally {
     if (client) {
       await disconnect();

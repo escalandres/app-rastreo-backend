@@ -133,8 +133,9 @@ export async function processTracker(trackerData) {
                 }
                 const dbResponse = await updateShipment(dbResult.result.id, locationData, statusInfo);
                 consoleLog(dbResponse);
+                db_updateBatteryPercentage(dbResult.result.tracker_id, trackerData.batteryLevel);
                 if(!dbResponse.success){
-                    db_updateBatteryPercentage(dbResult.result.tracker_id, trackerData.batteryLevel);
+                    
                     return {success: false, message: "Error al guardar coordenadas"};
                 }else{
                     locationData.tracker = trackerData.id;

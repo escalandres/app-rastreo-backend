@@ -88,6 +88,7 @@ export async function processTracker(trackerData) {
             //if(!dbResult.result.delivery_date){
                 let statusInfo = {};
                 if(dbResult.result.shipment_data.company !== ''){
+                    consoleLog('Company', dbResult.result.shipment_data.company, true);
                     switch(dbResult.result.shipment_data.company){
                         case "DHL":
                             consoleLog('DHL');
@@ -95,15 +96,15 @@ export async function processTracker(trackerData) {
                             break;
 
                         case "Estafeta":
-                            statusInfo = await Estafeta(dbResult.result.shipment_data.tracking_number);
+                            statusInfo = await Estafeta(dbResult.result);
                             break;
 
                         case "FedEx":
-                            statusInfo = await FedEx(dbResult.result.shipment_data.tracking_number);
+                            statusInfo = await FedEx(dbResult.result);
                             break;
                     }
                 }
-                consoleLog('statusInfo', statusInfo);
+                consoleLog('statusInfo', statusInfo, true);
                 let locationData = {};
 
                 //Verificar si hay datos del GPS del rastreador
@@ -275,6 +276,7 @@ function processDHLResponse(dhlResponse, shipmentStatus){
 // ---------------------- Estafeta y FedEx ----------------------
 
 async function queryEstafeta(trackingCode) {
+    consoleLog('queryEstafeta',"", true);
     let serviceInfo = [];
     let shipmentStatus = "";
     const url = `https://rastreositecorecms.azurewebsites.net/Tracking/searchByGet/?wayBillType=1&wayBill=${trackingCode}`;
@@ -359,9 +361,10 @@ function processEstafetaFedexResponse(response, shipmentStatus){
             description: `${translateStatus(latestStatus.statusCode)} | ${latestStatus.description}`,
             location: latestStatus.location
         };
+        consoleLog('lastStatus', lastStatus, true);
         return lastStatus
     } 
-    consoleLog('Estatus ya existe en la DB');
+    consoleLog('Estatus ya existe en la DB', "", true);
     return {};
 }
 

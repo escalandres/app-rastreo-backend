@@ -134,7 +134,7 @@ export async function processTracker(trackerData) {
                 const dbResponse = await updateShipment(dbResult.result.id, locationData, statusInfo);
                 consoleLog(dbResponse);
                 if(!dbResponse.success){
-                    await db_updateBatteryPercentage(dbResult.result.tracker_id, trackerData.batteryLevel);
+                    await db_updateBatteryPercentage(dbResult.result.container_id, trackerData.batteryLevel);
                     return {success: false, message: "Error al guardar coordenadas"};
                 }else{
                     locationData.tracker = trackerData.id;
@@ -145,7 +145,7 @@ export async function processTracker(trackerData) {
                     locationData.cid = trackerData.cid;
                     locationData.location = processLocation(locationData.isCellTower, locationData.radius)
                     await sendNotifyEmail(locationData);
-                    await db_updateBatteryPercentage(dbResult.result.tracker_id, trackerData.batteryLevel);
+                    await db_updateBatteryPercentage(dbResult.result.container_id, trackerData.batteryLevel);
                     return {success: true, message: "Coordenadas guardadas correctamente"};
                 }
             // }

@@ -635,24 +635,25 @@ export async function db_updateBatteryPercentage(trackerId, batteryPercentage = 
     if (!dbResult) {
       return { success: false, result: "", error: "El tracker no existe." };
     }
+    await collection.updateOne({id: trackerId}, {$set: {battery_percentage: battery}});
+    consoleLog('db_updateBatteryPercentage - Finaliza', true);
+    // if(endShipment) {
+    //   // Si se está finalizando el envío, se permite cambiar el porcentaje de batería
+    //   battery.allow_change = true;
+    //   batteryPercentage = dbResult.battery_percentage.percentage; // Mantener el porcentaje actual
+    //   await collection.updateOne({id: trackerId}, {$set: {battery_percentage: battery}});
+    //   return { success: true, result: "¡Se ha actualizado el porcentaje de batería!", error: "" };
+    // }
 
-    if(endShipment) {
-      // Si se está finalizando el envío, se permite cambiar el porcentaje de batería
-      battery.allow_change = true;
-      batteryPercentage = dbResult.battery_percentage.percentage; // Mantener el porcentaje actual
-      await collection.updateOne({id: trackerId}, {$set: {battery_percentage: battery}});
-      return { success: true, result: "¡Se ha actualizado el porcentaje de batería!", error: "" };
-    }
-
-    if (dbResult.battery_percentage.percentage < batteryPercentage && dbResult.battery_percentage.allow_change) {
-      await collection.updateOne({id: trackerId}, {$set: {battery_percentage: battery}});
-      consoleLog("Se actualizó el porcentaje de batería:", batteryPercentage,true);
-      return { success: true, result: "¡Se ha actualizado el porcentaje de batería!", error: "" };
-    }else if(dbResult.battery_percentage.percentage >= batteryPercentage) {
-      await collection.updateOne({id: trackerId}, {$set: {battery_percentage: battery}});
-      consoleLog("Se actualizó el porcentaje de batería:", batteryPercentage,true);
-      return { success: true, result: "¡Se ha actualizado el porcentaje de batería!", error: "" };
-    }
+    // if (dbResult.battery_percentage.percentage < batteryPercentage && dbResult.battery_percentage.allow_change) {
+    //   await collection.updateOne({id: trackerId}, {$set: {battery_percentage: battery}});
+    //   consoleLog("Se actualizó el porcentaje de batería:", batteryPercentage,true);
+    //   return { success: true, result: "¡Se ha actualizado el porcentaje de batería!", error: "" };
+    // }else if(dbResult.battery_percentage.percentage >= batteryPercentage) {
+    //   await collection.updateOne({id: trackerId}, {$set: {battery_percentage: battery}});
+    //   consoleLog("Se actualizó el porcentaje de batería:", batteryPercentage,true);
+    //   return { success: true, result: "¡Se ha actualizado el porcentaje de batería!", error: "" };
+    // }
   } catch (error) {
     consoleLog('db_updateBatteryPercentage - Ocurrió un error:', error, true);
   } finally {

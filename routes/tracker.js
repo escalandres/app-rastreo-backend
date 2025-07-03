@@ -56,7 +56,7 @@ router.post('/tracker-on', (req, res) => {
     consoleLog("----------------");
     if(req.body.datos !== "AT+CMGR=0ERROR" && req.body.datos !== "Enviando informacion de los rastreadores al servidor"){
         consoleLog("req.body.datos", req.body.datos);
-        subirDatos(req,res);
+        NotificarEncendido(req,res);
     }else{
         consoleLog("Formato de mensaje no válido");
         consoleLog("-------req.body.datos", req.body.datos);

@@ -52,6 +52,18 @@ router.post('/upload-data', (req, res) => {
     }
 });
 
+router.post('/tracker-on', (req, res) => {
+    consoleLog("----------------");
+    if(req.body.datos !== "AT+CMGR=0ERROR" && req.body.datos !== "Enviando informacion de los rastreadores al servidor"){
+        consoleLog("req.body.datos", req.body.datos);
+        subirDatos(req,res);
+    }else{
+        consoleLog("Formato de mensaje no válido");
+        consoleLog("-------req.body.datos", req.body.datos);
+        res.status(400).send({success: false});
+    }
+});
+
 router.post('/update-battery', async (req, res) => {
     consoleLog("update-battery");
     const { trackerId, batteryPercentage } = req.body;

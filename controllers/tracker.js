@@ -1,5 +1,5 @@
 import { processTracker } from "./shipment.js";
-import { sendOtpEmail, sendNotifyEmail } from "./modules/email.mjs";
+import { sendOtpEmail, sendNotifyEmail, sendEncendido } from "./modules/email.mjs";
 import { consoleLog, convertirUTCAMexico } from "./modules/utils.mjs";
 
 function formatDate(inputDate) {
@@ -104,6 +104,46 @@ function extraerDatos(mensaje) {
     // }
 }
 
+function extraerDatosEncendido(mensaje) {
+    let regex = ""
+    let datosRastreador = {};
+    if(mensaje.includes("+CMGR: 'REC UNREAD'")){
+        // Expresión regular para extraer los datos
+        regex = /\+(CMT|CMGR):\s'REC UNREAD','(\+52\d{10,12})','','([\d\/:,]+)-([\d\/:,]+)'tracker:(\d+),time:([\d\-:T]+)OK/gm;
+
+        const resultado = regex.exec(mensaje);
+
+        if (resultado) {
+            datosRastreador = {
+                numcell: resultado[2],
+                fecha: formatDate(resultado[3]),
+                tracker: resultado[5],
+                time: convertirUTCAMexico(resultado[6]),
+            };
+        } else {
+            consoleLog("Formato de mensaje no válido", "", true);
+            return {};
+        }
+    }else if(mensaje.includes("+CMT: ")){
+        regex = /\+CMT:\s'(\+52\d{10,12})','','([\d\/:,]+)-([\d\/:,]+)'tracker:(\d+),time:([\d\-:T]+)/gm
+        const resultado = regex.exec(mensaje);
+        if (resultado) {
+            datosRastreador = {
+                numcell: resultado[1],
+                fecha: formatDate(resultado[2]),
+                tracker: resultado[4],
+                time: convertirUTCAMexico(resultado[5]),
+            };
+            
+        } else {
+            consoleLog("Formato de mensaje no válido", "", true);
+            return {};
+        }
+
+    }
+    return datosRastreador;
+}
+
 export async function subirDatos(req, res){
     try {
         let mensajeReceptor = req.body.datos;
@@ -119,6 +159,37 @@ export async function subirDatos(req, res){
         
         if(trackerData != {}){
             const response = await processTracker(trackerData);
+            if(!response.success){
+                return res.status(400).json(response)
+            }else{
+                return res.status(200).json(response);
+            }
+        }
+        
+        return res.status(400).json({ success: false, message: "El mensaje no tiene un formato válido" })
+        
+    } catch (error) {
+        console.error('Ocurrio un error:',error);
+        // Enviar respuesta JSON indicando fallo
+        res.status(400).json({ success: false , message: "Error al guardar coordenadas"});
+    }
+}
+
+export async function NotificarEncendido(req, res){
+    try {
+        let mensajeReceptor = req.body.datos;
+        consoleLog("Mensaje del receptor:", mensajeReceptor, true)
+        const token = req.headers.authorization.replace("Bearer ", "");
+
+        if (!token || token !== process.env.TOKEN) {
+            return res.status(401).json({ success: false, message: "Token de autorización inválido" });
+        }
+        // Extraer datos del mensaje enviado por el rastreador
+        const trackerData = extraerDatosEncendido(mensajeReceptor);
+        consoleLog("Encendido", trackerData, true);
+        
+        if(trackerData != {}){
+            const response = await sendEncendido(trackerData);
             if(!response.success){
                 return res.status(400).json(response)
             }else{

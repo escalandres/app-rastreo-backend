@@ -1,8 +1,9 @@
 import express from 'express';
 
-import { subirDatos, subirDatos1 } from '../controllers/tracker.js';
+import { subirDatos, subirDatos1, NotificarEncendido } from '../controllers/tracker.js';
 import { db_updateBatteryPercentage } from '../controllers/modules/database.mjs';
 import { consoleLog } from '../controllers/modules/utils.mjs';
+
 const router = express.Router();
 
 router.post('/post', subirDatos);

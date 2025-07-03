@@ -537,7 +537,7 @@ export async function db_startShipment(shipment) {
     // Verificar si el número de rastreo ya existe
     const existingTracker = await collection.findOne({ "shipment_data.tracking_number": shipment.shipment_data.tracking_number });
 
-    if (existingTracker) {
+    if (existingTracker && existingTracker !== "") {
       return { success: false, result: "", error: "El número de rastreo ya existe. No se puede registrar el envío." };
     }
 

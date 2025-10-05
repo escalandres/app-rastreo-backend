@@ -144,8 +144,10 @@ export async function processTracker(trackerData) {
                     locationData.mnc = trackerData.mnc;
                     locationData.lac = trackerData.lac;
                     locationData.cid = trackerData.cid;
+                    locationData.company = dbResult.result.shipment_data.company;
+                    locationData.tracking_number = dbResult.result.shipment_data.tracking_number;
                     locationData.location = processLocation(locationData.isCellTower, locationData.radius)
-                    await sendNotifyEmail(locationData);
+                    await sendNotifyEmail(locationData,statusInfo);
                     await db_updateBatteryPercentage(dbResult.result.container_id, trackerData.batteryLevel);
                     return {success: true, message: "Coordenadas guardadas correctamente"};
                 }

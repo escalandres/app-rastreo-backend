@@ -2,7 +2,6 @@ import ejs from "ejs";
 import puppeteer from "puppeteer";
 import fs from "fs/promises";
 import path from "path";
-import { buffer } from "stream/consumers";
 import { consoleLog, translateStatus, colorStatus, translateStatusCode, convertDateToReport, generateDate, processLocation } from "./utils.mjs";
 
 export async function generarPDF() {
@@ -12,7 +11,7 @@ export async function generarPDF() {
             { id: 2, nombre: "Ana López", email: "ana.lopez@example.com" },
             { id: 3, nombre: "Carlos García", email: "carlos.garcia@example.com" }
         ];
-        const templateFolder = process.env.NODE_ENV === 'production' ? PROD_EMAIL_TEMPLATES_PATH : DEV_EMAIL_TEMPLATES_PATH;
+        const templateFolder = EMAIL_TEMPLATES_PATH;
         const templatePath = path.join(templateFolder, `${PLANTILLAS.notify.file}`);
         const template = await fs.readFile(path.join(templatePath, "plantilla.ejs"), "utf-8");
         const html = ejs.render(template, { datos });

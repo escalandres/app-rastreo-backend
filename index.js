@@ -29,11 +29,9 @@ const currentFilePath = fileURLToPath(currentFileURL);
 // Obtiene el directorio del archivo actual
 const __dirname = dirname(currentFilePath);
 global.__dirname = __dirname;
-global.PROD_EMAIL_TEMPLATES_PATH = path.join(__dirname, 'src', 'prod', 'email_templates');
-global.DEV_EMAIL_TEMPLATES_PATH = path.join(__dirname, 'src', 'dev', 'email_templates');
-global.PROD_PDF_TEMPLATES_PATH = path.join(__dirname, 'src', 'prod', 'pdf_templates');
-global.DEV_PDF_TEMPLATES_PATH = path.join(__dirname, 'src', 'dev','pdf_templates');
-global.PDF_PATH = path.join(__dirname, 'src', 'pdf');
+global.EMAIL_TEMPLATES_PATH = path.join(__dirname, 'src', 'templates', 'email_templates');
+global.PDF_TEMPLATES_PATH = path.join(__dirname, 'src', 'templates', 'pdf_templates');
+global.TEMP_PATH = path.join(__dirname, 'temp');
 
 // -------------- settings --------------
 app.use(express.json());

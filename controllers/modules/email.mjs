@@ -9,8 +9,12 @@ export const PLANTILLAS = {
         file: 'p.html'
     },
     notify: {
-        subject: "Hay novedades en tu cuenta",
-        file: 'notify.html'
+        subject: "Hay novedades en tu rastreador",
+        file: 'notify_tracker.html'
+    },
+    delivery: {
+        subject: "Hay novedades en tu rastreador",
+        file: 'delivery.html'
     },
     encendido: {
         subject: "Rastreador encendido",
@@ -24,7 +28,7 @@ export const PLANTILLAS = {
 
 export async function sendOtpEmail(email,otp) {
     try{
-        const templateFolder = process.env.NODE_ENV === 'production' ? PROD_EMAIL_TEMPLATES_PATH : DEV_EMAIL_TEMPLATES_PATH;
+        const templateFolder = EMAIL_TEMPLATES_PATH;
         const templatePath = path.join(templateFolder, `${PLANTILLAS.otp.file}`);
         let template = fs.readFileSync(templatePath, 'utf8');
         consoleLog("template");
@@ -48,24 +52,26 @@ export async function sendOtpEmail(email,otp) {
     }
 }
 
-export async function sendNotifyEmail(data) {
+export async function sendNotifyEmail(data, statusInfo) {
     try{
         consoleLog("enviando correo de notificacion");
         consoleLog("data", data);
-        const templateFolder = process.env.NODE_ENV === 'production' ? PROD_EMAIL_TEMPLATES_PATH : DEV_EMAIL_TEMPLATES_PATH;
-        const templatePath = path.join(templateFolder, `${PLANTILLAS.notify.file}`);
+        const templateFolder = EMAIL_TEMPLATES_PATH;
+        const hasStatusInfo = statusInfo && Object.keys(statusInfo).length > 0;
+        const templateObj = hasStatusInfo ? PLANTILLAS.delivery : PLANTILLAS.notify;
+        const templatePath = path.join(templateFolder, `${templateObj.file}`);
         let template = fs.readFileSync(templatePath, 'utf8');
-        consoleLog("template");
-        const variables = data;
-        consoleLog("variables", variables);
+        const allVariables = { ...data, ...(hasStatusInfo ? statusInfo : {}) };
+        consoleLog("allVariables", allVariables);
+        // const variables = data;
         // Reemplaza las variables en la plantilla
-        Object.keys(variables).forEach(key => {
-            consoleLog("key", key);
+        Object.keys(allVariables).forEach(key => {
+            // consoleLog("key", key);
             const regex = new RegExp(`{${key}}`, 'g');
-            template = template.replace(regex, variables[key]);
+            template = template.replace(regex, allVariables[key]);
         });
-    
-        let subject = `${PLANTILLAS.notify.subject} ${variables.tracker}`;
+
+        let subject = `${templateObj.subject} ${allVariables.tracker}`;
         let email = "andres.escala.344@gmail.com";
         let info = await sendMail(email,subject,template);
         return {success: true, message: info};
@@ -80,7 +86,7 @@ export async function sendEncendido(data) {
         consoleLog("enviando correo de encendido");
         consoleLog("data", data);
         const templateObj = PLANTILLAS.encendido;
-        const templateFolder = process.env.NODE_ENV === 'production' ? PROD_EMAIL_TEMPLATES_PATH : DEV_EMAIL_TEMPLATES_PATH;
+        const templateFolder = EMAIL_TEMPLATES_PATH;
         const templatePath = path.join(templateFolder, `${templateObj.file}`);
         let template = fs.readFileSync(templatePath, 'utf8');
         consoleLog("template");

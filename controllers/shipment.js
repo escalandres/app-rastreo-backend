@@ -289,7 +289,11 @@ async function queryEstafeta(trackingCode) {
         ? true : false,
         executablePath: process.env.NODE_ENV === "production"
         ? process.env.PUPPETEER_EXECUTABLE_PATH
-        : puppeteer.executablePath()
+        : puppeteer.executablePath(),
+        args: [
+            "--no-sandbox",
+            "--disable-setuid-sandbox"
+        ]
     });
     const page = await browser.newPage();
 

@@ -8,6 +8,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon --env-file .env index.js",
     "start": "node index.js",
+    "postinstall": "npx puppeteer browsers install chrome",
     "check-vulnerabilities": "npx is-my-node-vulnerable"
   },
   "author": "escalandres",

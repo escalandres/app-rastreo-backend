@@ -1,14 +1,4 @@
 import express from 'express';
-// import path from 'path';
-// import { dirname } from 'path';
-// import { fileURLToPath } from 'url';
-// Set up storage for uploaded files
-
-// const currentFileURL = import.meta.url;
-// // Convierte la URL del archivo en una ruta de sistema de archivos
-// const currentFilePath = fileURLToPath(currentFileURL);
-// // Obtiene el directorio del archivo actual
-// const __dirname = dirname(currentFilePath);
 
 import { signup, login, logout, changeUserPassword, generateOTP, checkOTP, validateCheckToken, validateChangeToken, googleAuth, githubAuth } from '../controllers/user.js';
 

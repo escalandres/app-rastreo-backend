@@ -55,20 +55,6 @@ export async function generarReporteSeguimiento(data) {
         consoleLog("Datasource:", datasource); // Verifica el contenido de datasource
         const html = ejs.render(template, { datasource });
 
-        // const browser = await puppeteer.launch({
-        //     headless: process.env.NODE_ENV === "production"
-        //     ? true : false,
-        //     executablePath: process.env.NODE_ENV === "production"
-        //     ? process.env.PUPPETEER_EXECUTABLE_PATH
-        //     : puppeteer.executablePath(),
-        //     args: [
-        //         '--disable-infobars',
-        //         '--no-sandbox',
-        //         '--disable-setuid-sandbox',
-        //         '--disable-dev-shm-usage',
-        //         '--disable-blink-features=AutomationControlled'
-        //     ]
-        // });
         const browser = await puppeteer.launch({
             executablePath: '/usr/bin/chromium',
             headless: 'new',

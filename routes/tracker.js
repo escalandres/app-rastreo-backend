@@ -1,17 +1,43 @@
 import express from 'express';
 
-import { subirDatos, subirDatos1, NotificarEncendido } from '../controllers/tracker.js';
+import { subirDatos, subirDatos1, notificarEncendido } from '../controllers/tracker.js';
 import { db_updateBatteryPercentage } from '../controllers/modules/database.mjs';
 import { consoleLog } from '../controllers/modules/utils.mjs';
 
 const router = express.Router();
 
-router.post('/post', subirDatos);
+router.post('/', (req, res) => {
+    consoleLog("----------------");
+    if(req.body.datos !== "AT+CMGR=0ERROR" && req.body.datos !== "Enviando informacion de los rastreadores al servidor"){
+        consoleLog("req.body.datos", req.body.datos);
+        subirDatos(req,res);
+    }else{
+        consoleLog("Formato de mensaje no válido");
+        consoleLog("-------req.body.datos", req.body.datos);
+        res.status(400).send({success: false});
+    }
+});
 
-router.get('/test', (req, res) => {
+router.post('/tracker-on', (req, res) => {
+    consoleLog("----------------");
+    if(req.body.datos !== "AT+CMGR=0ERROR" && req.body.datos !== "Enviando informacion de los rastreadores al servidor"){
+        consoleLog("req.body.datos", req.body.datos);
+        notificarEncendido(req,res);
+    }else{
+        consoleLog("Formato de mensaje no válido");
+        consoleLog("-------req.body.datos", req.body.datos);
+        res.status(400).send({success: false});
+    }
+});
+
+router.get('/despertar-servidor', (req, res) => {
     consoleLog("Hay conexion con el servidor");
     res.send('Hay conexion con el servidor');
 });
+
+// ---------------- Endpoints para pruebas ----------------
+
+router.post('/post', subirDatos);
 
 router.post('/test-json', (req, res) => {
     consoleLog(req.body.datos);
@@ -28,36 +54,7 @@ router.post('/post-test', (req, res) => {
     if(req.body.datos !== "AT+CMGR=0ERROR" && req.body.datos !== "Enviando informacion de los rastreadores al servidor"){
         const mensaje = req.body.datos;
         consoleLog("req.body.datos", mensaje);
-        // const regex = /\+(CMT|CMGR):\s'REC UNREAD','(\+52\d{10,12})','','(\d{2}\/\d{2}\/\d{2},\d{2}:\d{2}:\d{2}-\d{2})'id:(\d+),latitud:([-\d.]+),longitud:([-\d.]+);/;
-
-        // const resultado = regex.exec(mensaje);
-        // consoleLog("resultado", resultado);
-
-        // subirDatos(req,res);
         subirDatos1(req,res);
-    }else{
-        consoleLog("Formato de mensaje no válido");
-        consoleLog("-------req.body.datos", req.body.datos);
-        res.status(400).send({success: false});
-    }
-});
-router.post('/upload-data', (req, res) => {
-    consoleLog("----------------");
-    if(req.body.datos !== "AT+CMGR=0ERROR" && req.body.datos !== "Enviando informacion de los rastreadores al servidor"){
-        consoleLog("req.body.datos", req.body.datos);
-        subirDatos(req,res);
-    }else{
-        consoleLog("Formato de mensaje no válido");
-        consoleLog("-------req.body.datos", req.body.datos);
-        res.status(400).send({success: false});
-    }
-});
-
-router.post('/tracker-on', (req, res) => {
-    consoleLog("----------------");
-    if(req.body.datos !== "AT+CMGR=0ERROR" && req.body.datos !== "Enviando informacion de los rastreadores al servidor"){
-        consoleLog("req.body.datos", req.body.datos);
-        NotificarEncendido(req,res);
     }else{
         consoleLog("Formato de mensaje no válido");
         consoleLog("-------req.body.datos", req.body.datos);

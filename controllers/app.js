@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import { generarOTP, validateToken, consoleLog } from "./modules/utils.mjs";
+import { generarOTP, validateToken, consoleLog, getCurrentTime } from "./modules/utils.mjs";
 import { consultaEmpresasPaqueteria, registerNewShipment, getContainerShipments, 
     getCurrentContainerShipment, getUserContainers, linkTracker, getAppInfo, 
     db_startShipment, db_updateTracker, db_getShipmentInfo, db_endShipment, db_updateBatteryPercentage, db_changeTrackingCode } from "./modules/database.mjs";
@@ -341,21 +341,4 @@ export async function changeTrackingCode(req, res) {
 
     }
     
-}
-
-function getCurrentTime(){
-    let nowInMexico = new Date().toLocaleString("en-US", { timeZone: "America/Mexico_City" });
-    let dateInMexico = new Date(nowInMexico);
-
-    let yyyy = dateInMexico.getFullYear();
-    let MM = String(dateInMexico.getMonth() + 1).padStart(2, '0');
-    let dd = String(dateInMexico.getDate()).padStart(2, '0');
-    let hh = String(dateInMexico.getHours()).padStart(2, '0');
-    let mm = String(dateInMexico.getMinutes()).padStart(2, '0');
-    let ss = String(dateInMexico.getSeconds()).padStart(2, '0');
-
-    let formattedDate = `${yyyy}-${MM}-${dd}T${hh}:${mm}:${ss}`;
-
-    consoleLog("current time", formattedDate, true);
-    return formattedDate;
 }

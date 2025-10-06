@@ -245,4 +245,20 @@ export function convertirUTCAMexico(fechaUTC) {
     return `${año}-${mes}-${dia}T${horas}:${minutos}:${segundos}`;
 }
 
+export function getCurrentTime(){
+    let nowInMexico = new Date().toLocaleString("en-US", { timeZone: "America/Mexico_City" });
+    let dateInMexico = new Date(nowInMexico);
+
+    let yyyy = dateInMexico.getFullYear();
+    let MM = String(dateInMexico.getMonth() + 1).padStart(2, '0');
+    let dd = String(dateInMexico.getDate()).padStart(2, '0');
+    let hh = String(dateInMexico.getHours()).padStart(2, '0');
+    let mm = String(dateInMexico.getMinutes()).padStart(2, '0');
+    let ss = String(dateInMexico.getSeconds()).padStart(2, '0');
+
+    let formattedDate = `${yyyy}-${MM}-${dd}T${hh}:${mm}:${ss}`;
+
+    consoleLog("current time", formattedDate, true);
+    return formattedDate;
+}
 

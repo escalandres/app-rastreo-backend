@@ -63,7 +63,7 @@ export async function sendNotifyEmail(data, statusInfo) {
         let template = fs.readFileSync(templatePath, 'utf8');
         const allVariables = { ...data, ...(hasStatusInfo ? statusInfo : {}) };
         consoleLog("allVariables", allVariables);
-        // const variables = data;
+
         // Reemplaza las variables en la plantilla
         Object.keys(allVariables).forEach(key => {
             // consoleLog("key", key);

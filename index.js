@@ -14,12 +14,12 @@ import appRoutes from './routes/app.js';
 import trackerRoutes from './routes/tracker.js';
 import shipmentRoutes from './routes/shipment.js';
 import sendMail from './controllers/modules/nodemailer.js';
+
 import dotenv from 'dotenv';
 // -------------- Variables modules --------------
 const app = express();
 
 dotenv.config();
-
 
 // -------------- Variables Globales --------------
 // Obtiene la URL del archivo actual
@@ -40,19 +40,19 @@ app.use(cors());
 app.use(cookieParser());
 
 // -------------- Configuración de express-session  --------------
-app.use(session({
-    secret: process.env.KEY, // Cambia esto a una clave secreta fuerte en producción
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-        maxAge: 15 * 60 * 1000, // 15 minutos (en milisegundos)
-        secure: false,             // Solo se envía la cookie en conexiones seguras (HTTPS)
-        httpOnly: true,           // La cookie solo es accesible por el servidor (no por JavaScript en el navegador)
-        sameSite: 'strict',       // Controla cómo se envía la cookie en las solicitudes del mismo sitio
-        path: '/',                // Ruta base donde se aplica la cookie
-        domain: 'localhost:5322',    // Dominio para el que se aplicará la cookie
-    },
-}));
+// app.use(session({
+//     secret: process.env.KEY, // Cambia esto a una clave secreta fuerte en producción
+//     resave: false,
+//     saveUninitialized: false,
+//     cookie: {
+//         maxAge: 15 * 60 * 1000, // 15 minutos (en milisegundos)
+//         secure: false,             // Solo se envía la cookie en conexiones seguras (HTTPS)
+//         httpOnly: true,           // La cookie solo es accesible por el servidor (no por JavaScript en el navegador)
+//         sameSite: 'strict',       // Controla cómo se envía la cookie en las solicitudes del mismo sitio
+//         path: '/',                // Ruta base donde se aplica la cookie
+//         domain: 'localhost:5322',    // Dominio para el que se aplicará la cookie
+//     },
+// }));
 
 // Aplicar los middlewares en orden
 // app.use(express.static(path.join(__dirname, 'public')));
@@ -83,13 +83,3 @@ app.post('/sendmail', async (req, res) => {
 });
 
 app.listen(process.env.PORT, () => console.log(`App running on http://localhost:${process.env.PORT}`))
-
-
-
-
-
-
-
-
-
-

@@ -5,9 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body{
-            color:rgba(0,0,0,0.87);
-            width: 50%;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f8f9fa;
+            line-height: 1.6;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px 0;
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
         .center-icon{
             display: flex;
@@ -37,6 +52,10 @@
             padding-top:20px;
             text-align:left
         }
+        .button__container{
+            padding: 20px 0;
+            text-align:center
+        }
         .button{
             color:#ffffff!important;
             cursor:pointer;
@@ -44,7 +63,6 @@
             font-size:14px;
             font-weight:500;
             line-height:20px;
-            margin-top:20px;
             padding:10px 24px;
             text-align:center;
             text-decoration:none;
@@ -105,7 +123,9 @@
             <br>
             Para acceder, haga clic en el botón de abajo, o ingrese con el siguiente <a class="link" href="https://app-rastreo-cosmos.netlify.app/login">enlace</a>
             <br>
-            <a class="button" href="https://app-rastreo-cosmos.netlify.app/login" type="submit">Ver novedades</a>
+            <div class="button__container">
+                <a class="button" href="https://app-rastreo-cosmos.netlify.app/login" type="submit">Ver novedades</a>
+            </div>
             <br>
             <br>Actualización de su envío:
             <br><br>

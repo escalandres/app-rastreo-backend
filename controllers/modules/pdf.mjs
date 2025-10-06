@@ -42,6 +42,7 @@ export async function generarReporteSeguimiento(data) {
         // datasource
         const template = await fs.readFile(path.join(PDF_TEMPLATES_PATH, "reporte_seguimiento.ejs"), "utf-8");
         const datasource = processDataSource(data);
+        console.log("generarReporteSeguimiento");
         consoleLog("Datasource:", datasource); // Verifica el contenido de datasource
         const html = ejs.render(template, { datasource });
 
@@ -62,6 +63,7 @@ export async function generarReporteSeguimiento(data) {
         const browser = await puppeteer.launch({
             executablePath: '/usr/bin/chromium',
             headless: 'new',
+            timeout: 60000,
             args: [
                 '--no-sandbox',
                 '--disable-setuid-sandbox',
@@ -76,7 +78,7 @@ export async function generarReporteSeguimiento(data) {
         const page = await browser.newPage();
         await page.setContent(html);
         const pdfBuffer = await page.pdf({ format: "A4" });
-
+        consoleLog("PDF generado, cerrando navegador...");
         await browser.close();
         await fs.writeFile(path.join(PDF_PATH, "reporte_seguimiento.pdf"), pdfBuffer);
         const pdf = {

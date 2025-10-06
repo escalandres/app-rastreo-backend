@@ -17,10 +17,19 @@ export async function generarPDF() {
         const html = ejs.render(template, { datos });
 
         const browser = await puppeteer.launch({
-            headless: process.env.NODE_ENV === "production",
-            executablePath: process.env.NODE_ENV === "production"
-            ? process.env.PUPPETEER_EXECUTABLE_PATH
-            : puppeteer.executablePath()
+            executablePath: '/usr/bin/chromium',
+            headless: 'new',
+            timeout: 60000,
+            args: [
+                '--no-sandbox',
+                '--disable-setuid-sandbox',
+                '--disable-dev-shm-usage',
+                '--disable-gpu',
+                '--disable-dev-tools',
+                '--no-first-run',
+                '--no-zygote',
+                '--single-process'
+            ]
         });
         const page = await browser.newPage();
         await page.setContent(html);
@@ -80,7 +89,7 @@ export async function generarReporteSeguimiento(data) {
         const pdfBuffer = await page.pdf({ format: "A4" });
         consoleLog("PDF generado, cerrando navegador...");
         await browser.close();
-        await fs.writeFile(path.join(PDF_PATH, "reporte_seguimiento.pdf"), pdfBuffer);
+        await fs.writeFile(path.join(PDF_TEMPLATES_PATH, "reporte_seguimiento.pdf"), pdfBuffer);
         const pdf = {
             extension: "pdf",
             nombre: `reporte_seguimiento_${datasource.id}_${new Date().toISOString().slice(0, 10)}.pdf`,

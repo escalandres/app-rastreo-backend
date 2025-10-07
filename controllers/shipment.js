@@ -1,5 +1,5 @@
-import puppeteer from 'puppeteer';
-import { consultaEmpresasPaqueteria, registerNewShipment, getContainerShipments, getCurrentContainerShipment, updateShipment, db_updateBatteryPercentage } from "./modules/database.mjs";
+import puppeteer, { executablePath } from 'puppeteer';
+import { consultaEmpresasPaqueteria, registerNewShipment, getContainerShipments, getCurrentContainerShipment, updateShipment, db_updateBatteryPercentage } from "../services/shipment.js";
 import { translateStatus, translateStatusCode, convertToISO, createStatusCodeFromDescription, convertToISOFromDDMMYYYY, extractDetailsFromEstafeta,
     getMostRecentEntry, isEmptyObj, generarCoordenadasCiudadMexico, getOldestEntry, processLocation
 } from "./modules/utils.mjs";
@@ -299,24 +299,27 @@ async function queryFedEx(trackingCode) {
     let serviceInfo = [];
     const url = `https://www.fedex.com/fedextrack/?trknbr=${trackingCode}&~${trackingCode}~FX`;
     consoleLog('url', url);
-
+    
     // Iniciar el navegador
-    const browser = await puppeteer.launch({
-        executablePath: '/usr/bin/chromium',
-        headless: 'new',
+    const launchOptions = {
+        executablePath: puppeteer.executablePath(),
+        headless: true,
         timeout: 60000,
         args: [
-            '--no-sandbox',
-            '--disable-setuid-sandbox',
-            '--disable-dev-shm-usage',
-            '--disable-gpu',
-            '--disable-dev-tools',
-            '--no-first-run',
-            '--no-zygote',
-            '--single-process'
+            '--disable-infobars',
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-blink-features=AutomationControlled'
         ]
-    });
+    };
 
+    if (process.env.IS_DOCKER === 'true') {
+        consoleLog('Running in Docker, setting executablePath for Chromium');
+        launchOptions.executablePath = '/usr/bin/chromium';
+    }
+
+    const browser = await puppeteer.launch(launchOptions);
     const page = await browser.newPage();
 
     // Establecer un agente de usuario que imite un navegador real
@@ -710,65 +713,81 @@ export async function estafetaTracking(req, res){
     })();
 }
 
-export async function fedExTracking(req, res){
+export async function fedExTracking(req, res) {
+    consoleLog('fedExTracking', "", true);
     const { trackingCode } = req.query;
 
     const url = `https://www.fedex.com/fedextrack/?trknbr=${trackingCode}&~${trackingCode}~FX`;
     consoleLog('url', url);
 
-    (async () => {
-        /// Iniciar el navegador
-        const browser = await puppeteer.launch({
-            headless: false,
+    let browser;
+    let serviceInfo = [];
+
+    try {
+        console.log('executablePath:', puppeteer.executablePath());
+        
+        // Configuración del navegador
+        const launchOptions = {
+            executablePath: puppeteer.executablePath(),
+            headless: true,
+            timeout: 60000,
             args: [
                 '--disable-infobars',
-                '--no-sandbox',
-                '--disable-setuid-sandbox',
-                '--disable-dev-shm-usage',
-                '--disable-blink-features=AutomationControlled'
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            '--disable-dev-shm-usage',
+            '--disable-blink-features=AutomationControlled'
             ]
+        };
+
+        if (process.env.IS_DOCKER === 'true') {
+            consoleLog('Running in Docker, setting executablePath for Chromium');
+            launchOptions.executablePath = '/usr/bin/chromium';
+        }
+
+        consoleLog('launchOptions', launchOptions);
+
+        // Iniciar navegador
+        browser = await puppeteer.launch(launchOptions);
+       const page = await browser.newPage();
+
+    // Establecer un agente de usuario que imite un navegador real
+    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36');
+
+    // Habilitar la interceptación de solicitudes
+    await page.setRequestInterception(true);
+
+    // Desactivar la detección de automatización
+    await page.evaluateOnNewDocument(() => {
+        Object.defineProperty(navigator, 'webdriver', {
+            get: () => false,
         });
-        const page = await browser.newPage();
-        
-        // Establecer un agente de usuario que imite un navegador real
-        await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36');
-    
-        // Habilitar la interceptación de solicitudes
-        await page.setRequestInterception(true);
-    
-        // Desactivar la detección de automatización
-        await page.evaluateOnNewDocument(() => {
-            Object.defineProperty(navigator, 'webdriver', {
-                get: () => false,
-            });
-        });
-        
-        // Interceptar las solicitudes de red
-        page.on('request', (request) => {
+    });
+
+    // Interceptar las solicitudes de red
+    page.on('request', (request) => {
         // Bloquear las solicitudes a logx.optimizely.com
         if (request.url().includes('logx.optimizely.com')) {
             request.abort();
         } else {
             request.continue();
         }
-        });
+    });
 
-        // Añadir una función para capturar errores de navegación
-        page.on('error', error => {
-            console.error('Error en la página:', error);
-        });
-        let response;
-        try {
-            // Navegar a la URL
-            await page.goto(url, { waitUntil: 'networkidle2' });
-        
-            // Confirmar que se ha cargado la página
-            // consoleLog('Página cargada:', page.url());
-            // Esperar explícitamente un tiempo adicional para permitir la carga del contenido dinámico
-            await new Promise(resolve => setTimeout(resolve, 6000)); // Esperar 6 segundos
-            
-            // Extraer el contenido de la tabla con los registros por día
-            const tableData = await page.evaluate(() => {
+    // Añadir una función para capturar errores de navegación
+    page.on('error', error => {
+        console.error('Error en la página:', error);
+    });
+
+    try {
+        // Navegar a la URL
+        await page.goto(url, { waitUntil: 'networkidle2' });
+
+        // Esperar explícitamente un tiempo adicional para permitir la carga del contenido dinámico
+        await new Promise(resolve => setTimeout(resolve, 6000)); // Esperar 6 segundos
+
+        // Extraer el contenido de la tabla con los registros por día
+        const tableData = await page.evaluate(() => {
             const rows = document.querySelectorAll('#detail-view-sections-desktop .fdx-c-table__tbody__tr.travel-history-table__row');
             const extractedData = [];
             rows.forEach(row => {
@@ -779,7 +798,7 @@ export async function fedExTracking(req, res){
                     const timeElement = _row.querySelector('.travel-history__scan-event span');
                     const statusElement = _row.querySelector('#status');
                     const locationElement = _row.querySelector('.fdx-o-grid__item--4.fdx-u-fontweight--regular');
-            
+
                     const rowData = {
                         date: dateElement ? dateElement.innerText.trim() : 'N/A',
                         time: timeElement ? timeElement.innerText.trim() : 'N/A',
@@ -791,21 +810,27 @@ export async function fedExTracking(req, res){
             });
             return extractedData;
         });
+
         serviceInfo = tableData;
-        
-        // consoleLog(tableData);
-        // consoleLog('tableData',tableData.length);
-        } catch (error) {
-            console.error('Ocurrió un error:', error);
-        } finally {
-            // Cerrar el navegador
-            await browser.close();
-        }
+
         serviceInfo.forEach(row => {
             row.timestamp = row.date ? convertToISO(row.date, row.time || '12:00 AM') : null;
         });
-        consoleLog('response', serviceInfo);
 
-        return res.status(200).json({ message: "Shipment tracked successfully", result: serviceInfo, url: url });
-    })();
+        consoleLog('serviceInfo', serviceInfo);
+    } catch (error) {
+        console.error('Ocurrió un error:', error);
+    } finally {
+        // Cerrar el navegador
+        await browser.close();
+    }
+
+    return res.status(200).json({ message: "Shipment tracked successfully", result: serviceInfo, url: url });
+} catch (error) {
+    console.error('Ocurrió un error al iniciar el navegador o procesar la página:', error);
+    if (browser) {
+        await browser.close();
+    }
+    return res.status(500).json({ message: "Error al rastrear el envío", error: error.message });
+}
 }

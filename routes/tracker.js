@@ -1,6 +1,6 @@
 import express from 'express';
 
-import { subirDatos, subirDatos1, notificarEncendido } from '../controllers/tracker.js';
+import { subirDatos, subirDatos1, notificarEncendido, notificarRastreoActivo } from '../controllers/tracker.js';
 import { db_updateBatteryPercentage } from '../services/shipment.js';
 import { consoleLog } from '../controllers/modules/utils.mjs';
 
@@ -19,10 +19,22 @@ router.post('/', (req, res) => {
 });
 
 router.post('/tracker-on', (req, res) => {
-    consoleLog("----------------");
+    consoleLog("Rastreador encendido");
     if(req.body.datos !== "AT+CMGR=0ERROR" && req.body.datos !== "Enviando informacion de los rastreadores al servidor"){
         consoleLog("req.body.datos", req.body.datos);
         notificarEncendido(req,res);
+    }else{
+        consoleLog("Formato de mensaje no válido");
+        consoleLog("-------req.body.datos", req.body.datos);
+        res.status(400).send({success: false});
+    }
+});
+
+router.post('/rastreo-on', (req, res) => {
+    consoleLog("Rastreador activado");
+    if(req.body.datos !== "AT+CMGR=0ERROR" && req.body.datos !== "Enviando informacion de los rastreadores al servidor"){
+        consoleLog("req.body.datos", req.body.datos);
+        notificarRastreoActivo(req,res);
     }else{
         consoleLog("Formato de mensaje no válido");
         consoleLog("-------req.body.datos", req.body.datos);

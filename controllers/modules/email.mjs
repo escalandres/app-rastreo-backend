@@ -20,6 +20,10 @@ export const PLANTILLAS = {
         subject: "Rastreador encendido",
         file: 'encendido.html'
     },
+    rastreoActivo: {
+        subject: "Comienza tu rastreo",
+        file: 'rastreo.html'
+    },
     otp: {
         subject: "Código de verificación:",
         file: 'otp.html'
@@ -86,6 +90,34 @@ export async function sendEncendido(data) {
         consoleLog("enviando correo de encendido");
         consoleLog("data", data);
         const templateObj = PLANTILLAS.encendido;
+        const templateFolder = EMAIL_TEMPLATES_PATH;
+        const templatePath = path.join(templateFolder, `${templateObj.file}`);
+        let template = fs.readFileSync(templatePath, 'utf8');
+        consoleLog("template");
+        const variables = data;
+        consoleLog("variables", variables);
+        // Reemplaza las variables en la plantilla
+        Object.keys(variables).forEach(key => {
+            consoleLog("key", key);
+            const regex = new RegExp(`{${key}}`, 'g');
+            template = template.replace(regex, variables[key]);
+        });
+
+        let subject = `${templateObj.subject} ${variables.tracker}`;
+        let email = "andres.escala.344@gmail.com";
+        let info = await sendMail(email,subject,template);
+        return {success: true, message: info};
+    }catch(error){
+        console.error('Error al enviar el correo. ',error);
+        return {success: false, error: error}
+    }
+}
+
+export async function sendRastreoActivo(data) {
+    try{
+        consoleLog("enviando correo de encendido");
+        consoleLog("data", data);
+        const templateObj = PLANTILLAS.rastreoActivo;
         const templateFolder = EMAIL_TEMPLATES_PATH;
         const templatePath = path.join(templateFolder, `${templateObj.file}`);
         let template = fs.readFileSync(templatePath, 'utf8');

@@ -1,5 +1,5 @@
 import { processTracker } from "./shipment.js";
-import { sendEncendido } from "./modules/email.mjs";
+import { sendEncendido, sendRastreoActivo } from "./modules/email.mjs";
 import { consoleLog, convertirUTCAMexico } from "./modules/utils.mjs";
 
 export async function subirDatos(req, res){
@@ -120,6 +120,37 @@ export async function notificarEncendido(req, res){
     }
 }
 
+export async function notificarRastreoActivo(req, res){
+    try {
+        let mensajeReceptor = req.body.datos;
+        consoleLog("Mensaje del receptor:", mensajeReceptor, true)
+        const token = req.headers.authorization.replace("Bearer ", "");
+
+        if (!token || token !== process.env.TOKEN) {
+            return res.status(401).json({ success: false, message: "Token de autorización inválido" });
+        }
+        // Extraer datos del mensaje enviado por el rastreador
+        const trackerData = extraerDatosRastreoActivo(mensajeReceptor);
+        consoleLog("Rastreo ON", trackerData, true);
+        
+        if(trackerData != {}){
+            const response = await sendRastreoActivo(trackerData);
+            if(!response.success){
+                return res.status(400).json(response)
+            }else{
+                return res.status(200).json(response);
+            }
+        }
+        
+        return res.status(400).json({ success: false, message: "El mensaje no tiene un formato válido" })
+        
+    } catch (error) {
+        console.error('Ocurrio un error:',error);
+        // Enviar respuesta JSON indicando fallo
+        res.status(400).json({ success: false , message: "Error al guardar coordenadas"});
+    }
+}
+
 function extraerDatosEncendido(mensaje) {
     let regex = ""
     let datosRastreador = {};
@@ -159,6 +190,61 @@ function extraerDatosEncendido(mensaje) {
     }
     return datosRastreador;
 }
+
+function extraerDatosRastreoActivo(mensaje) {
+    const encabezado = mensaje.includes("+CMGR")
+        ? "\\+(CMT|CMGR):\\s'REC UNREAD',"
+        : mensaje.includes("+CMT")
+            ? "\\+CMT:"
+            : null;
+
+    if (!encabezado) return {};
+
+    const regexAhorro = new RegExp(
+        `${encabezado}'?(\\+52\\d{10,12})'?,'','([\\d\\/,:,]+)-([\\d\\/,:,]+)'` +
+        `Rastreo con Modo Ahorro ACTIVADO\\. Rastreador:\\s*(\\d+)\\. ` +
+        `Time:\\s*([\\d\\-:T]+)\\. INT:\\s*` +
+        `([0-9]+)D([0-9]+)H([0-9]+)M([0-9]+)S`,
+        "m"
+    );
+
+    const regexContinuo = new RegExp(
+        `${encabezado}'?(\\+52\\d{10,12})'?,'','([\\d\\/,:,]+)-([\\d\\/,:,]+)'` +
+        `Rastreo Continuo ACTIVADO\\. Rastreador:\\s*(\\d+)\\. ` +
+        `Time:\\s*([\\d\\-:T]+)`,
+        "m"
+    );
+
+    let resultado = regexAhorro.exec(mensaje);
+    if (resultado) {
+        return {
+            fecha: formatDate_ddMMyyyy(resultado[3]),
+            tracker: resultado[5],
+            time: convertirUTCAMexico(resultado[6]),
+            intervalo: {
+                dias: Number(resultado[7]),
+                horas: Number(resultado[8]),
+                minutos: Number(resultado[9]),
+                seg: Number(resultado[10])
+            },
+            modo: "ahorro"
+        };
+    }
+
+    resultado = regexContinuo.exec(mensaje);
+    if (resultado) {
+        return {
+            fecha: formatDate_ddMMyyyy(resultado[3]),
+            tracker: resultado[5],
+            time: convertirUTCAMexico(resultado[6]),
+            intervalo: 59,
+            modo: "continuo"
+        };
+    }
+
+    return {};
+}
+
 
 // ---------------------- Funciones auxiliares ------------------
 

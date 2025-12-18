@@ -1,8 +1,10 @@
-
+import { dbClient } from '../config/mongodb.js';
+import { consoleLog } from '../controllers/modules/utils.mjs';
 
 export async function consultaEmpresasPaqueteria() {
+  let client = null;
   try {
-    const client = await connect()
+    client = await dbClient.connect();
     const collection = client.collection('shipment_companies');
     const dbResult = await collection.find({}).toArray();
 
@@ -17,14 +19,15 @@ export async function consultaEmpresasPaqueteria() {
     return {success: false, catalogo: {}, error: error}
   } finally {
     if (client) {
-      await disconnect();
+      await dbClient.disconnect();
     }
   }
 }
 
 export async function getUserContainers(userID) {
+  let client = null;
   try {
-    const client = await connect()
+    client = await dbClient.connect();
     const collection = client.collection('trackers');
     const dbResult = await collection.find({ user_id: userID}).toArray();
     if (dbResult) {
@@ -38,14 +41,15 @@ export async function getUserContainers(userID) {
     return {success: false, user: {}, error: error}
   } finally {
     if (client) {
-      await disconnect();
+      await dbClient.disconnect();
     }
   }
 }
 
 export async function getAppInfo(userID) {
+  let client = null;
   try {
-    const client = await connect();
+    client = await dbClient.connect();
     const companiesCollection = client.collection('shipment_companies');
     const trackerCollection = client.collection('trackers');
 
@@ -61,14 +65,15 @@ export async function getAppInfo(userID) {
     return {success: false, results: {}, error: error}
   } finally {
     if (client) {
-      await disconnect();
+      await dbClient.disconnect();
     }
   }
 }
 
 export async function registerNewShipment(shipment) {
+  let client = null;
   try {
-    const client = await connect()
+    client = await dbClient.connect();
     const shipmentCollection = client.collection('shipments');
     const shipmentID = generarOTP();
     consoleLog("shipmentID", shipmentID);
@@ -88,14 +93,15 @@ export async function registerNewShipment(shipment) {
     return {success: false, message: error};
   } finally {
     if (client) {
-      await disconnect();
+      await dbClient.disconnect();
     }
   }
 }
 
 export async function updateShipment(shipmentID, newLocation, newStatus) {
+  let client = null;
   try {
-    const client = await connect()
+    client = await dbClient.connect();
     const shipmentCollection = client.collection('shipments');
     consoleLog("shipmentID", shipmentID);
     consoleLog("newLocation", newLocation);
@@ -113,14 +119,15 @@ export async function updateShipment(shipmentID, newLocation, newStatus) {
     return {success: false, message: error};
   } finally {
     if (client) {
-      await disconnect();
+      await dbClient.disconnect();
     }
   }
 }
 
 export async function linkTracker(tracker) {
+  let client = null;
   try {
-    const client = await connect()
+    client = await dbClient.connect();
     const collection = client.collection('trackers');
 
     // Verifica si existe el rastreador 
@@ -152,15 +159,15 @@ export async function linkTracker(tracker) {
     return {success: false, message: error};
   } finally {
     if (client) {
-      await disconnect();
+      await dbClient.disconnect();
     }
   }
 }
 
 export async function getContainerShipments(containerID) {
-  let client; // Asegúrate de declarar client aquí
+  let client = null;
   try {
-    client = await connect();
+    client = await dbClient.connect();
     const collection = client.collection('shipments');
     
     // Corrige la proyección aquí
@@ -180,15 +187,16 @@ export async function getContainerShipments(containerID) {
     return { success: false, results: {}, error: error.message }; // Usa error.message para más claridad
   } finally {
     if (client) {
-      await disconnect();
+      await dbClient.disconnect();
     }
   }
 }
 
 
 export async function db_getShipmentInfo(id) {
+  let client = null;
   try {
-    const client = await connect()
+    client = await dbClient.connect();
     const collection = client.collection('shipments');
     const dbResult = await collection.findOne({ id: parseInt(id)});
     if (dbResult) {
@@ -202,14 +210,15 @@ export async function db_getShipmentInfo(id) {
     return {success: false, user: {}, error: error}
   } finally {
     if (client) {
-      await disconnect();
+      await dbClient.disconnect();
     }
   }
 }
 
 export async function getCurrentContainerShipment(containerID) {
+  let client = null;
   try {
-    const client = await connect()
+    client = await dbClient.connect();
     const collection = client.collection('shipments');
     consoleLog("containerID", containerID);
     const dbResult = await collection.findOne({ container_id: parseInt(containerID) }, { sort: { start_date: -1 }}); // Ordena por fecha de inicio de envío de forma descendente. Obtener fecha más actual
@@ -225,14 +234,15 @@ export async function getCurrentContainerShipment(containerID) {
     return {success: false, user: {}, error: error}
   } finally {
     if (client) {
-      await disconnect();
+      await dbClient.disconnect();
     }
   }
 }
 
 export async function db_startShipment(shipment) {
+  let client = null;
   try {
-    const client = await connect()
+    client = await dbClient.connect();
     const collection = client.collection('shipments');
     await collection.createIndex({ id: 1 }, { unique: true });
     // Crear un índice único en shipment_data.tracking_number
@@ -257,14 +267,15 @@ export async function db_startShipment(shipment) {
     return {success: false, message: error};
   } finally {
     if (client) {
-      await disconnect();
+      await dbClient.disconnect();
     }
   }
 }
 
 export async function db_updateTracker(trackerId, nickname, img) {
+  let client = null;
   try {
-    const client = await connect()
+    client = await dbClient.connect();
     const collection = client.collection('trackers');
     const dbResult = await collection.updateOne({id: trackerId}, {$set: {nickname: nickname, img: img}});
     if (dbResult.acknowledged) {
@@ -277,15 +288,16 @@ export async function db_updateTracker(trackerId, nickname, img) {
     return {success: false, message: error};
   } finally {
     if (client) {
-      await disconnect();
+      await dbClient.disconnect();
     }
   }
 }
 
 export async function db_endShipment(shipmentId, endDate) {
+  let client = null;
   try {
     consoleLog("db_endShipment", endDate, true);
-    const client = await connect()
+    client = await dbClient.connect();
     const collection = client.collection('shipments');
     const dbResult = await collection.updateOne({id: shipmentId}, {$set: {delivery_date: endDate}});
     consoleLog("dbResult", dbResult);
@@ -299,14 +311,15 @@ export async function db_endShipment(shipmentId, endDate) {
     return {success: false, message: error};
   } finally {
     if (client) {
-      await disconnect();
+      await dbClient.disconnect();
     }
   }
 }
 
 export async function db_changeTrackingCode(shipmentId, shipmentData){
+  let client = null;
   try {
-    const client = await connect()
+    client = await dbClient.connect();
     const collection = client.collection('shipments');
     const dbResult = await collection.updateOne({id: shipmentId}, {$set: {shipment_data: shipmentData}});
     consoleLog("dbResult", dbResult);
@@ -320,20 +333,21 @@ export async function db_changeTrackingCode(shipmentId, shipmentData){
     return {success: false, message: error};
   } finally {
     if (client) {
-      await disconnect();
+      await dbClient.disconnect();
     }
   }
 }
 
 export async function db_updateBatteryPercentage(trackerId, batteryPercentage = 0, endShipment = false) {
   consoleLog('db_updateBatteryPercentage', "empieza", true);
+  let client = null;
   try {
     let battery = {
       percentage: batteryPercentage,
       allow_change: false,
       last_update: new Date()
     }
-    const client = await connect()
+    client = await dbClient.connect();
     const collection = client.collection('trackers');
     let dbResult = await collection.findOne({id: trackerId});
     if (!dbResult) {
@@ -362,7 +376,7 @@ export async function db_updateBatteryPercentage(trackerId, batteryPercentage = 
     consoleLog('db_updateBatteryPercentage - Ocurrió un error:', error, true);
   } finally {
     if (client) {
-      await disconnect();
+      await dbClient.disconnect();
     }
   }
 }

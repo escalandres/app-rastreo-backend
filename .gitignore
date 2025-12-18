@@ -1,3 +1,9 @@
 node_modules/
 .env
 .vscode
+
+# Docker local
+.dockerignore
+docker-compose.yml
+docker-compose.*.yml
+restart-docker.*

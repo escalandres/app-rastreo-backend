@@ -1,8 +1,10 @@
 import { dbClient } from '../config/mongodb.js';
+import { consoleLog } from '../controllers/modules/utils.mjs';
 
 export async function getUser(email) {
+    let client = null;
     try {
-        const client = await dbClient.dbClient.connect()
+        client = await dbClient.connect();
         const usersCollection = client.collection('users');
         const dbResult = await usersCollection.findOne({email: email});
 
@@ -24,8 +26,9 @@ export async function getUser(email) {
 }
 
 export async function registerNewUser(user) {
+    let client = null;
     try {
-        const client = await dbClient.connect()
+        client = await dbClient.connect();
         const usersCollection = client.collection('users');
 
         // Crear índices únicos en email y userId
@@ -49,8 +52,9 @@ export async function registerNewUser(user) {
 }
 
 export async function registrarOTP(email) {
+    let client = null;
     try {
-        const client = await dbClient.connect();
+        client = await dbClient.connect();
         let dbResult = await client.collection("users").findOne({email: email});
         consoleLog(dbResult)
         if(dbResult){
@@ -81,9 +85,10 @@ export async function registrarOTP(email) {
 
 export async function getOTP(email) {
     consoleLog('getOTP')
+    let client = null;
     try {
         let otp = ""
-        const client = await dbClient.connect()
+        client = await dbClient.connect();
         const dbResult = await client.collection("otp")
         .find({ email: email })
         .sort({ "timestamp": -1 })
@@ -113,8 +118,9 @@ export async function getOTP(email) {
 }
 
 export async function changePassword(email,password) {
+    let client = null;
     try {
-        const client = await dbClient.connect()
+        client = await dbClient.connect();
         const usersCollection = client.collection('users');
         const dbResult = await usersCollection.updateOne({email: email}, {$set: {password: password}});
 
@@ -135,8 +141,9 @@ export async function changePassword(email,password) {
 }
 
 export async function guardarCoordenadas(coordenadas) {
+    let client = null;
     try {
-        const client = await dbClient.connect()
+        client = await dbClient.connect();
         const collection = client.collection('bitacora_envios');
 
         const dbResult = await collection.insertOne(coordenadas);
@@ -156,8 +163,9 @@ export async function guardarCoordenadas(coordenadas) {
 }
 
 export async function authGoogle(oauth) {
+    let client = null;
     try {
-        const client = await dbClient.connect()
+        client = await dbClient.connect();
         const collection = client.collection('users');
         const dbResult = await collection.findOne({email: oauth.email});
 
@@ -194,8 +202,9 @@ export async function authGoogle(oauth) {
 }
 
 export async function authGithub(oauth) {
+    let client = null;
     try {
-        const client = await dbClient.connect()
+        client = await dbClient.connect();
         const collection = client.collection('users');
         const dbResult = await collection.findOne({email: oauth.email});
 
@@ -232,8 +241,9 @@ export async function authGithub(oauth) {
 }
 
 export async function getUserCellphone(email) {
+    let client = null;
     try {
-        const client = await dbClient.dbClient.connect()
+        client = await dbClient.dbClient.connect();
         const usersCollection = client.collection('users');
         const dbResult = await usersCollection.findOne(
             {email: email},

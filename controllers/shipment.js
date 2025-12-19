@@ -57,17 +57,19 @@ export async function obtenerEnvioMasReciente(req, res) {
 
 export async function processTracker(trackerData) {
     try {
-        consoleLog.log("processTracker");
+        console.log("processTracker");
         // Obtener numero de rastreo del envío actual del rastreador provista por la paquetería
         const dbResult = await getCurrentShipment(trackerData.id);
         consoleLog('dbResult', dbResult);
         if(dbResult.success){
+            console.log("Existe el envio en la base de datos");
             //Envio en curso
             // Obtener información envío actual del rastreador provista por la paquetería
             consoleLog('dbResult.result.delivery_date', dbResult.result.delivery_date);
             //if(!dbResult.result.delivery_date){
                 let statusInfo = {};
                 if(dbResult.result.shipment_data.company !== ''){
+                    console.log("Obteniendo datos de la paquetería");
                     consoleLog('Company', dbResult.result.shipment_data.company, true);
                     switch(dbResult.result.shipment_data.company){
                         case "DHL":
@@ -86,9 +88,10 @@ export async function processTracker(trackerData) {
                 }
                 consoleLog('statusInfo', statusInfo, true);
                 let locationData = {};
-
+                
                 //Verificar si hay datos del GPS del rastreador
                 if(trackerData.lat != 0  || trackerData.lng != 0){
+                    console.log("Hay datos del GPS del rastreador");
                     locationData = {
                         date: trackerData.time,
                         lat: trackerData.lat,
@@ -99,6 +102,7 @@ export async function processTracker(trackerData) {
                     };
                 }
                 else{
+                    console.log("Obteniendo datos de la torre celular");
                     let openCellIdData = await getCellTowerLocation(trackerData);
                     consoleLog('openCellIdData', openCellIdData);
                     if(openCellIdData.status === "error") return {success: false, message:  "Ocurrió un error al obtener la ubicación de la torre celular"}; 
@@ -112,9 +116,11 @@ export async function processTracker(trackerData) {
                         batteryLevel: trackerData.batteryLevel
                     };
                 }
+                console.log("Guardando estado del envío");
                 const dbResponse = await updateShipment(dbResult.result.id, locationData, statusInfo);
                 consoleLog(dbResponse);
                 if(!dbResponse.success){
+                    console.log("Actualizando porcentaje de batería");
                     await db_updateBatteryPercentage(dbResult.result.container_id, trackerData.batteryLevel);
                     return {success: false, message: "Error al guardar coordenadas"};
                 }else{
@@ -126,7 +132,8 @@ export async function processTracker(trackerData) {
                     locationData.cid = trackerData.cid;
                     locationData.company = dbResult.result.shipment_data.company;
                     locationData.tracking_number = dbResult.result.shipment_data.tracking_number;
-                    locationData.location = processLocation(locationData.isCellTower, locationData.radius)
+                    locationData.location = processLocation(locationData.isCellTower, locationData.radius);
+                    console.log("enviando correo electrónico de notificación");
                     await sendNotifyEmail(locationData,statusInfo);
                     await db_updateBatteryPercentage(dbResult.result.container_id, trackerData.batteryLevel);
                     return {success: true, message: "Coordenadas guardadas correctamente"};

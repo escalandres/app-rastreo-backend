@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from "path";
 import sendMail from './nodemailer.js';
+import sendMailResend from './resend.mjs';
 import { consoleLog } from './utils.mjs';
 
 export const PLANTILLAS = {
@@ -105,7 +106,7 @@ export async function sendEncendido(data) {
 
         let subject = `${templateObj.subject} ${variables.tracker}`;
         let email = "andres.escala.344@gmail.com";
-        let info = await sendMail(email,subject,template);
+        let info = await sendMailResend(email,subject,template);
         return {success: true, message: info};
     }catch(error){
         console.error('Error al enviar el correo. ',error);

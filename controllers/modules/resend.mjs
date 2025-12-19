@@ -1,25 +1,35 @@
 import { Resend } from 'resend';
-import { PLANTILLAS, createEmail } from './email.mjs';
-const key = process.env.RESEND_API_KEY;
 
-export async function sendRecoverEmail(userEmail, userName, code) {
+const resend = new Resend(process.env.RESEND_API_KEY);
+
+export default async function sendMailResend(to, subject, template) {
     try {
-        const email = createEmail(PLANTILLAS.recover, userName, code);
-        const resend = new Resend(process.env.RESEND_API_KEY);
-        // console.log(email.subject)
-        // console.log(email.html)
-        const data = await resend.emails.send({
-            from: 'drivehub@drivehub.com',
-            to: userEmail,
-            subject: email.subject,
-            html: email.html.toString()
+        // Validar API key
+        if (!process.env.RESEND_API_KEY) {
+            throw new Error('RESEND_API_KEY no está configurado');
+        }
+
+        console.log("Enviando correo a:", to);
+        
+        const { data, error } = await resend.emails.send({
+            from: 'Tu App <onboarding@resend.dev>', // Email por defecto de Resend
+            to: [to],
+            subject: subject,
+            html: template,
+            // Opcional: agregar reply-to
+            reply_to: process.env.USER_EMAIL,
         });
-        console.log(data)
-        let a = data.error === null;
-        return {success: a, error: ""}
+
+        if (error) {
+            console.error('❌ Error de Resend:', error);
+            return { success: false, error: error.message };
+        }
+
+        console.log("✅ Email enviado:", data.id);
+        console.log("Email enviado:", data.id);
+        return { success: true, message: data };
     } catch (error) {
-        console.error('Error al enviar el correo. ',error);
-        return {success: false, error: error}
+        console.error('❌ Error al enviar el correo:', error);
+        return { success: false, error: error.message };
     }
 }
-

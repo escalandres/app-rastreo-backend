@@ -212,14 +212,14 @@ function extraerDatosRastreoActivo(mensaje) {
     console.log("resultado", resultado);
     if (resultado) {
         return {
-            fecha: formatDate_ddMMyyyy(resultado[3]),
-            tracker: resultado[5],
-            time: convertirUTCAMexico(resultado[6]),
+            fecha: formatDate_ddMMyyyy(resultado[2]),
+            tracker: resultado[4],
+            time: convertirUTCAMexico(resultado[5]),
             intervalo: {
-                dias: Number(resultado[7]),
-                horas: Number(resultado[8]),
-                minutos: Number(resultado[9]),
-                seg: Number(resultado[10])
+                dias: Number(resultado[6]),
+                horas: Number(resultado[7]),
+                minutos: Number(resultado[8]),
+                seg: Number(resultado[9])
             },
             modo: "ahorro"
         };

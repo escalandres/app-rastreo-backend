@@ -6,10 +6,13 @@ export default async function sendMail(to,subject,template) {
         // Create a transporter
         const transporter = nodemailer.createTransport({
             service: "gmail",
+            host: 'smtp.gmail.com', // o tu servidor SMTP
+            port: 587, // Cambia de 25 a 587
+            secure: false, // true para puerto 465, false para otros puertos
             auth: {
                 user: process.env.USER_EMAIL,
                 pass: process.env.PASS_EMAIL,
-            },
+            }
         });
         let mailOptions = {
             from: process.env.USER_EMAIL,

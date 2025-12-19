@@ -99,6 +99,7 @@ export async function registerNewShipment(shipment) {
 }
 
 export async function updateShipment(shipmentID, newLocation, newStatus) {
+  consoleLog('updateShipment', "empieza", true);
   let client = null;
   try {
     client = await dbClient.connect();

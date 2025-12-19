@@ -62,7 +62,7 @@ function extraerDatos(mensaje) {
 
         const r = regex.exec(mensaje);
         if (!r) return {};
-        console.log("r2", r);
+        // console.log("r2", r);
         datosRastreador = {
             numcell: r[1],
             fecha: formatDate_ddMMyyyy(r[2]),
@@ -165,7 +165,7 @@ function extraerDatosEncendido(mensaje) {
 
         const resultado = regex.exec(mensaje);
         if (!resultado) return {};
-        console.log("resultado2", resultado);
+        // console.log("resultado2", resultado);
         datosRastreador = {
             numcell: resultado[1],
             fecha: formatDate_ddMMyyyy(resultado[2]),

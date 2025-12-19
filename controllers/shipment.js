@@ -57,6 +57,7 @@ export async function obtenerEnvioMasReciente(req, res) {
 
 export async function processTracker(trackerData) {
     try {
+        consoleLog.log("processTracker");
         // Obtener numero de rastreo del envío actual del rastreador provista por la paquetería
         const dbResult = await getCurrentShipment(trackerData.id);
         consoleLog('dbResult', dbResult);

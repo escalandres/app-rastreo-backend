@@ -159,12 +159,12 @@ function extraerDatosEncendido(mensaje) {
 
         const resultado = regex.exec(mensaje);
         if (!resultado) return {};
-
+        console.log("resultado1", resultado);
         datosRastreador = {
-            numcell: resultado[2],
-            fecha: formatDate_ddMMyyyy(resultado[3]),
-            tracker: resultado[5],
-            time: convertirUTCAMexico(resultado[6]),
+            numcell: resultado[1],
+            fecha: formatDate_ddMMyyyy(resultado[2]),
+            tracker: resultado[3],
+            time: convertirUTCAMexico(resultado[4]),
         };
 
     } else if (mensaje.includes("+CMT")) {
@@ -172,12 +172,12 @@ function extraerDatosEncendido(mensaje) {
 
         const resultado = regex.exec(mensaje);
         if (!resultado) return {};
-
+        console.log("resultado2", resultado);
         datosRastreador = {
             numcell: resultado[1],
-            fecha: formatDate_ddMMyyyy(resultado[3]),
-            tracker: resultado[4],
-            time: convertirUTCAMexico(resultado[5]),
+            fecha: formatDate_ddMMyyyy(resultado[2]),
+            tracker: resultado[3],
+            time: convertirUTCAMexico(resultado[4]),
         };
     }
 

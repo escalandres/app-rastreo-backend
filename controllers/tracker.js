@@ -215,12 +215,10 @@ function extraerDatosRastreoActivo(mensaje) {
             fecha: formatDate_ddMMyyyy(resultado[2]),
             tracker: resultado[4],
             time: convertirUTCAMexico(resultado[5]),
-            intervalo: {
-                dias: Number(resultado[6]),
-                horas: Number(resultado[7]),
-                minutos: Number(resultado[8]),
-                seg: Number(resultado[9])
-            },
+            dias: Number(resultado[6]),
+            horas: Number(resultado[7]),
+            minutos: Number(resultado[8]),
+            seg: Number(resultado[9]),
             modo: "ahorro"
         };
     }
@@ -231,7 +229,10 @@ function extraerDatosRastreoActivo(mensaje) {
             fecha: formatDate_ddMMyyyy(resultado[3]),
             tracker: resultado[5],
             time: convertirUTCAMexico(resultado[6]),
-            intervalo: 59,
+            dias: 0,
+            horas: 0,
+            minutos: 0,
+            seg: 59,
             modo: "continuo"
         };
     }

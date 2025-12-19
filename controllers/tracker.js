@@ -184,12 +184,11 @@ function extraerDatosEncendido(mensaje) {
     return datosRastreador;
 }
 
-
 function extraerDatosRastreoActivo(mensaje) {
     const encabezado = mensaje.includes("+CMGR")
         ? "\\+(CMT|CMGR):\\s'REC UNREAD',"
         : mensaje.includes("+CMT")
-            ? "\\+CMT:"
+            ? "\\+CMT:\\s*"
             : null;
 
     if (!encabezado) return {};
@@ -238,6 +237,7 @@ function extraerDatosRastreoActivo(mensaje) {
 
     return {};
 }
+
 
 
 // ---------------------- Funciones auxiliares ------------------

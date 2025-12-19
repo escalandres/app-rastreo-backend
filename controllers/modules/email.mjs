@@ -77,7 +77,7 @@ export async function sendNotifyEmail(data, statusInfo) {
         });
 
         let subject = `${templateObj.subject} ${allVariables.tracker}`;
-        let email = "andres.escala.344@gmail.com";
+        let email = process.env.TO_EMAIL;
         let info = await sendMail(email,subject,template);
         return {success: true, message: info};
     }catch(error){
@@ -105,7 +105,7 @@ export async function sendEncendido(data) {
         });
 
         let subject = `${templateObj.subject} ${variables.tracker}`;
-        let email = "andres.escala.344@gmail.com";
+        let email = process.env.TO_EMAIL;
         let info = await sendMailResend(email,subject,template);
         return {success: true, message: info};
     }catch(error){
@@ -133,7 +133,7 @@ export async function sendRastreoActivo(data) {
         });
 
         let subject = `${templateObj.subject} ${variables.tracker}`;
-        let email = "andres.escala.344@gmail.com";
+        let email = process.env.TO_EMAIL;
         let info = await sendMail(email,subject,template);
         return {success: true, message: info};
     }catch(error){

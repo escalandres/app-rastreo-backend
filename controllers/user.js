@@ -1,5 +1,5 @@
 import { getUser, registerNewUser, changePassword, getOTP, registrarOTP,authGoogle, authGithub } from "../services/user.js";
-import { sendRecoverEmail } from "./modules/resend.mjs";
+// import { sendRecoverEmail } from "./modules/resend.mjs";
 import { sendOtpEmail, sendNotifyEmail } from "./modules/email.mjs";
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';

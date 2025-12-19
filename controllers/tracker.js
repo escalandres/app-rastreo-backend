@@ -175,7 +175,7 @@ function extraerDatosEncendido(mensaje) {
 
         datosRastreador = {
             numcell: resultado[1],
-            fecha: formatDate_ddMMyyyy(resultado[2]),
+            fecha: formatDate_ddMMyyyy(resultado[3]),
             tracker: resultado[4],
             time: convertirUTCAMexico(resultado[5]),
         };
@@ -209,6 +209,7 @@ function extraerDatosRastreoActivo(mensaje) {
     );
 
     let resultado = regexAhorro.exec(mensaje);
+    console.log("resultado", resultado);
     if (resultado) {
         return {
             fecha: formatDate_ddMMyyyy(resultado[3]),

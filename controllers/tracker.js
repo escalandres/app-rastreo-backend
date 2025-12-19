@@ -13,9 +13,10 @@ export async function subirDatos(req, res){
         }
         // Extraer datos del mensaje enviado por el rastreador
         const trackerData = extraerDatos(mensajeReceptor);
-        consoleLog("datosRastreador", trackerData, true);
+        // consoleLog("datosRastreador", trackerData, true);
         
         if(Object.keys(trackerData).length > 0){
+            console.log("Comienza proceso de guardado de datos");
             const response = await processTracker(trackerData);
             if(!response.success){
                 return res.status(400).json(response)
@@ -23,7 +24,7 @@ export async function subirDatos(req, res){
                 return res.status(200).json(response);
             }
         }
-        
+        console.log("El mensaje no tiene un formato válido");
         return res.status(400).json({ success: false, message: "El mensaje no tiene un formato válido" })
         
     } catch (error) {
@@ -95,7 +96,7 @@ export async function notificarEncendido(req, res){
         const trackerData = extraerDatosEncendido(mensajeReceptor);
         consoleLog("Encendido", trackerData, true);
         
-        if(trackerData != {}){
+        if(Object.keys(trackerData).length > 0){
             const response = await sendEncendido(trackerData);
             if(!response.success){
                 return res.status(400).json(response)
@@ -126,7 +127,7 @@ export async function notificarRastreoActivo(req, res){
         const trackerData = extraerDatosRastreoActivo(mensajeReceptor);
         consoleLog("Rastreo ON", trackerData, true);
         
-        if(trackerData != {}){
+        if(Object.keys(trackerData).length > 0){
             const response = await sendRastreoActivo(trackerData);
             if(!response.success){
                 return res.status(400).json(response)

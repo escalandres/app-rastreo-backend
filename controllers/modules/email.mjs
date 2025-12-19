@@ -23,7 +23,7 @@ export const PLANTILLAS = {
     },
     rastreoActivo: {
         subject: "Comienza tu rastreo",
-        file: 'rastreo.html'
+        file: 'rastreo_activo.html'
     },
     otp: {
         subject: "Código de verificación:",

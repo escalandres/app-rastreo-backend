@@ -12,7 +12,7 @@ export default async function sendMailResend(to, subject, template) {
         console.log("Enviando correo a:", to);
         
         const { data, error } = await resend.emails.send({
-            from: 'Tu App <onboarding@resend.dev>', // Email por defecto de Resend
+            from: 'App Rastreo Cosmos <onboarding@resend.dev>', // Email por defecto de Resend
             to: [to],
             subject: subject,
             html: template,

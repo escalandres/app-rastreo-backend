@@ -152,44 +152,38 @@ export async function notificarRastreoActivo(req, res){
 }
 
 function extraerDatosEncendido(mensaje) {
-    let regex = ""
     let datosRastreador = {};
-    if(mensaje.includes("+CMGR: 'REC UNREAD'")){
-        // Expresión regular para extraer los datos
-        regex = /\+(CMT|CMGR):\s'REC UNREAD','(\+52\d{10,12})','','([\d\/:,]+)-([\d\/:,]+)'El rastreador:(\d+), esta encendido. Tiempo:([\d\-:T]+).OK/gm;
+
+    if (mensaje.includes("+CMGR")) {
+        const regex = /\+(CMT|CMGR):\s'REC UNREAD','(\+52\d{10,12})','','([\d\/:,]+)-([\d\/:,]+)'El rastreador:\s*(\d+),\s*esta encendido\. Tiempo:\s*([\d\-:T]+)\.OK/gm;
 
         const resultado = regex.exec(mensaje);
+        if (!resultado) return {};
 
-        if (resultado) {
-            datosRastreador = {
-                numcell: resultado[2],
-                fecha: formatDate_ddMMyyyy(resultado[3]),
-                tracker: resultado[5],
-                time: convertirUTCAMexico(resultado[6]),
-            };
-        } else {
-            consoleLog("Formato de mensaje no válido", "", true);
-            return {};
-        }
-    }else if(mensaje.includes("+CMT: ")){
-        regex = /\+CMT:\s'(\+52\d{10,12})','','([\d\/:,]+)-([\d\/:,]+)'El rastreador: (\d+)esta encendido. Tiempo: ([\d\-:T]+)./gm
+        datosRastreador = {
+            numcell: resultado[2],
+            fecha: formatDate_ddMMyyyy(resultado[3]),
+            tracker: resultado[5],
+            time: convertirUTCAMexico(resultado[6]),
+        };
+
+    } else if (mensaje.includes("+CMT")) {
+        const regex = /\+CMT:\s'(\+52\d{10,12})','','([\d\/:,]+)-([\d\/:,]+)'El rastreador:\s*(\d+),\s*esta encendido\. Tiempo:\s*([\d\-:T]+)\./gm;
+
         const resultado = regex.exec(mensaje);
-        if (resultado) {
-            datosRastreador = {
-                numcell: resultado[1],
-                fecha: formatDate_ddMMyyyy(resultado[2]),
-                tracker: resultado[4],
-                time: convertirUTCAMexico(resultado[5]),
-            };
-            
-        } else {
-            consoleLog("Formato de mensaje no válido", "", true);
-            return {};
-        }
+        if (!resultado) return {};
 
+        datosRastreador = {
+            numcell: resultado[1],
+            fecha: formatDate_ddMMyyyy(resultado[2]),
+            tracker: resultado[4],
+            time: convertirUTCAMexico(resultado[5]),
+        };
     }
+
     return datosRastreador;
 }
+
 
 function extraerDatosRastreoActivo(mensaje) {
     const encabezado = mensaje.includes("+CMGR")

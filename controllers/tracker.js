@@ -15,7 +15,7 @@ export async function subirDatos(req, res){
         const trackerData = extraerDatos(mensajeReceptor);
         consoleLog("datosRastreador", trackerData, true);
         
-        if(trackerData != {}){
+        if(Object.keys(trackerData).length === 0){
             const response = await processTracker(trackerData);
             if(!response.success){
                 return res.status(400).json(response)

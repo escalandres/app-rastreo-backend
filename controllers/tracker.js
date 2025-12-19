@@ -156,7 +156,7 @@ function extraerDatosEncendido(mensaje) {
     let datosRastreador = {};
     if(mensaje.includes("+CMGR: 'REC UNREAD'")){
         // Expresión regular para extraer los datos
-        regex = /\+(CMT|CMGR):\s'REC UNREAD','(\+52\d{10,12})','','([\d\/:,]+)-([\d\/:,]+)'El rastreador:(\d+), esta encendido. Tiempo:([\d\-:T]+)OK/gm;
+        regex = /\+(CMT|CMGR):\s'REC UNREAD','(\+52\d{10,12})','','([\d\/:,]+)-([\d\/:,]+)'El rastreador:(\d+), esta encendido. Tiempo:([\d\-:T]+).OK/gm;
 
         const resultado = regex.exec(mensaje);
 
@@ -172,7 +172,7 @@ function extraerDatosEncendido(mensaje) {
             return {};
         }
     }else if(mensaje.includes("+CMT: ")){
-        regex = /\+CMT:\s'(\+52\d{10,12})','','([\d\/:,]+)-([\d\/:,]+)'tracker:(\d+),time:([\d\-:T]+)/gm
+        regex = /\+CMT:\s'(\+52\d{10,12})','','([\d\/:,]+)-([\d\/:,]+)'El rastreador: (\d+)esta encendido. Tiempo: ([\d\-:T]+)./gm
         const resultado = regex.exec(mensaje);
         if (resultado) {
             datosRastreador = {

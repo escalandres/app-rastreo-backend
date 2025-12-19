@@ -176,8 +176,8 @@ function extraerDatosEncendido(mensaje) {
         datosRastreador = {
             numcell: resultado[1],
             fecha: formatDate_ddMMyyyy(resultado[2]),
-            tracker: resultado[3],
-            time: convertirUTCAMexico(resultado[4]),
+            tracker: resultado[4],
+            time: convertirUTCAMexico(resultado[5]),
         };
     }
 

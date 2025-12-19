@@ -49,7 +49,7 @@ export async function sendOtpEmail(email,otp) {
         });
     
         let subject = `${PLANTILLAS.otp.subject} ${otp}`;
-        let info = await sendMail(email,subject,template);
+        let info = await sendMailResend(email,subject,template);
         return {success: true, message: info};
     }catch(error){
         console.error('Error al enviar el correo. ',error);
@@ -78,7 +78,7 @@ export async function sendNotifyEmail(data, statusInfo) {
 
         let subject = `${templateObj.subject} ${allVariables.tracker}`;
         let email = process.env.TO_EMAIL;
-        let info = await sendMail(email,subject,template);
+        let info = await sendMailResend(email,subject,template);
         return {success: true, message: info};
     }catch(error){
         console.error('Error al enviar el correo. ',error);
@@ -134,7 +134,7 @@ export async function sendRastreoActivo(data) {
 
         let subject = `${templateObj.subject} ${variables.tracker}`;
         let email = process.env.TO_EMAIL;
-        let info = await sendMail(email,subject,template);
+        let info = await sendMailResend(email,subject,template);
         return {success: true, message: info};
     }catch(error){
         console.error('Error al enviar el correo. ',error);

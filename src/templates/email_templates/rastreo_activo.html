@@ -7,19 +7,18 @@
     <title>Novedades - Cosmos</title>
 </head>
 <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f5f5f5;">
-    <!-- Tabla contenedora principal -->
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #f5f5f5;">
         <tr>
             <td align="center" style="padding: 40px 20px;">
-                <!-- Contenedor del email -->
                 <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" style="background-color: #ffffff; border: 1px solid #dadce0; max-width: 600px;">
+                    
                     <!-- Logo -->
                     <tr>
                         <td align="center" style="padding: 40px 20px 20px 20px;">
                             <img src="https://res.cloudinary.com/deudksu4e/image/upload/v1730330521/cosmos-orange.png" width="80" height="60" alt="Cosmos" style="display: block; border: 0;">
                         </td>
                     </tr>
-                    
+
                     <!-- Título -->
                     <tr>
                         <td align="center" style="padding: 0 40px 24px 40px; border-bottom: 1px solid #dadce0;">
@@ -28,35 +27,60 @@
                             </h1>
                         </td>
                     </tr>
-                    
+
                     <!-- Contenido principal -->
                     <tr>
                         <td style="padding: 20px 40px; font-family: Roboto, Helvetica, Arial, sans-serif; font-size: 14px; line-height: 20px; color: rgba(0,0,0,0.87);">
-                            ¡Has activado el seguimiento de tu rastreador <strong>{tracker}</strong> el <strong>{time}</strong>! Acceda a la aplicación para tener más información de su envío.
+                            ¡Has activado el seguimiento de tu rastreador <strong>{tracker}</strong> el <strong>{time}</strong>!  
+                            Acceda a la aplicación para tener más información de su envío.
                             <br><br>
                             Para acceder, haga clic en el botón de abajo, o ingrese con el siguiente 
-                            <a href="https://app-rastreo-cosmos.netlify.app/login" style="color: #4f46e5; text-decoration: none;">enlace</a>
+                            <a href="https://app-rastreo-cosmos.netlify.app/login" style="color: #4f46e5; text-decoration: none;">enlace</a>.
                         </td>
                     </tr>
-                    
+
+                    <!-- Configuración del rastreador -->
+                    <tr>
+                        <td style="padding: 0 40px 20px 40px;">
+                            <table width="100%" cellspacing="0" cellpadding="0" border="0" style="border: 1px solid #e0e0e0; border-radius: 6px;">
+                                <tr>
+                                    <td colspan="2" style="padding: 12px 16px; background-color: #f8f9fa; font-family: Roboto, Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 500; color: rgba(0,0,0,0.87);">
+                                        Configuración del rastreador
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 10px 16px; font-size: 13px; color: rgba(0,0,0,0.6);">
+                                        Intervalo de envío
+                                    </td>
+                                    <td style="padding: 10px 16px; font-size: 13px; color: rgba(0,0,0,0.87); text-align: right;">
+                                        {dias}d {horas}h {minutos}m {seg} s
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 10px 16px; font-size: 13px; color: rgba(0,0,0,0.6); border-top: 1px solid #e0e0e0;">
+                                        Modo de operación
+                                    </td>
+                                    <td style="padding: 10px 16px; font-size: 13px; color: rgba(0,0,0,0.87); text-align: right; border-top: 1px solid #e0e0e0;">
+                                        {modo}
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
                     <!-- Botón -->
                     <tr>
                         <td align="center" style="padding: 0 40px 40px 40px;">
-                            <!--[if mso]>
-                            <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="https://app-rastreo-cosmos.netlify.app/login" style="height:40px;v-text-anchor:middle;width:150px;" arcsize="13%" strokecolor="#4f46e5" fillcolor="#4f46e5">
-                                <w:anchorlock/>
-                                <center style="color:#ffffff;font-family:sans-serif;font-size:14px;font-weight:500;">Ver novedades</center>
-                            </v:roundrect>
-                            <![endif]-->
-                            <!--[if !mso]><!-->
-                            <a href="https://app-rastreo-cosmos.netlify.app/login" style="display: inline-block; padding: 10px 24px; font-family: Roboto, Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 500; line-height: 20px; color: #ffffff; text-decoration: none; background-color: #4f46e5; border: 1px solid #4f46e5; border-radius: 8px; text-align: center;">
+                            <a href="https://app-rastreo-cosmos.netlify.app/login"
+                               style="display: inline-block; padding: 10px 24px; font-family: Roboto, Helvetica, Arial, sans-serif;
+                               font-size: 14px; font-weight: 500; line-height: 20px; color: #ffffff;
+                               text-decoration: none; background-color: #4f46e5; border-radius: 8px;">
                                 Ver novedades
                             </a>
-                            <!--<![endif]-->
                         </td>
                     </tr>
                 </table>
-                
+
                 <!-- Footer -->
                 <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" style="max-width: 600px;">
                     <tr>

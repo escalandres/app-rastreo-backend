@@ -11,46 +11,42 @@ export const PLANTILLAS = {
     },
     notify: {
         subject: "Hay novedades en tu rastreador",
-        file: 'notify_tracker.html'
+        file: 'tracker-notification.html'
     },
     delivery: {
         subject: "Hay novedades en tu rastreador",
-        file: 'delivery.html'
+        file: 'delivery-updated.html'
     },
-    encendido: {
+    trackerOn: {
         subject: "Rastreador encendido",
-        file: 'encendido.html'
+        file: 'tracker-on.html'
     },
-    rastreoActivo: {
-        subject: "Comienza tu rastreo",
-        file: 'rastreo_activo.html'
+    trackerActivated: {
+        subject: "Rastreador activado",
+        file: 'tracking-activated.html'
     },
     otp: {
         subject: "Código de verificación:",
-        file: 'otp.html'
+        file: 'otp-code.html'
+    },
+    trackingGuideAdded: {
+        subject: "Guía de rastreo agregada",
+        file: 'tracking-guide-added.html'
+    },
+    trackingStarted: {
+        subject: "Comenzando rastreo",
+        file: 'tracking-started.html'
     }
 }
 
 export async function sendOtpEmail(email,otp) {
     try{
-        const templateFolder = EMAIL_TEMPLATES_PATH;
-        const templatePath = path.join(templateFolder, `${PLANTILLAS.otp.file}`);
-        let template = fs.readFileSync(templatePath, 'utf8');
-        consoleLog("template");
-        const variables = {
+        const data = {
             otp: otp,
             email: email
         };
-        // Reemplaza las variables en la plantilla
-        Object.keys(variables).forEach(key => {
-            consoleLog("key", key);
-            const regex = new RegExp(`{${key}}`, 'g');
-            template = template.replace(regex, variables[key]);
-        });
-    
-        let subject = `${PLANTILLAS.otp.subject} ${otp}`;
-        let info = await sendMailResend(email,subject,template);
-        return {success: true, message: info};
+        let response = await buildEmail(PLANTILLAS.otp,data);
+        return response;
     }catch(error){
         console.error('Error al enviar el correo. ',error);
         return {success: false, error: error}
@@ -59,66 +55,62 @@ export async function sendOtpEmail(email,otp) {
 
 export async function sendNotifyEmail(data, statusInfo) {
     try{
-        consoleLog("enviando correo de notificacion");
-        consoleLog("data", data);
-        const templateFolder = EMAIL_TEMPLATES_PATH;
         const hasStatusInfo = statusInfo && Object.keys(statusInfo).length > 0;
         const templateObj = hasStatusInfo ? PLANTILLAS.delivery : PLANTILLAS.notify;
-        const templatePath = path.join(templateFolder, `${templateObj.file}`);
-        let template = fs.readFileSync(templatePath, 'utf8');
         const allVariables = { ...data, ...(hasStatusInfo ? statusInfo : {}) };
-        consoleLog("allVariables", allVariables);
-
-        // Reemplaza las variables en la plantilla
-        Object.keys(allVariables).forEach(key => {
-            // consoleLog("key", key);
-            const regex = new RegExp(`{${key}}`, 'g');
-            template = template.replace(regex, allVariables[key]);
-        });
-
-        let subject = `${templateObj.subject} ${allVariables.tracker}`;
-        let email = process.env.TO_EMAIL;
-        let info = await sendMailResend(email,subject,template);
-        return {success: true, message: info};
+        let response = await buildEmail(templateObj,allVariables);
+        return response;
     }catch(error){
         console.error('Error al enviar el correo. ',error);
         return {success: false, error: error}
     }
 }
 
-export async function sendEncendido(data) {
+export async function sendTrackerOn(data) {
     try{
-        consoleLog("enviando correo de encendido");
-        consoleLog("data", data);
-        const templateObj = PLANTILLAS.encendido;
-        const templateFolder = EMAIL_TEMPLATES_PATH;
-        const templatePath = path.join(templateFolder, `${templateObj.file}`);
-        let template = fs.readFileSync(templatePath, 'utf8');
-        consoleLog("template");
-        const variables = data;
-        consoleLog("variables", variables);
-        // Reemplaza las variables en la plantilla
-        Object.keys(variables).forEach(key => {
-            consoleLog("key", key);
-            const regex = new RegExp(`{${key}}`, 'g');
-            template = template.replace(regex, variables[key]);
-        });
-
-        let subject = `${templateObj.subject} ${variables.tracker}`;
-        let email = process.env.TO_EMAIL;
-        let info = await sendMailResend(email,subject,template);
-        return {success: true, message: info};
+        let response = await buildEmail(PLANTILLAS.trackerOn,data);
+        return response;
     }catch(error){
         console.error('Error al enviar el correo. ',error);
         return {success: false, error: error}
     }
 }
 
-export async function sendRastreoActivo(data) {
+export async function sendTrackerActivated(data) {
+    try{
+        let response = await buildEmail(PLANTILLAS.trackerActivated,data);
+        return response;
+    }catch(error){
+        console.error('Error al enviar el correo. ',error);
+        return {success: false, error: error}
+    }
+}
+
+export async function sendTrackingGuideAdded(data) {
+    try{
+        let response = await buildEmail(PLANTILLAS.trackingGuideAdded,data);
+        return response;
+    }catch(error){
+        console.error('Error al enviar el correo. ',error);
+        return {success: false, error: error}
+    }
+}
+
+export async function sendTrackingStarted(data) {
+    try{
+        let response = await buildEmail(PLANTILLAS.trackingStarted,data);
+        return response;
+    }catch(error){
+        console.error('Error al enviar el correo. ',error);
+        return {success: false, error: error}
+    }
+}
+
+async function buildEmail(templateToSend,data) {
     try{
         consoleLog("enviando correo de encendido");
         consoleLog("data", data);
-        const templateObj = PLANTILLAS.rastreoActivo;
+        const templateObj = templateToSend;
         const templateFolder = EMAIL_TEMPLATES_PATH;
         const templatePath = path.join(templateFolder, `${templateObj.file}`);
         let template = fs.readFileSync(templatePath, 'utf8');

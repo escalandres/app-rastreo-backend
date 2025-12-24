@@ -1,5 +1,5 @@
 import { processTracker } from "./shipment.js";
-import { sendEncendido, sendRastreoActivo } from "./modules/email.mjs";
+import { sendTrackerOn, sendTrackerActivated } from "./modules/email.mjs";
 import { consoleLog, convertirUTCAMexico } from "./modules/utils.mjs";
 
 export async function subirDatos(req, res){
@@ -97,7 +97,7 @@ export async function notificarEncendido(req, res){
         consoleLog("Encendido", trackerData, true);
         
         if(Object.keys(trackerData).length > 0){
-            const response = await sendEncendido(trackerData);
+            const response = await sendTrackerOn(trackerData);
             if(!response.success){
                 return res.status(400).json(response)
             }else{
@@ -128,7 +128,7 @@ export async function notificarRastreoActivo(req, res){
         consoleLog("Rastreo ON", trackerData, true);
         
         if(Object.keys(trackerData).length > 0){
-            const response = await sendRastreoActivo(trackerData);
+            const response = await sendTrackerActivated(trackerData);
             if(!response.success){
                 return res.status(400).json(response)
             }else{

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Guía de rastreo agregada - Cosmos</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f5f5f5;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #f5f5f5;">
+        <tr>
+            <td align="center" style="padding: 40px 20px;">
+                <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" style="background-color: #ffffff; border: 1px solid #dadce0; max-width: 600px;">
+                    <!-- Logo -->
+                    <tr>
+                        <td align="center" style="padding: 40px 20px 20px 20px;">
+                            <img src="https://res.cloudinary.com/deudksu4e/image/upload/v1730330521/cosmos-orange.png" width="80" height="60" alt="Cosmos" style="display: block; border: 0;">
+                        </td>
+                    </tr>
+                    
+                    <!-- Título -->
+                    <tr>
+                        <td align="center" style="padding: 0 40px 24px 40px; border-bottom: 1px solid #dadce0;">
+                            <h1 style="margin: 0; font-family: 'Google Sans', Roboto, Helvetica, Arial, sans-serif; font-size: 24px; line-height: 32px; color: rgba(0,0,0,0.87); font-weight: 400;">
+                                Nueva guía de rastreo agregada
+                            </h1>
+                        </td>
+                    </tr>
+                    
+                    <!-- Contenido principal -->
+                    <tr>
+                        <td style="padding: 20px 40px; font-family: Roboto, Helvetica, Arial, sans-serif; font-size: 14px; line-height: 20px; color: rgba(0,0,0,0.87);">
+                            Se ha agregado una guía de rastreo de paquetería a su envío <strong>{shipment_id}</strong> el <strong>{date_added}</strong>.
+                            <br><br>
+                            Ahora puede hacer seguimiento de su envío tanto por GPS como por el servicio de paquetería.
+                        </td>
+                    </tr>
+                    
+                    <!-- Información del envío -->
+                    <tr>
+                        <td style="padding: 0 40px 20px 40px;">
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #f0f4ff; border-radius: 8px; border: 1px solid #d0dff5;">
+                                <tr>
+                                    <td style="padding: 20px;">
+                                        <table role="presentation" width="100%" cellspacing="0" cellpadding="6" border="0">
+                                            <tr>
+                                                <td style="font-family: Roboto, Helvetica, Arial, sans-serif; font-size: 12px; color: rgba(0,0,0,0.54); padding-bottom: 2px;">
+                                                    ID del envío
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="font-family: 'Courier New', Courier, monospace; font-size: 16px; font-weight: 500; color: rgba(0,0,0,0.87); padding-bottom: 12px;">
+                                                    {shipment_id}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="font-family: Roboto, Helvetica, Arial, sans-serif; font-size: 12px; color: rgba(0,0,0,0.54); padding-bottom: 2px;">
+                                                    Rastreador
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="font-family: Roboto, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 500; color: rgba(0,0,0,0.87); padding-bottom: 12px;">
+                                                    {tracker}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="font-family: Roboto, Helvetica, Arial, sans-serif; font-size: 12px; color: rgba(0,0,0,0.54); padding-bottom: 2px;">
+                                                    Rastreo iniciado el
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="font-family: Roboto, Helvetica, Arial, sans-serif; font-size: 14px; color: rgba(0,0,0,0.87);">
+                                                    {tracking_start_date}
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    
+                    <!-- Información de la guía -->
+                    <tr>
+                        <td style="padding: 0 40px 20px 40px;">
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #f8f9fa; border-radius: 8px;">
+                                <tr>
+                                    <td style="padding: 24px;">
+                                        <table role="presentation" width="100%" cellspacing="0" cellpadding="8" border="0">
+                                            <tr>
+                                                <td style="font-family: Roboto, Helvetica, Arial, sans-serif; font-size: 13px; color: rgba(0,0,0,0.54); padding-bottom: 4px;">
+                                                    Empresa de paquetería
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="font-family: Roboto, Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 500; color: rgba(0,0,0,0.87); padding-bottom: 16px;">
+                                                    {company}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="font-family: Roboto, Helvetica, Arial, sans-serif; font-size: 13px; color: rgba(0,0,0,0.54); padding-bottom: 4px;">
+                                                    Número de guía
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="font-family: 'Courier New', Courier, monospace; font-size: 20px; font-weight: bold; color: rgba(0,0,0,0.87); letter-spacing: 1px;">
+                                                    {tracking_number}
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    
+                    <!-- Instrucciones -->
+                    <tr>
+                        <td style="padding: 0 40px 20px 40px; font-family: Roboto, Helvetica, Arial, sans-serif; font-size: 14px; line-height: 20px; color: rgba(0,0,0,0.87);">
+                            Para ver el seguimiento completo de su envío, haga clic en el botón de abajo o ingrese con el siguiente 
+                            <a href="https://app-rastreo-cosmos.netlify.app/login" style="color: #4f46e5; text-decoration: none;">enlace</a>
+                        </td>
+                    </tr>
+                    
+                    <!-- Botón -->
+                    <tr>
+                        <td align="center" style="padding: 0 40px 40px 40px;">
+                            <!--[if mso]>
+                            <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="https://app-rastreo-cosmos.netlify.app/login" style="height:40px;v-text-anchor:middle;width:180px;" arcsize="13%" strokecolor="#4f46e5" fillcolor="#4f46e5">
+                                <w:anchorlock/>
+                                <center style="color:#ffffff;font-family:sans-serif;font-size:14px;font-weight:500;">Ver seguimiento</center>
+                            </v:roundrect>
+                            <![endif]-->
+                            <!--[if !mso]><!-->
+                            <a href="https://app-rastreo-cosmos.netlify.app/login" style="display: inline-block; padding: 10px 24px; font-family: Roboto, Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 500; line-height: 20px; color: #ffffff; text-decoration: none; background-color: #4f46e5; border: 1px solid #4f46e5; border-radius: 8px; text-align: center;">
+                                Ver seguimiento
+                            </a>
+                            <!--<![endif]-->
+                        </td>
+                    </tr>
+                </table>
+                
+                <!-- Footer -->
+                <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" style="max-width: 600px;">
+                    <tr>
+                        <td style="padding: 20px 40px; font-family: Roboto, Helvetica, Arial, sans-serif; font-size: 11px; line-height: 18px; color: rgba(0,0,0,0.54); text-align: center;">
+                            Usted recibió este correo como medio de notificación de su cuenta.
+                            <br><br>
+                            © 2025 Cosmos, Aplicación de rastreo
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

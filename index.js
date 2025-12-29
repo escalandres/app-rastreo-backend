@@ -29,8 +29,8 @@ const currentFilePath = fileURLToPath(currentFileURL);
 // Obtiene el directorio del archivo actual
 const __dirname = dirname(currentFilePath);
 global.__dirname = __dirname;
-global.EMAIL_TEMPLATES_PATH = path.join(__dirname, 'src', 'templates', 'email_templates');
-global.PDF_TEMPLATES_PATH = path.join(__dirname, 'src', 'templates', 'pdf_templates');
+global.EMAIL_TEMPLATES_PATH = path.join(__dirname, 'src', 'templates', 'email');
+global.PDF_TEMPLATES_PATH = path.join(__dirname, 'src', 'templates', 'pdf');
 global.TEMP_PATH = path.join(__dirname, 'temp');
 
 // -------------- settings --------------

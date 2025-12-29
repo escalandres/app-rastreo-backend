@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from "path";
-import sendMail from './nodemailer.js';
+// import sendMail from './nodemailer.js';
 import sendMailResend from './resend.mjs';
 import { consoleLog } from './utils.mjs';
 

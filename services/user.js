@@ -9,7 +9,7 @@ export async function getUser(email) {
         const dbResult = await usersCollection.findOne({email: email});
 
         if (dbResult) {
-        consoleLog("Usuario encontrado:", dbResult);
+        // consoleLog("Usuario encontrado:", dbResult);
         await usersCollection.updateOne({email: email}, {$set: {last_login: new Date()}});
         return {success: true, user: dbResult, error: "" };
         } else {
@@ -60,11 +60,11 @@ export async function registrarOTP(email) {
         if(dbResult){
         const otp = generarOTP();
         const timeStamp = generateTimestamp();
-        consoleLog("otp", otp);
-        consoleLog("timeStamp", timeStamp);
-        consoleLog("email", email);
+        // consoleLog("otp", otp);
+        // consoleLog("timeStamp", timeStamp);
+        // consoleLog("email", email);
         
-        consoleLog("------conectado----------");
+        // consoleLog("------conectado----------");
         dbResult = await client.collection("otp").insertOne({otp: otp,email:email, timestamp: timeStamp});
 
         if (dbResult.acknowledged) {

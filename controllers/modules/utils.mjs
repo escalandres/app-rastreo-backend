@@ -20,11 +20,12 @@ export function consoleLog(title, message = "", showOnProd = false) {
     }
 }
 
-export function validateToken(token) { 
-    try { 
+export function validateToken(req) { 
+    try {
+        const authHeader = req.headers['authorization']; 
+        if (!authHeader) return null;
+        const token = authHeader.split(' ')[1];
         const decodedToken = jwt.verify(token, process.env.KEY); 
-        // console.log('Token válido'); 
-        // Puedes realizar acciones adicionales con el decodedToken aquí 
         return decodedToken; 
     } catch (error) { 
         console.error('Token no válido:', error.message); // Maneja el error según sea necesario 

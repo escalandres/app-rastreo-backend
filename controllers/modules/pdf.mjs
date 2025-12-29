@@ -55,21 +55,41 @@ export async function generarReporteSeguimiento(data) {
         consoleLog("Datasource:", datasource); // Verifica el contenido de datasource
         const html = ejs.render(template, { datasource });
 
+        // const browser = await puppeteer.launch({
+        //     executablePath: '/usr/bin/chromium',
+        //     headless: 'new',
+        //     timeout: 60000,
+        //     args: [
+        //         '--no-sandbox',
+        //         '--disable-setuid-sandbox',
+        //         '--disable-dev-shm-usage',
+        //         '--disable-gpu',
+        //         '--disable-dev-tools',
+        //         '--no-first-run',
+        //         '--no-zygote',
+        //         '--single-process'
+        //     ]
+        // });
+        const isProd = process.env.NODE_ENV === 'production';
+
         const browser = await puppeteer.launch({
-            executablePath: '/usr/bin/chromium',
             headless: 'new',
-            timeout: 60000,
-            args: [
-                '--no-sandbox',
-                '--disable-setuid-sandbox',
-                '--disable-dev-shm-usage',
-                '--disable-gpu',
-                '--disable-dev-tools',
-                '--no-first-run',
-                '--no-zygote',
-                '--single-process'
-            ]
+            executablePath: isProd ? '/usr/bin/chromium' : undefined,
+            args: isProd
+                ? [
+                    '--no-sandbox',
+                    '--disable-setuid-sandbox',
+                    '--disable-dev-shm-usage',
+                    '--disable-gpu',
+                    '--disable-dev-tools',
+                    '--no-first-run',
+                    '--no-zygote',
+                    '--single-process'
+                ]
+                : [],
+            timeout: 60000
         });
+
         const page = await browser.newPage();
         await page.setContent(html);
         const pdfBuffer = await page.pdf({ format: "A4" });

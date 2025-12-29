@@ -32,18 +32,13 @@ export async function dhlTracking(req, res) {
 
 export async function obtenerInfo(req, res) {
     consoleLog("Obteniendo Info");
-    const authHeader = req.headers['authorization']; 
-    if (authHeader) { 
-        const token = authHeader.split(' ')[1]; // Assuming 'Bearer <token>' 
-        const decodedToken = validateToken(token);
-        if(decodedToken){
-            let response = await getAppInfo(decodedToken.user.id);
-            consoleLog(response);
-            return res.status(200).json({success: response.success, results: response.results, error: response.error});
-        }
-    } else { 
-        return res.status(401).json({success: false, results: {}, error: 'Token no válido'});
-    }   
+    const decodedToken = validateToken(req);
+    if(decodedToken){
+        let response = await getAppInfo(decodedToken.user.id);
+        consoleLog(response);
+        return res.status(200).json({success: response.success, results: response.results, error: response.error});
+    }
+    return res.status(401).json({success: false, results: {}, error: 'Token no válido'}); 
 }
 
 export async function registrarNuevoEnvio(req, res) {
@@ -71,7 +66,7 @@ export async function obtenerContenedoresUsuario(req, res) {
     const authHeader = req.headers['authorization']; 
     if (authHeader) { 
         const token = authHeader.split(' ')[1]; // Assuming 'Bearer <token>' 
-        const decodedToken = validateToken(token);
+        const decodedToken = validateToken(req);
         if(decodedToken){
             const result = await getUserContainers(decodedToken.user.id);
             if(!result.success){
@@ -100,12 +95,12 @@ export async function obtenerEnviosContenedor(req, res) {
 
 export async function obtenerEnvioMasReciente(req, res) {
     consoleLog("Obteniendo envío más reciente");
-    const { trackerID } = req.query;
-    const authHeader = req.headers['authorization']; 
-    const token = authHeader.split(' ')[1]; // Assuming 'Bearer <token>' 
-    const decodedToken = validateToken(token);
+    // const { trackerID } = req.query;
+    const decodedToken = validateToken(req);
     if(decodedToken){
-        const result = await getCurrentContainerShipment(trackerID);
+        const id = req.params.id;
+        console.log("ID del rastreador:", id);
+        const result = await getCurrentContainerShipment(id);
         if(!result.success){
             return res.status(400).json({success: false, message: result.error, result: {}});
         }else{
@@ -122,7 +117,7 @@ export async function vincularRastreador(req, res) {
         const authHeader = req.headers['authorization']; 
         if (authHeader) { 
             const token = authHeader.split(' ')[1]; // Assuming 'Bearer <token>' 
-            const decodedToken = validateToken(token);
+            const decodedToken = validateToken(req);
             if(decodedToken){
                 const tracker = {
                     id: parseInt(trackerID),
@@ -158,7 +153,7 @@ export async function startShipment(req, res) {
         const authHeader = req.headers['authorization']; 
         if (authHeader) { 
             const token = authHeader.split(' ')[1]; // Assuming 'Bearer <token>' 
-            const decodedToken = validateToken(token);
+            const decodedToken = validateToken(req);
             if(decodedToken){ 
                 const shipment = {
                     id: generarOTP(),
@@ -201,7 +196,7 @@ export async function updateTracker(req, res) {
         const authHeader = req.headers['authorization']; 
         if (authHeader) { 
             const token = authHeader.split(' ')[1]; // Assuming 'Bearer <token>' 
-            const decodedToken = validateToken(token);
+            const decodedToken = validateToken(req);
             if(decodedToken){
                 const result = await db_updateTracker(trackerId, nickname, img);
                 consoleLog("result:", result);
@@ -282,22 +277,18 @@ export async function getShipments(req, res){
 export async function endShipment(req, res) {
     consoleLog("endShipment", "", true);
     try{
-        const { shipmentId, trackerId } = req.query;
+        const shipmentId = req.params.id;
         consoleLog("shipmentId:", shipmentId);
-        const authHeader = req.headers['authorization']; 
-        if (authHeader) { 
-            const token = authHeader.split(' ')[1]; // Assuming 'Bearer <token>' 
-            const decodedToken = validateToken(token);
-            if(decodedToken){
-                let endDate = getCurrentTime();
-                const result = await db_endShipment(parseInt(shipmentId), endDate);
-                consoleLog("result:", result);
-                if(!result.success){
-                    return res.status(400).json({success: false, message: result.error});
-                }else{
-                    db_updateBatteryPercentage(trackerId, 0, true);
-                    return res.status(200).json({success: true, message: result.message});
-                }
+        const decodedToken = validateToken(req);
+        if(decodedToken){
+            let endDate = getCurrentTime();
+            const result = await db_endShipment(parseInt(shipmentId), endDate);
+            consoleLog("result:", result);
+            if(!result.success){
+                return res.status(400).json({success: false, message: result.error});
+            }else{
+                // Revisar como indicar si rastreador se apagó
+                return res.status(200).json({success: true, message: result.message});
             }
         }
         return res.status(401).json({ success: false, message: 'No se proporcionó el token o no es válido' });
@@ -312,26 +303,22 @@ export async function endShipment(req, res) {
 export async function changeTrackingCode(req, res) {
     consoleLog("changeTrackingCode", "", true);
     try{
-        const { shipmentId, company, newTrackingCode } = req.query;
-        consoleLog("shipmentId:", shipmentId);
-        const authHeader = req.headers['authorization']; 
-        if (authHeader) { 
-            const token = authHeader.split(' ')[1]; // Assuming 'Bearer <token>' 
-            const decodedToken = validateToken(token);
-            if(decodedToken){
-                const shipmentData = {
-                    company: company,
-                    tracking_number: newTrackingCode,
-                    service_id: company === "DHL" ? "express" : ""
-                }
-                consoleLog("shipmentData:", shipmentData);
-                const result = await db_changeTrackingCode(parseInt(shipmentId), shipmentData);
-                consoleLog("result:", result);
-                if(!result.success){
-                    return res.status(400).json({success: false, message: result.error});
-                }else{
-                    return res.status(200).json({success: true, message: result.message});
-                }
+        const decodedToken = validateToken(req);
+        if(decodedToken){
+            const { shipmentId, company, newTrackingCode } = req.body;
+            consoleLog("shipmentId:", shipmentId);
+            const shipmentData = {
+                company: company,
+                tracking_number: newTrackingCode,
+                service_id: company === "DHL" ? "express" : ""
+            }
+            consoleLog("shipmentData:", shipmentData);
+            const result = await db_changeTrackingCode(parseInt(shipmentId), shipmentData);
+            consoleLog("result:", result);
+            if(!result.success){
+                return res.status(400).json({success: false, message: result.error});
+            }else{
+                return res.status(200).json({success: true, message: result.message});
             }
         }
         return res.status(401).json({ success: false, message: 'No se proporcionó el token o no es válido' });

@@ -2,7 +2,7 @@ import express from 'express';
 import { obtenerContenedoresUsuario, vincularRastreador, obtenerEnvioMasReciente, 
     obtenerInfo, startShipment, updateTracker, generateReport, generateCurrentReporteSeguimiento,
     generateReporteSeguimiento, getShipments, endShipment, changeTrackingCode
-} from '../controllers/app.js';
+} from '#controllers/app.js';
 
 const router = express.Router();
 // ---------------- Endpoints info app ----------------

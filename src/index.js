@@ -9,11 +9,11 @@ import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 
 // -------------- My modules --------------
-import userRoutes from './routes/user.js';
-import appRoutes from './routes/app.js';
-import trackerRoutes from './routes/tracker.js';
-import shipmentRoutes from './routes/shipment.js';
-import sendMail from './controllers/modules/nodemailer.js';
+import userRoutes from '#routes/user.js';
+import appRoutes from '#routes/app.js';
+import trackerRoutes from '#routes/tracker.js';
+import shipmentRoutes from '#routes/shipment.js';
+import sendMail from '#controllers/modules/nodemailer.js';
 
 import dotenv from 'dotenv';
 // -------------- Variables modules --------------
@@ -29,8 +29,8 @@ const currentFilePath = fileURLToPath(currentFileURL);
 // Obtiene el directorio del archivo actual
 const __dirname = dirname(currentFilePath);
 global.__dirname = __dirname;
-global.EMAIL_TEMPLATES_PATH = path.join(__dirname, 'src', 'templates', 'email');
-global.PDF_TEMPLATES_PATH = path.join(__dirname, 'src', 'templates', 'pdf');
+global.EMAIL_TEMPLATES_PATH = path.join(__dirname, 'templates', 'email');
+global.PDF_TEMPLATES_PATH = path.join(__dirname, 'templates', 'pdf');
 global.TEMP_PATH = path.join(__dirname, 'temp');
 
 // -------------- settings --------------

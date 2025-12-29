@@ -1,5 +1,5 @@
 import puppeteer, { executablePath } from 'puppeteer';
-import { consultaEmpresasPaqueteria, registerNewShipment, getContainerShipments, getCurrentContainerShipment, updateShipment, db_updateBatteryPercentage } from "../services/shipment.js";
+import { consultaEmpresasPaqueteria, registerNewShipment, getContainerShipments, getCurrentContainerShipment, updateShipment, db_updateBatteryPercentage } from "#services/shipment.js";
 import { translateStatus, translateStatusCode, convertToISO, createStatusCodeFromDescription, convertToISOFromDDMMYYYY, extractDetailsFromEstafeta,
     getMostRecentEntry, isEmptyObj, generarCoordenadasCiudadMexico, getOldestEntry, processLocation
 } from "./modules/utils.mjs";
@@ -225,21 +225,26 @@ async function queryEstafeta(trackingCode) {
     const url = `https://rastreositecorecms.azurewebsites.net/Tracking/searchByGet/?wayBillType=1&wayBill=${trackingCode}`;
 
     // Iniciar el navegador
+    const isProd = process.env.NODE_ENV === 'production';
+
     const browser = await puppeteer.launch({
-        executablePath: '/usr/bin/chromium',
         headless: 'new',
-        timeout: 60000,
-        args: [
-            '--no-sandbox',
-            '--disable-setuid-sandbox',
-            '--disable-dev-shm-usage',
-            '--disable-gpu',
-            '--disable-dev-tools',
-            '--no-first-run',
-            '--no-zygote',
-            '--single-process'
-        ]
+        executablePath: isProd ? '/usr/bin/chromium' : undefined,
+        args: isProd
+            ? [
+                '--no-sandbox',
+                '--disable-setuid-sandbox',
+                '--disable-dev-shm-usage',
+                '--disable-gpu',
+                '--disable-dev-tools',
+                '--no-first-run',
+                '--no-zygote',
+                '--single-process'
+            ]
+            : [],
+        timeout: 60000
     });
+
     const page = await browser.newPage();
 
     // Añadir una función para capturar errores de navegación

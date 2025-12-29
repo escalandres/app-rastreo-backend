@@ -1,5 +1,5 @@
-import { dbClient } from '../config/mongodb.js';
-import { consoleLog } from '../controllers/modules/utils.mjs';
+import { dbClient } from '#config/mongodb.js';
+import { consoleLog } from '#controllers/modules/utils.mjs';
 
 export async function getUser(email) {
     let client = null;

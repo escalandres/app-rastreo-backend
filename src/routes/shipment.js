@@ -1,7 +1,7 @@
 import express from 'express';
 import { dhlTracking, obtenerEmpresasPaqueteria, registrarNuevoEnvio, obtenerEnviosContenedor, 
     obtenerEnvioMasReciente, estafetaTracking, fedExTracking, processShipment, processShipmentManual,
-    getCellTowerLocation } from '../controllers/shipment.js';
+    getCellTowerLocation } from '#controllers/shipment.js';
 
 const router = express.Router();
 

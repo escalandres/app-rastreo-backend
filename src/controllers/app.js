@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 import { generarOTP, validateToken, consoleLog, getCurrentTime } from "./modules/utils.mjs";
 import { consultaEmpresasPaqueteria, registerNewShipment, getContainerShipments, 
     getCurrentContainerShipment, getUserContainers, linkTracker, getAppInfo, 
-    db_startShipment, db_updateTracker, db_getShipmentInfo, db_endShipment, db_updateBatteryPercentage, db_changeTrackingCode } from "../services/shipment.js";
+    db_startShipment, db_updateTracker, db_getShipmentInfo, db_endShipment, db_updateBatteryPercentage, db_changeTrackingCode } from "#services/shipment.js";
 
 import { generarPDF, generarReporteSeguimiento } from "./modules/pdf.mjs";
 

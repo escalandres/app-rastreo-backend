@@ -1,6 +1,6 @@
 import express from 'express';
 
-import { signup, login, logout, changeUserPassword, generateOTP, checkOTP, validateCheckToken, validateChangeToken, googleAuth, githubAuth } from '../controllers/user.js';
+import { signup, login, logout, changeUserPassword, generateOTP, checkOTP, validateCheckToken, validateChangeToken, googleAuth, githubAuth } from '#controllers/user.js';
 
 const router = express.Router();
 

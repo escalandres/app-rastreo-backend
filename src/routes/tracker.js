@@ -1,8 +1,8 @@
 import express from 'express';
 
-import { subirDatos, subirDatos1, notificarEncendido, notificarRastreoActivo } from '../controllers/tracker.js';
-import { db_updateBatteryPercentage } from '../services/shipment.js';
-import { consoleLog } from '../controllers/modules/utils.mjs';
+import { subirDatos, subirDatos1, notificarEncendido, notificarRastreoActivo } from '#controllers/tracker.js';
+import { db_updateBatteryPercentage } from '#services/shipment.js';
+import { consoleLog } from '#controllers/modules/utils.mjs';
 
 const router = express.Router();
 

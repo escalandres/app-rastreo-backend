@@ -90,13 +90,14 @@ export async function processTracker(trackerData) {
                 let locationData = {};
                 
                 //Verificar si hay datos del GPS del rastreador
-                if(trackerData.lat != 0  || trackerData.lng != 0){
+                if(trackerData.gps_fix){
                     console.log("Hay datos del GPS del rastreador");
                     locationData = {
                         date: trackerData.time,
                         lat: trackerData.lat,
                         lng: trackerData.lng,
                         isCellTower: false,
+                        source: "GPS",
                         radius: 0,
                         batteryLevel: trackerData.batteryLevel
                     };
@@ -112,6 +113,7 @@ export async function processTracker(trackerData) {
                         lat: openCellIdData.lat,
                         lng: openCellIdData.lon,
                         isCellTower: true,
+                        source: "CELL_TOWER",
                         radius: openCellIdData.accuracy,
                         batteryLevel: trackerData.batteryLevel
                     };

@@ -340,7 +340,7 @@ export async function db_changeTrackingCode(shipmentId, shipmentData){
 }
 
 export async function db_updateBatteryPercentage(trackerId, batteryPercentage = 0, endShipment = false) {
-  consoleLog('db_updateBatteryPercentage', "empieza", true);
+  // consoleLog('db_updateBatteryPercentage', "empieza", true);
   let client = null;
   try {
     let battery = {
@@ -355,7 +355,7 @@ export async function db_updateBatteryPercentage(trackerId, batteryPercentage = 
       return { success: false, result: "", error: "El tracker no existe." };
     }
     await collection.updateOne({id: trackerId}, {$set: {battery_percentage: battery}});
-    consoleLog('db_updateBatteryPercentage - Finaliza', true);
+    // consoleLog('db_updateBatteryPercentage - Finaliza', true);
     // if(endShipment) {
     //   // Si se está finalizando el envío, se permite cambiar el porcentaje de batería
     //   battery.allow_change = true;

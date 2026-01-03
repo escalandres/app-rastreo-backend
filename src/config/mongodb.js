@@ -9,7 +9,7 @@ let cachedDb = null;
 async function connect() {
     try {
         await client.connect();
-        console.log("Connected to MongoDB Atlas");
+        // console.log("Connected to MongoDB Atlas");
         const db = client.db("app-rastreo");
         return db;
     } catch (err) {
@@ -22,7 +22,7 @@ async function disconnect() {
     try {
         if (client) {
             await client.close();
-            console.log("Disconnected from MongoDB Atlas");
+            // console.log("Disconnected from MongoDB Atlas");
         } else {
             console.warn("No active connection to MongoDB Atlas.");
         }

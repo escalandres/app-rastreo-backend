@@ -57,23 +57,19 @@ export async function obtenerEnvioMasReciente(req, res) {
 
 export async function processTracker(trackerData) {
     try {
-        console.log("processTracker");
+        console.log("Comienza procesamiento de datos del rastreador");
         // Obtener numero de rastreo del envío actual del rastreador provista por la paquetería
         const dbResult = await getCurrentShipment(trackerData.id);
-        consoleLog('dbResult', dbResult);
         if(dbResult.success){
-            console.log("Existe el envio en la base de datos");
             //Envio en curso
             // Obtener información envío actual del rastreador provista por la paquetería
             consoleLog('dbResult.result.delivery_date', dbResult.result.delivery_date);
             //if(!dbResult.result.delivery_date){
                 let statusInfo = {};
                 if(dbResult.result.shipment_data.company !== ''){
-                    console.log("Obteniendo datos de la paquetería");
-                    consoleLog('Company', dbResult.result.shipment_data.company, true);
+                    console.log("Obteniendo datos de la paquetería. Company:", dbResult.result.shipment_data.company);
                     switch(dbResult.result.shipment_data.company){
                         case "DHL":
-                            consoleLog('DHL');
                             statusInfo = await DHL(dbResult.result);
                             break;
 
@@ -118,11 +114,11 @@ export async function processTracker(trackerData) {
                         batteryLevel: trackerData.batteryLevel
                     };
                 }
-                console.log("Guardando estado del envío");
+                // console.log("Guardando estado del envío");
                 const dbResponse = await updateShipment(dbResult.result.id, locationData, statusInfo);
                 consoleLog(dbResponse);
                 if(!dbResponse.success){
-                    console.log("Actualizando porcentaje de batería");
+                    // console.log("Actualizando porcentaje de batería");
                     await db_updateBatteryPercentage(dbResult.result.container_id, trackerData.batteryLevel);
                     return {success: false, message: "Error al guardar coordenadas"};
                 }else{
@@ -135,7 +131,7 @@ export async function processTracker(trackerData) {
                     locationData.company = dbResult.result.shipment_data.company;
                     locationData.tracking_number = dbResult.result.shipment_data.tracking_number;
                     locationData.location = processLocation(locationData.isCellTower, locationData.radius);
-                    console.log("enviando correo electrónico de notificación");
+                    // console.log("enviando correo electrónico de notificación");
                     await sendNotifyEmail(locationData,statusInfo);
                     await db_updateBatteryPercentage(dbResult.result.container_id, trackerData.batteryLevel);
                     return {success: true, message: "Coordenadas guardadas correctamente"};

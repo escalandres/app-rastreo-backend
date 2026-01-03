@@ -38,7 +38,7 @@ function extraerDatos(mensaje) {
     let datosRastreador = {};
 
     if (mensaje.includes("+CMGR")) {
-        const regex = /\+(CMT|CMGR):\s'REC UNREAD','(\+52\d{10,12})','','([\d\/:,]+)-([\d\/:,]+)'id:(\d+),time:([\d\-:T]+),red:(\w+),mcc:(\d+),mnc:(\d+),lac:(\d+),cid:(\d+),bat:(\d+),lat:([-\d.]+),lon:([-\d.]+),gps_fix:(0|1)/m;
+        const regex = /\+(CMT|CMGR):\s'REC UNREAD','(\+52\d{10,12})','','([\d\/:,]+)-([\d\/:,]+)'id:(\d+),time:([\d\-:T]+),red:(\w+),mcc:(\d+),mnc:(\d+),lac:(\d+),cid:(\d+),bat:(\d+),lat:([-\d.]+),lon:([-\d.]+),gps_fix:([\d])/m;
 
         const r = regex.exec(mensaje);
         if (!r) return {};
@@ -60,7 +60,7 @@ function extraerDatos(mensaje) {
         };
         console.log("gos_fix", r[15]);
     } else if (mensaje.includes("+CMT")) {
-        const regex = /\+CMT:\s*'(\+52\d{10,12})','','([\d\/:,]+)-([\d\/:,]+)'id:(\d+),time:([\d\-:T]+),red:(\w+),mcc:(\d+),mnc:(\d+),lac:(\d+),cid:(\d+),bat:(\d+),lat:([-\d.]+),lon:([-\d.]+),gps_fix:(0|1)/m;
+        const regex = /\+CMT:\s*'(\+52\d{10,12})','','([\d\/:,]+)-([\d\/:,]+)'id:(\d+),time:([\d\-:T]+),red:(\w+),mcc:(\d+),mnc:(\d+),lac:(\d+),cid:(\d+),bat:(\d+),lat:([-\d.]+),lon:([-\d.]+),gps_fix:([\d])/m;
 
         const r = regex.exec(mensaje);
         if (!r) return {};

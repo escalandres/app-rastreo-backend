@@ -15,7 +15,7 @@ export const PLANTILLAS = {
     },
     delivery: {
         subject: "Hay novedades en tu rastreador",
-        file: 'delivery-updated.html'
+        file: 'delivery-update.html'
     },
     trackerOn: {
         subject: "Rastreador encendido",

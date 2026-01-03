@@ -101,7 +101,8 @@ export async function processTracker(trackerData) {
                 else{
                     console.log("Obteniendo datos de la torre celular");
                     let openCellIdData = await getCellTowerLocation(trackerData);
-                    consoleLog('openCellIdData', openCellIdData);
+                    console.log("Status de respuesta de OpenCellId:", openCellIdData.status);
+                    console.log('openCellIdData', openCellIdData);
                     if(openCellIdData.status === "error") return {success: false, message:  "Ocurrió un error al obtener la ubicación de la torre celular"}; 
 
                     locationData = {

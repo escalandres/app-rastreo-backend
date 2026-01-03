@@ -94,6 +94,7 @@ export async function processTracker(trackerData) {
                         lng: trackerData.lng,
                         isCellTower: false,
                         source: "GPS",
+                        status: "ok",
                         radius: 0,
                         batteryLevel: trackerData.batteryLevel
                     };
@@ -101,19 +102,37 @@ export async function processTracker(trackerData) {
                 else{
                     console.log("Obteniendo datos de la torre celular");
                     let openCellIdData = await getCellTowerLocation(trackerData);
-                    console.log("Status de respuesta de OpenCellId:", openCellIdData.status);
-                    console.log('openCellIdData', openCellIdData);
-                    if(openCellIdData.status === "error") return {success: false, message:  "Ocurrió un error al obtener la ubicación de la torre celular"}; 
-
-                    locationData = {
-                        date: trackerData.time,
-                        lat: openCellIdData.lat,
-                        lng: openCellIdData.lon,
-                        isCellTower: true,
-                        source: "CELL_TOWER",
-                        radius: openCellIdData.accuracy,
-                        batteryLevel: trackerData.batteryLevel
-                    };
+                    if(openCellIdData.status === "error"){
+                        console.log("No se encontró ubicación para la torre celular proporcionada");
+                        locationData = {
+                            date: trackerData.time,
+                            lat: null,
+                            lng: null,
+                            source: "NONE", // GPS ni Cell-ID
+                            status: "no_location",
+                            error: "cellid_not_found",
+                            radius: null,
+                            batteryLevel: trackerData.batteryLevel,
+                            cell: {
+                                mcc: trackerData.mcc,
+                                mnc: trackerData.mnc,
+                                lac: trackerData.lac,
+                                cid: trackerData.cid
+                            }
+                        };
+                    } else{
+                        console.log("Ubicación de la torre celular obtenida correctamente");
+                        locationData = {
+                            date: trackerData.time,
+                            lat: openCellIdData.lat,
+                            lng: openCellIdData.lon,
+                            isCellTower: true,
+                            source: "CELL_TOWER",
+                            status: "ok",
+                            radius: openCellIdData.accuracy,
+                            batteryLevel: trackerData.batteryLevel
+                        };
+                    }                    
                 }
                 // console.log("Guardando estado del envío");
                 const dbResponse = await updateShipment(dbResult.result.id, locationData, statusInfo);

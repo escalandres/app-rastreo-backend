@@ -59,7 +59,7 @@ function extraerDatos(mensaje) {
             gps_fix: r[15] === '1'
         };
         console.log("r", r);
-        console.log("gos_fix", r[15]);
+        console.log("1gos_fix", r[15]);
     } else if (mensaje.includes("+CMT")) {
         const regex = /\+CMT:\s*'(\+52\d{10,12})','','([\d\/:,]+)-([\d\/:,]+)'id:(\d+),time:([\d\-:T]+),red:(\w+),mcc:(\d+),mnc:(\d+),lac:(\d+),cid:(\d+),bat:(\d+),lat:([-\d.]+),lon:([-\d.]+),gps_fix:(\d+)/m;
 
@@ -79,10 +79,10 @@ function extraerDatos(mensaje) {
             batteryLevel: Number(r[11]),
             lat: Number(r[12]),
             lng: Number(r[13]),
-            gps_fix: r[15] === '1'
+            gps_fix: r[14] === '1'
         };
         console.log("r", r);
-        console.log("gos_fix", r[15]);
+        console.log("2gos_fix", r[14]);
     }
 
     return datosRastreador;

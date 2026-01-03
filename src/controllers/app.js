@@ -312,7 +312,7 @@ export async function changeTrackingCode(req, res) {
                 tracking_number: newTrackingCode,
                 service_id: company === "DHL" ? "express" : ""
             }
-            consoleLog("shipmentData:", shipmentData);
+            console.log("shipmentData:", shipmentData);
             const result = await db_changeTrackingCode(parseInt(shipmentId), shipmentData);
             consoleLog("result:", result);
             if(!result.success){

@@ -141,6 +141,7 @@ export async function processTracker(trackerData) {
             // return {success: false, message: "El envío seleccionado ya terminó"};
         }
     } catch (error) {
+        console.error("Error al guardar coordenadas:", error);
         return {success: false, message: "Error al guardar coordenadas"};
     }
 

@@ -117,13 +117,14 @@ export function generateDate(date = '') {
     return `${day}/${month}/${year} ${hours}:${minutes}`;
 }
 
-export function processLocation(isCellTower, radius) {
-    console.log('isCellTower', isCellTower);
-    console.log('radius', radius);
-    if (isCellTower) {
+export function processLocation(source, radius) {
+    console.log('source', source);
+    if (source === "CELL_TOWER") {
         return `Aproximada, en un radio de ${radius / 1000} km`
-    } else {
+    }else if (source === "GPS") {
         return 'GPS, ubicación exacta'
+    }else {
+        return 'Fuente desconocida'
     }
 }
 

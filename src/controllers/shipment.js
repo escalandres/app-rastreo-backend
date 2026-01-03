@@ -112,6 +112,7 @@ export async function processTracker(trackerData) {
                             status: "no_location",
                             error: "cellid_not_found",
                             radius: null,
+                            isCellTower: false,
                             batteryLevel: trackerData.batteryLevel,
                             cell: {
                                 mcc: trackerData.mcc,
@@ -150,7 +151,7 @@ export async function processTracker(trackerData) {
                     locationData.cid = trackerData.cid;
                     locationData.company = dbResult.result.shipment_data.company;
                     locationData.tracking_number = dbResult.result.shipment_data.tracking_number;
-                    locationData.location = processLocation(locationData.isCellTower, locationData.radius);
+                    locationData.location = processLocation(locationData.source, locationData.radius);
                     // console.log("enviando correo electrónico de notificación");
                     await sendNotifyEmail(locationData,statusInfo);
                     await db_updateBatteryPercentage(dbResult.result.container_id, trackerData.batteryLevel);

@@ -234,6 +234,8 @@ export function generarCoordenadasCiudadMexico() {
 }
 
 export function convertirUTCAMexico(fechaUTC) {
+    if (!fechaUTC || fechaUTC === 'INVALID') return null;
+
     let fechaMexico = new Date(fechaUTC+"Z").toLocaleString('en-US', { timeZone: 'America/Mexico_City' });
     let fecha = new Date(fechaMexico);
     

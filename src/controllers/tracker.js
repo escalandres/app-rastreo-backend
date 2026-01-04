@@ -38,7 +38,8 @@ function extraerDatos(mensaje) {
     let datosRastreador = {};
 
     if (mensaje.includes("+CMGR")) {
-        const regex = /\+(CMT|CMGR):\s'REC UNREAD','(\+52\d{10,12})','','([\d\/:,]+)-([\d\/:,]+)'id:(\d+),time:([\d\-:T]+),red:(\w+),mcc:(\d+),mnc:(\d+),lac:(\d+),cid:(\d+),bat:(\d+),lat:([-\d.]+),lon:([-\d.]+),gps_fix:(\d+)/m;
+        // const regex = /\+(CMT|CMGR):\s'REC UNREAD','(\+52\d{10,12})','','([\d\/:,]+)-([\d\/:,]+)'id:(\d+),time:([\d\-:T]+),red:(\w+),mcc:(\d+),mnc:(\d+),lac:(\d+),cid:(\d+),bat:(\d+),lat:([-\d.]+),lon:([-\d.]+),gps_fix:(\d+)/m;
+        const regex = /\+(CMT|CMGR):\s'REC UNREAD','(\+52\d{10,12})','','([\d\/:,]+)-([\d\/:,]+)'id:(\d+),time:((?:[\d\-:T]+)|INVALID),red:(\w+),mcc:(\d+),mnc:(\d+),lac:(\d+),cid:(\d+),bat:(\d+),lat:([-\d.]+),lon:([-\d.]+),gps_fix:(\d+),rtc_fix:(\d+)/m;
 
         const r = regex.exec(mensaje);
         if (!r) return {};
@@ -55,10 +56,12 @@ function extraerDatos(mensaje) {
             batteryLevel: Number(r[12]),
             lat: Number(r[13]),
             lng: Number(r[14]),
-            gps_fix: r[15] === '1'
+            gps_fix: r[15] === '1',
+            rtc_fix: r[16] === '1'
         };
     } else if (mensaje.includes("+CMT")) {
-        const regex = /\+CMT:\s*'(\+52\d{10,12})','','([\d\/:,]+)-([\d\/:,]+)'id:(\d+),time:([\d\-:T]+),red:(\w+),mcc:(\d+),mnc:(\d+),lac:(\d+),cid:(\d+),bat:(\d+),lat:([-\d.]+),lon:([-\d.]+),gps_fix:(\d+)/m;
+        // const regex = /\+CMT:\s*'(\+52\d{10,12})','','([\d\/:,]+)-([\d\/:,]+)'id:(\d+),time:([\d\-:T]+),red:(\w+),mcc:(\d+),mnc:(\d+),lac:(\d+),cid:(\d+),bat:(\d+),lat:([-\d.]+),lon:([-\d.]+),gps_fix:(\d+)/m;
+        const regex = /\+CMT:\s*'(\+52\d{10,12})','','([\d\/:,]+)-([\d\/:,]+)'id:(\d+),time:((?:[\d\-:T]+)|INVALID),red:(\w+),mcc:(\d+),mnc:(\d+),lac:(\d+),cid:(\d+),bat:(\d+),lat:([-\d.]+),lon:([-\d.]+),gps_fix:(\d+),rtc_fix:(\d+)/m;
 
         const r = regex.exec(mensaje);
         if (!r) return {};
@@ -76,8 +79,14 @@ function extraerDatos(mensaje) {
             batteryLevel: Number(r[11]),
             lat: Number(r[12]),
             lng: Number(r[13]),
-            gps_fix: r[14] === '1'
+            gps_fix: r[14] === '1',
+            rtc_fix: r[15] === '1'
         };
+    }
+
+    if (datosRastreador.rtc_fix === false && (!datosRastreador.time || datosRastreador.time === 'INVALID')) {
+        // rtc_fix = 0 -> el reloj está desconfigurado
+        datosRastreador.time = datosRastreador.fecha;
     }
 
     return datosRastreador;

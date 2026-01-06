@@ -208,26 +208,63 @@ async function queryDHL(trackingCode, service) {
     return serviceInfo;
 }
 
-function processDHLResponse(dhlResponse, shipmentStatus){
-    if(dhlResponse.status === 404) return {};
+// function processDHLResponse(dhlResponse, shipmentStatus){
+//     if(dhlResponse.status === 404) return {};
+//     consoleLog('processDHLResponse');
+//     consoleLog('dhlResponse',dhlResponse);
+//     consoleLog('shipmentStatus',shipmentStatus);
+//     consoleLog('dhlResponse.shipments.status',dhlResponse.shipments[0].status);
+//     //Verificar si el estatus ya existe en la DB
+//     const existe = shipmentStatus.some(item => item.timestamp === dhlResponse.shipments[0].status.timestamp);
+//     // Si no existe, extraer información a guardar
+//     if(!existe){
+//         let lastStatus = { 
+//             timestamp: dhlResponse.shipments[0].status.timestamp, 
+//             status_code: dhlResponse.shipments[0].status.statusCode,
+//             description: `${translateStatus(dhlResponse.shipments[0].status.statusCode)} | ${dhlResponse.shipments[0].status.description}`,
+//             location: dhlResponse.shipments[0].status.location.address.addressLocality 
+//         };
+//         return lastStatus
+//     } 
+//     consoleLog('Estatus ya existe en la DB');
+//     return {};
+// }
+
+function processDHLResponse(dhlResponse, shipmentStatus) {
+    if (dhlResponse.status === 404) return null;
+    
     consoleLog('processDHLResponse');
-    consoleLog('dhlResponse',dhlResponse);
-    consoleLog('shipmentStatus',shipmentStatus);
-    consoleLog('dhlResponse.shipments.status',dhlResponse.shipments[0].status);
-    //Verificar si el estatus ya existe en la DB
-    const existe = shipmentStatus.some(item => item.timestamp === dhlResponse.shipments[0].status.timestamp);
-    // Si no existe, extraer información a guardar
-    if(!existe){
-        let lastStatus = { 
-            timestamp: dhlResponse.shipments[0].status.timestamp, 
-            status_code: dhlResponse.shipments[0].status.statusCode,
-            description: `${translateStatus(dhlResponse.shipments[0].status.statusCode)} | ${dhlResponse.shipments[0].status.description}`,
-            location: dhlResponse.shipments[0].status.location.address.addressLocality 
-        };
-        return lastStatus
-    } 
-    consoleLog('Estatus ya existe en la DB');
-    return {};
+    consoleLog('dhlResponse', dhlResponse);
+    consoleLog('shipmentStatus', shipmentStatus);
+    
+    const shipment = dhlResponse.shipments[0];
+    consoleLog('dhlResponse.shipments.status', shipment.status);
+    
+    // Crear un Set con los timestamps existentes para búsqueda O(1)
+    const existingTimestamps = new Set(
+        shipmentStatus.map(status => status.timestamp)
+    );
+    
+    // Filtrar solo los eventos nuevos del array completo
+    const newEvents = shipment.events
+        .filter(event => !existingTimestamps.has(event.timestamp))
+        .map(event => ({
+            timestamp: event.timestamp,
+            status_code: event.statusCode,
+            description: `${translateStatus(event.statusCode)} | ${event.description}`,
+            location: event.location.address.addressLocality
+        }))
+        .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp)); // Ordenar cronológicamente
+    
+    if (newEvents.length === 0) {
+        consoleLog('No hay eventos nuevos');
+        return null; // No hay cambios, retorna null
+    }
+    
+    consoleLog(`Se encontraron ${newEvents.length} evento(s) nuevo(s)`);
+    
+    // Retornar el array actualizado completo
+    return [...shipmentStatus, ...newEvents];
 }
 
 // ------ Estafeta y FedEx ------

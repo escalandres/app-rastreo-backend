@@ -98,6 +98,33 @@ export async function registerNewShipment(shipment) {
   }
 }
 
+// export async function updateShipment(shipmentID, newLocation, newStatus) {
+//   consoleLog('updateShipment', "empieza", true);
+//   let client = null;
+//   try {
+//     client = await dbClient.connect();
+//     const shipmentCollection = client.collection('shipments');
+//     consoleLog("shipmentID", shipmentID);
+//     consoleLog("newLocation", newLocation);
+//     consoleLog("newStatus", newStatus);
+//     if(!isEmptyObj(newLocation)) await shipmentCollection.updateOne({id: shipmentID}, {$push: { locations: newLocation }});
+//     if(!isEmptyObj(newStatus)) await shipmentCollection.updateOne({id: shipmentID}, {$push: { shipment_status: newStatus}});
+//     if(newStatus.status_code === "delivered"){
+//       let newDeliveryDate = new Date();
+//       newDeliveryDate = formatDateToTimestamp(newDeliveryDate);
+//       await shipmentCollection.updateOne({id: shipmentID}, {$set: { delivery_date: newDeliveryDate}});
+//     }
+//     return {success: true, message: 'Guardado exitoso'};
+//   } catch (error) {
+//     console.error('Ocurrió un error:', error);
+//     return {success: false, message: error};
+//   } finally {
+//     if (client) {
+//       await dbClient.disconnect();
+//     }
+//   }
+// }
+
 export async function updateShipment(shipmentID, newLocation, newStatus) {
   consoleLog('updateShipment', "empieza", true);
   let client = null;
@@ -107,13 +134,47 @@ export async function updateShipment(shipmentID, newLocation, newStatus) {
     consoleLog("shipmentID", shipmentID);
     consoleLog("newLocation", newLocation);
     consoleLog("newStatus", newStatus);
-    if(!isEmptyObj(newLocation)) await shipmentCollection.updateOne({id: shipmentID}, {$push: { locations: newLocation }});
-    if(!isEmptyObj(newStatus)) await shipmentCollection.updateOne({id: shipmentID}, {$push: { shipment_status: newStatus}});
-    if(newStatus.status_code === "delivered"){
-      let newDeliveryDate = new Date();
-      newDeliveryDate = formatDateToTimestamp(newDeliveryDate);
-      await shipmentCollection.updateOne({id: shipmentID}, {$set: { delivery_date: newDeliveryDate}});
+    
+    // Manejar locations (puede ser objeto o null)
+    if(!isEmptyObj(newLocation)) {
+      await shipmentCollection.updateOne(
+        {id: shipmentID}, 
+        {$push: { locations: newLocation }}
+      );
     }
+    
+    // Manejar shipment_status (puede ser array completo o null)
+    if(newStatus !== null && newStatus !== undefined) {
+      // Si newStatus es un array, reemplazar todo el array
+      if(Array.isArray(newStatus)) {
+        await shipmentCollection.updateOne(
+          {id: shipmentID}, 
+          {$set: { shipment_status: newStatus }}
+        );
+      } 
+      // Si es un objeto, hacer push como antes (retrocompatibilidad)
+      else if(!isEmptyObj(newStatus)) {
+        await shipmentCollection.updateOne(
+          {id: shipmentID}, 
+          {$push: { shipment_status: newStatus }}
+        );
+      }
+      
+      // Verificar si el último estado es "delivered"
+      const lastStatus = Array.isArray(newStatus) 
+        ? newStatus[newStatus.length - 1] 
+        : newStatus;
+        
+      if(lastStatus.status_code === "delivered") {
+        let newDeliveryDate = new Date();
+        newDeliveryDate = formatDateToTimestamp(newDeliveryDate);
+        await shipmentCollection.updateOne(
+          {id: shipmentID}, 
+          {$set: { delivery_date: newDeliveryDate }}
+        );
+      }
+    }
+    
     return {success: true, message: 'Guardado exitoso'};
   } catch (error) {
     console.error('Ocurrió un error:', error);

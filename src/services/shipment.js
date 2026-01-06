@@ -442,3 +442,53 @@ export async function db_updateBatteryPercentage(trackerId, batteryPercentage = 
     }
   }
 }
+
+
+export async function db_bulkLocationInsert(shipmentID, locations) {
+  let client = null;
+  try {
+    client = await dbClient.connect();
+    const collection = client.collection('shipments');
+    // Validaciones
+    if (!Array.isArray(locations) || locations.length === 0) {
+      return res.status(400).json({
+        status: "error",
+        message: "locations debe ser un array no vacío"
+      });
+    }
+
+    // Inserción masiva manteniendo tu estructura
+    const result = await collection.updateOne(
+      { id: shipmentID },
+      {
+        $push: {
+          locations: {
+            $each: locations
+          }
+        }
+      }
+    );
+
+    if (result.matchedCount === 0) {
+      return {
+        success: false,
+        status: "error",
+        message: "Shipment no encontrado"
+      };
+    }
+
+    return {
+      success: true,
+      status: "ok",
+      inserted: locations.length
+    }
+
+  } catch (error) {
+    console.error("Error insertando locations:", error);
+    return {
+      success: false,
+      status: "error",
+      message: "Error interno del servidor"
+    }
+  }
+}

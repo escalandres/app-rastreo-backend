@@ -38,7 +38,7 @@ app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 app.use(cors({
     origin: process.env.FRONTEND_URL,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: false
 }));

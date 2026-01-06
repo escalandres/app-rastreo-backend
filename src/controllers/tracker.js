@@ -158,7 +158,7 @@ function extraerDatosEncendido(mensaje) {
     let datosRastreador = {};
 
     if (mensaje.includes("+CMGR")) {
-        const regex = /\+(CMT|CMGR):\s'REC UNREAD','(\+52\d{10,12})','','([\d\/:,]+)-([\d\/:,]+)'El rastreador:\s*(\d+),\s*esta encendido\. Tiempo:\s*([\d\-:T]+)\.OK/gm;
+        const regex = /\+(CMT|CMGR):\s'REC UNREAD','(\+52\d{10,12})','','([\d\/:,]+)-([\d\/:,]+)'Rastreador:\s*(\d+)\s+ENCENDIDO;HoraRed:\s*([\d\-:T]+);OK/gm;
 
         const resultado = regex.exec(mensaje);
         if (!resultado) return {};
@@ -167,11 +167,12 @@ function extraerDatosEncendido(mensaje) {
             numcell: resultado[1],
             fecha: formatDate_ddMMyyyy(resultado[2]),
             tracker: resultado[3],
-            time: convertirUTCAMexico(resultado[4]),
+            time: resultado[4],
+            // time: convertirUTCAMexico(resultado[4]),
         };
 
     } else if (mensaje.includes("+CMT")) {
-        const regex = /\+CMT:\s'(\+52\d{10,12})','','([\d\/:,]+)-([\d\/:,]+)'El rastreador:\s*(\d+),\s*esta encendido\. Tiempo:\s*([\d\-:T]+)\./gm;
+        const regex = /\+CMT:\s'(\+52\d{10,12})','','([\d\/:,]+)-([\d\/:,]+)'Rastreador:\s*(\d+)\s+ENCENDIDO;HoraRed:\s*([\d\-:T]+);/gm;
 
         const resultado = regex.exec(mensaje);
         if (!resultado) return {};

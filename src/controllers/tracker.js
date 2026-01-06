@@ -94,6 +94,7 @@ function extraerDatos(mensaje) {
 
 export async function notificarEncendido(req, res){
     try {
+        console.log("Entró a notificar encendido");
         let mensajeReceptor = req.body.datos;
         consoleLog("Mensaje del receptor:", mensajeReceptor, true)
         const token = req.headers.authorization.replace("Bearer ", "");

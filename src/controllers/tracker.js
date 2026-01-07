@@ -221,11 +221,11 @@ function extraerDatosRastreoActivo(mensaje) {
         return {
             fecha: formatDate_ddMMyyyy(resultado[2]),
             tracker: resultado[4],
-            time: convertirUTCAMexico(resultado[5]),
-            dias: Number(resultado[6]),
-            horas: Number(resultado[7]),
-            minutos: Number(resultado[8]),
-            seg: Number(resultado[9]),
+            dias: Number(resultado[5]),
+            horas: Number(resultado[6]),
+            minutos: Number(resultado[7]),
+            seg: Number(resultado[8]),
+            time: convertirUTCAMexico(resultado[9]),
             modo: "ahorro"
         };
     }

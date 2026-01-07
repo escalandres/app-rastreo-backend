@@ -203,8 +203,8 @@ function extraerDatosRastreoActivo(mensaje) {
         `${encabezado}'?(\\+52\\d{10,12})'?,'','([\\d\\/,:,]+)-([\\d\\/,:,]+)'` +
         `Rastreo Modo Ahorro ACTIVADO\\s*` +
         `ID:\\s*(\\d+)\\s*` +
-        `INT:\\s+([0-9]+)D([0-9]+)H([0-9]+)M([0-9]+)S\\s*` +
-        `TIME:\\s*([\\d\\-:T]+)\\`,
+        `INT:\\s*(\\d+)D(\\d+)H(\\d+)M(\\d+)S\\s*` +
+        `TIME:\\s*([0-9\\-:T]+)`,
         "m"
     );
 

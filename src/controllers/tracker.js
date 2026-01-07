@@ -94,7 +94,7 @@ function extraerDatos(mensaje) {
 
 export async function notificarEncendido(req, res){
     try {
-        console.log("Entró a notificar encendido");
+        console.log("---------- Notificar Encendido -----------");
         let mensajeReceptor = req.body.datos;
         consoleLog("Mensaje del receptor:", mensajeReceptor, true)
         const token = req.headers.authorization.replace("Bearer ", "");
@@ -126,6 +126,7 @@ export async function notificarEncendido(req, res){
 
 export async function notificarRastreoActivo(req, res){
     try {
+        console.log("---------- Notificar Rastreo Activo -----------");
         let mensajeReceptor = req.body.datos;
         consoleLog("Mensaje del receptor:", mensajeReceptor, true)
         const token = req.headers.authorization.replace("Bearer ", "");
@@ -200,9 +201,10 @@ function extraerDatosRastreoActivo(mensaje) {
 
     const regexAhorro = new RegExp(
         `${encabezado}'?(\\+52\\d{10,12})'?,'','([\\d\\/,:,]+)-([\\d\\/,:,]+)'` +
-        `Rastreo con Modo Ahorro ACTIVADO\\. Rastreador:\\s*(\\d+)\\. ` +
-        `Time:\\s*([\\d\\-:T]+)\\. INT:\\s*` +
-        `([0-9]+)D([0-9]+)H([0-9]+)M([0-9]+)S`,
+        `Rastreo Modo Ahorro ACTIVADO\\s*` +
+        `ID:\\s*(\\d+)\\s*` +
+        `INT:\\s*(\\d+)D(\\d+)H(\\d+)M(\\d+)S\\s*` +
+        `TIME:\\s*([0-9\\-:T]+)`,
         "m"
     );
 

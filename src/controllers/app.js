@@ -5,6 +5,7 @@ import { consultaEmpresasPaqueteria, registerNewShipment, getContainerShipments,
     db_startShipment, db_updateTracker, db_getShipmentInfo, db_endShipment, db_updateBatteryPercentage, db_changeTrackingCode } from "#services/shipment.js";
 
 import { generarPDF, generarReporteSeguimiento } from "./modules/pdf.mjs";
+import { sendTrackingStarted } from "./modules/email.mjs";
 
 export async function dhlTracking(req, res) {
     const myHeaders = new Headers();
@@ -57,6 +58,12 @@ export async function registrarNuevoEnvio(req, res) {
     if(!result.success){
         return res.status(400).json({success: false, message: result.error});
     }else{
+        const payload = {
+            shipment_id: result.data.shipmentID,
+            date: result.data.date,
+            tracker: containerID
+        }
+        const response = await sendTrackingStarted(payload);
         return res.status(200).json({success: true, message: result.result});
     }
 }

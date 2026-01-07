@@ -36,41 +36,74 @@
                         </td>
                     </tr>
                     
-                    <!-- Información del envío -->
+                    <!-- Información del envío con dos columnas -->
                     <tr>
                         <td style="padding: 0 40px 20px 40px;">
                             <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #f0f4ff; border-radius: 8px; border: 1px solid #d0dff5;">
                                 <tr>
                                     <td style="padding: 20px;">
-                                        <table role="presentation" width="100%" cellspacing="0" cellpadding="6" border="0">
+                                        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
                                             <tr>
-                                                <td style="font-family: Roboto, Helvetica, Arial, sans-serif; font-size: 12px; color: rgba(0,0,0,0.54); padding-bottom: 2px;">
-                                                    ID del envío
+                                                <!-- Columna 1: Info del envío -->
+                                                <td valign="top" width="50%" style="padding-right: 10px;">
+                                                    <table role="presentation" width="100%" cellspacing="0" cellpadding="6" border="0">
+                                                        <tr>
+                                                            <td style="font-family: Roboto, Helvetica, Arial, sans-serif; font-size: 12px; color: rgba(0,0,0,0.54); padding-bottom: 2px;">
+                                                                ID del envío
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="font-family: 'Courier New', Courier, monospace; font-size: 16px; font-weight: 500; color: rgba(0,0,0,0.87); padding-bottom: 12px;">
+                                                                {shipment_id}
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="font-family: Roboto, Helvetica, Arial, sans-serif; font-size: 12px; color: rgba(0,0,0,0.54); padding-bottom: 2px;">
+                                                                Rastreador
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="font-family: Roboto, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 500; color: rgba(0,0,0,0.87); padding-bottom: 12px;">
+                                                                {tracker}
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="font-family: Roboto, Helvetica, Arial, sans-serif; font-size: 12px; color: rgba(0,0,0,0.54); padding-bottom: 2px;">
+                                                                Fecha de inicio
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="font-family: Roboto, Helvetica, Arial, sans-serif; font-size: 14px; color: rgba(0,0,0,0.87);">
+                                                                {date}
+                                                            </td>
+                                                        </tr>
+                                                    </table>
                                                 </td>
-                                            </tr>
-                                            <tr>
-                                                <td style="font-family: 'Courier New', Courier, monospace; font-size: 16px; font-weight: 500; color: rgba(0,0,0,0.87); padding-bottom: 12px;">
-                                                    {shipment_id}
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td style="font-family: Roboto, Helvetica, Arial, sans-serif; font-size: 12px; color: rgba(0,0,0,0.54); padding-bottom: 2px;">
-                                                    Rastreador
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td style="font-family: Roboto, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 500; color: rgba(0,0,0,0.87); padding-bottom: 12px;">
-                                                    {tracker}
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td style="font-family: Roboto, Helvetica, Arial, sans-serif; font-size: 12px; color: rgba(0,0,0,0.54); padding-bottom: 2px;">
-                                                    Fecha de inicio
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td style="font-family: Roboto, Helvetica, Arial, sans-serif; font-size: 14px; color: rgba(0,0,0,0.87);">
-                                                    {date}
+                                                
+                                                <!-- Columna 2: Info de paquetería (condicional) -->
+                                                <td valign="top" width="50%" style="padding-left: 10px; border-left: 1px solid #d0dff5;">
+                                                    <table role="presentation" width="100%" cellspacing="0" cellpadding="6" border="0">
+                                                        <tr>
+                                                            <td style="font-family: Roboto, Helvetica, Arial, sans-serif; font-size: 12px; color: rgba(0,0,0,0.54); padding-bottom: 2px;">
+                                                                Empresa de paquetería
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="font-family: 'Courier New', Courier, monospace; font-size: 16px; font-weight: 500; color: rgba(0,0,0,0.87); padding-bottom: 12px;">
+                                                                {company}
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="font-family: Roboto, Helvetica, Arial, sans-serif; font-size: 12px; color: rgba(0,0,0,0.54); padding-bottom: 2px;">
+                                                                Número de rastreo
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="font-family: Roboto, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 500; color: rgba(0,0,0,0.87); padding-bottom: 12px;">
+                                                                {tracking_number}
+                                                            </td>
+                                                        </tr>
+                                                    </table>
                                                 </td>
                                             </tr>
                                         </table>
@@ -79,9 +112,6 @@
                             </table>
                         </td>
                     </tr>
-                    
-                    <!-- Información de paquetería (condicional) -->
-                    {shipping_info}
                     
                     <!-- Instrucciones -->
                     <tr>

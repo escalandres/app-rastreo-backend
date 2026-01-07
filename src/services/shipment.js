@@ -1,5 +1,5 @@
 import { dbClient } from '#config/mongodb.js';
-import { consoleLog, isEmptyObj } from '#controllers/modules/utils.mjs';
+import { consoleLog, isEmptyObj, getCurrentTime } from '#controllers/modules/utils.mjs';
 
 export async function consultaEmpresasPaqueteria() {
   let client = null;
@@ -84,7 +84,7 @@ export async function registerNewShipment(shipment) {
 
     const dbResult = await shipmentCollection.insertOne(shipment);
     if (dbResult.acknowledged) {
-      return { success: true, result: "Envío registrado!", error: "" };
+      return { success: true, result: "Envío registrado!", data: { shipmentID: shipmentID, date: getCurrentTime() }, error: "" };
     } else {
       return { success: false, result: "", error: "No se pudo registrar el envío" }
     }

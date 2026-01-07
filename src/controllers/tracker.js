@@ -139,7 +139,7 @@ export async function notificarRastreoActivo(req, res){
         consoleLog("Rastreo ON", trackerData, true);
         
         if(Object.keys(trackerData).length > 0){
-            const response = await sendTrackingStarted(trackerData);
+            const response = await sendTrackerActivated(trackerData);
             if(!response.success){
                 return res.status(400).json(response)
             }else{

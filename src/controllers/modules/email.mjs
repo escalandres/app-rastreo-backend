@@ -23,7 +23,7 @@ export const PLANTILLAS = {
     },
     trackerActivated: {
         subject: "Rastreador activado",
-        file: 'tracking-activated.html'
+        file: 'tracker-activated.html'
     },
     otp: {
         subject: "Código de verificación:",

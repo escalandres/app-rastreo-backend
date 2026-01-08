@@ -167,7 +167,7 @@ export async function updateShipment(shipmentID, newLocation, newStatus) {
         
       if(lastStatus.status_code === "delivered") {
         let newDeliveryDate = new Date();
-        newDeliveryDate = formatDateToTimestamp(newDeliveryDate);
+        newDeliveryDate = getCurrentTime();
         await shipmentCollection.updateOne(
           {id: shipmentID}, 
           {$set: { delivery_date: newDeliveryDate }}

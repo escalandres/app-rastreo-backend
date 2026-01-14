@@ -1062,7 +1062,7 @@ export async function fedExTrackingNew(trackingCode) {
         //     page.goto(url)
         // ]);
         await page.goto(url, { waitUntil: 'domcontentloaded' });
-        await page.waitForSelector('#detail-view-sections-desktop', { timeout: 20000 });
+        await page.waitForSelector('#detail-view-sections-desktop', { timeout: 40000 });
         // Extraer el contenido de la tabla con los registros por día
         const tableData = await page.evaluate(() => {
             const rows = document.querySelectorAll('#detail-view-sections-desktop .fdx-c-table__tbody__tr.travel-history-table__row');

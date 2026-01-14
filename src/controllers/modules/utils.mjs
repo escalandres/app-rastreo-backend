@@ -72,6 +72,13 @@ export function translateStatus(estado) {
     return traducciones[estado] || 'Estado desconocido';
 }
 
+export function translateStatusFedex(estado) { 
+    // console.log('translateStatusFedex estado', estado);
+    if (estado.indexOf('Delivered') !== -1) return 'delivered';
+    if (estado.indexOf('Error') !== -1) return 'failure';
+    return 'transit';
+}
+
 export function colorStatus(estado) { 
     const colores = {
         delivered: 'color: green;',

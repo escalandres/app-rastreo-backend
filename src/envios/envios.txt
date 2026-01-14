@@ -10,9 +10,11 @@ https://rastreositecorecms.azurewebsites.net/Tracking/searchByGet/?wayBillType=1
 
 URL FedEx
 
-https://www.fedex.com/fedextrack/?trknbr=778600719309&trkqual=2460569000~778600719309~FX
-Tracking ID
-778600719309
+https://www.fedex.com/fedextrack/?trknbr=883147235753&~883147235753~FX
+883147235753
 
-https://www.fedex.com/fedextrack/?trknbr=778600719309&trkqual=2460569000~778600719309~FX
-Tracking ID
+https://www.fedex.com/fedextrack/?trknbr=883365189950&~883365189950~FX
+883365189950
+
+https://www.fedex.com/fedextrack/?trknbr=883691718490&~883691718490~FX
+883691718490

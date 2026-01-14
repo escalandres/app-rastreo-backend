@@ -1,7 +1,7 @@
 import puppeteer, { executablePath } from 'puppeteer';
 import { consultaEmpresasPaqueteria, registerNewShipment, getContainerShipments, getCurrentContainerShipment, updateShipment, db_updateBatteryPercentage } from "#services/shipment.js";
 import { translateStatus, translateStatusCode, convertToISO, createStatusCodeFromDescription, convertToISOFromDDMMYYYY, extractDetailsFromEstafeta,
-    getMostRecentEntry, isEmptyObj, generarCoordenadasCiudadMexico, getOldestEntry, processLocation
+    getMostRecentEntry, isEmptyObj, generarCoordenadasCiudadMexico, getOldestEntry, processLocation, translateStatusFedex
 } from "./modules/utils.mjs";
 import { sendNotifyEmail } from "./modules/email.mjs";
 import { consoleLog } from './modules/utils.mjs';
@@ -711,10 +711,72 @@ export async function dhlTracking(req, res) {
         console.error('error', error);
     }
 
+    const shipment = serviceInfo.shipments[0];
+    const newEvents = shipment.events
+        .map(event => ({
+            timestamp: event.timestamp,
+            status_code: event.statusCode,
+            description: `${translateStatus(event.statusCode)} | ${event.description}`,
+            location: event.location.address.addressLocality
+        }))
+        .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp)); // Ordenar cronológicamente
+    
+    if (newEvents.length === 0) {
+        consoleLog('No hay eventos nuevos');
+        return null; // No hay cambios, retorna null
+    }
+    
+    consoleLog(`Se encontraron ${newEvents.length} evento(s) nuevo(s)`);
+
     consoleLog('serviceInfo',serviceInfo);
-    return res.status(200).json({ message: "Shipment tracked successfully", result: serviceInfo });
+    return res.status(200).json({ message: "Shipment tracked successfully", result: serviceInfo, newEvents: newEvents });
 }
 
+export async function dhlTrackingNew(trackingCode) {
+    const myHeaders = new Headers();
+    myHeaders.append("DHL-API-Key", process.env.DHL_API_KEY);
+    let serviceInfo = {};
+    
+    const requestOptions = {
+        method: "GET",
+        headers: myHeaders,
+        redirect: "follow"
+    };
+    
+    const service = "express";
+    const language = "es";
+    const limit = 2;
+    consoleLog(`service: ${service}, language: ${language}, limit: ${limit}`);
+    try{
+        let response = await fetch(`https://api-eu.dhl.com/track/shipments?trackingNumber=${trackingCode}&service=${service}&language=${language}&limit=${limit}`, requestOptions);
+        let data = await response.text();
+        serviceInfo = JSON.parse(data);
+        const shipment = serviceInfo.shipments[0];
+        const newEvents = shipment.events
+            .map(event => ({
+                timestamp: event.timestamp,
+                status_code: event.statusCode,
+                description: `${translateStatus(event.statusCode)} | ${event.description}`,
+                location: event.location.address.addressLocality
+            }))
+            .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp)); // Ordenar cronológicamente
+        
+        if (newEvents.length === 0) {
+            consoleLog('No hay eventos nuevos');
+            return null; // No hay cambios, retorna null
+        }
+        
+        consoleLog(`Se encontraron ${newEvents.length} evento(s) nuevo(s)`);
+
+        consoleLog('serviceInfo',serviceInfo);
+        return newEvents;
+    }
+    catch(error){
+        console.error('error', error);
+        return {};
+    }
+}
+    
 export async function estafetaTracking(req, res){
     const { trackingCode } = req.query;
     let shipmentStatus = "";
@@ -794,19 +856,19 @@ export async function fedExTracking(req, res) {
     let serviceInfo = [];
 
     try {
-        console.log('executablePath:', puppeteer.executablePath());
+        // console.log('executablePath:', puppeteer.executablePath());
         
         // Configuración del navegador
         const launchOptions = {
             executablePath: puppeteer.executablePath(),
-            headless: true,
+            headless: false,
             timeout: 60000,
             args: [
                 '--disable-infobars',
             '--no-sandbox',
             '--disable-setuid-sandbox',
             '--disable-dev-shm-usage',
-            '--disable-blink-features=AutomationControlled'
+            '--disable-blink-features=AutomationControlled',
             ]
         };
 
@@ -815,47 +877,57 @@ export async function fedExTracking(req, res) {
             launchOptions.executablePath = '/usr/bin/chromium';
         }
 
-        consoleLog('launchOptions', launchOptions);
+        // consoleLog('launchOptions', launchOptions);
 
         // Iniciar navegador
         browser = await puppeteer.launch(launchOptions);
-       const page = await browser.newPage();
+        const page = await browser.newPage();
 
-    // Establecer un agente de usuario que imite un navegador real
-    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36');
+        // Habilitar la interceptación de solicitudes
+        await page.setRequestInterception(true);
 
-    // Habilitar la interceptación de solicitudes
-    await page.setRequestInterception(true);
+        await page.evaluateOnNewDocument(() => {
+            // Object.defineProperty(navigator, 'webdriver', { get: () => false });
+            const proto = Object.getPrototypeOf(navigator);
+            delete proto.webdriver;
+            Object.setPrototypeOf(navigator, proto);
 
-    // Desactivar la detección de automatización
-    await page.evaluateOnNewDocument(() => {
-        Object.defineProperty(navigator, 'webdriver', {
-            get: () => false,
+            Object.defineProperty(navigator, 'plugins', {
+                get: () => [1, 2, 3],
+            });
+
+            Object.defineProperty(navigator, 'languages', {
+                get: () => ['es-MX', 'es'],
+            });
+
+            window.chrome = { runtime: {} };
+
+            Object.defineProperty(navigator, 'platform', {
+                get: () => 'Win32',
+            });
+
+            Object.defineProperty(navigator, 'maxTouchPoints', {
+                get: () => 1,
+            });
         });
-    });
 
-    // Interceptar las solicitudes de red
-    page.on('request', (request) => {
-        // Bloquear las solicitudes a logx.optimizely.com
-        if (request.url().includes('logx.optimizely.com')) {
-            request.abort();
-        } else {
+        // Interceptar las solicitudes de red
+        page.on('request', (request) => {
             request.continue();
-        }
-    });
+        });
 
-    // Añadir una función para capturar errores de navegación
-    page.on('error', error => {
-        console.error('Error en la página:', error);
-    });
+        // Añadir una función para capturar errores de navegación
+        page.on('error', error => {
+            console.error('Error en la página:', error);
+        });
 
-    try {
         // Navegar a la URL
-        await page.goto(url, { waitUntil: 'networkidle2' });
-
-        // Esperar explícitamente un tiempo adicional para permitir la carga del contenido dinámico
-        await new Promise(resolve => setTimeout(resolve, 6000)); // Esperar 6 segundos
-
+        // await Promise.all([
+        //     page.waitForNavigation({ waitUntil: 'networkidle2' }),
+        //     page.goto(url)
+        // ]);
+        await page.goto(url, { waitUntil: 'domcontentloaded' });
+        await page.waitForSelector('#detail-view-sections-desktop', { timeout: 20000 });
         // Extraer el contenido de la tabla con los registros por día
         const tableData = await page.evaluate(() => {
             const rows = document.querySelectorAll('#detail-view-sections-desktop .fdx-c-table__tbody__tr.travel-history-table__row');
@@ -888,19 +960,187 @@ export async function fedExTracking(req, res) {
         });
 
         consoleLog('serviceInfo', serviceInfo);
+
+        let trackingStatuses = serviceInfo.map(entry => ({
+            timestamp: entry.timestamp,
+            status_code: translateStatusFedex(entry.status),
+            description: `${translateStatus(translateStatusFedex(entry.status))} | ${entry.status}`,
+            location: entry.location
+        }));    
+
+        return res.status(200).json({ message: "Shipment tracked successfully", url: url, result: serviceInfo, tracking: trackingStatuses });
     } catch (error) {
-        console.error('Ocurrió un error:', error);
+        console.error('Ocurrió un error al iniciar el navegador o procesar la página:', error);
+        if (browser) {
+            await browser.close();
+        }
+        return res.status(500).json({ message: "Error al rastrear el envío", error: error.message });
     } finally {
         // Cerrar el navegador
         await browser.close();
     }
+}
 
-    return res.status(200).json({ message: "Shipment tracked successfully", result: serviceInfo, url: url });
-} catch (error) {
-    console.error('Ocurrió un error al iniciar el navegador o procesar la página:', error);
-    if (browser) {
+export async function fedExTrackingNew(trackingCode) {
+    consoleLog('fedExTracking', "", true);
+
+    const url = `https://www.fedex.com/fedextrack/?trknbr=${trackingCode}&~${trackingCode}~FX`;
+    consoleLog('url', url);
+
+    let browser;
+    let serviceInfo = [];
+
+    try {
+        // console.log('executablePath:', puppeteer.executablePath());
+        
+        // Configuración del navegador
+        const launchOptions = {
+            executablePath: puppeteer.executablePath(),
+            headless: false,
+            timeout: 60000,
+            args: [
+                '--disable-infobars',
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            '--disable-dev-shm-usage',
+            '--disable-blink-features=AutomationControlled',
+            ]
+        };
+
+        if (process.env.IS_DOCKER === 'true') {
+            consoleLog('Running in Docker, setting executablePath for Chromium');
+            launchOptions.executablePath = '/usr/bin/chromium';
+        }
+
+        // consoleLog('launchOptions', launchOptions);
+
+        // Iniciar navegador
+        browser = await puppeteer.launch(launchOptions);
+        const page = await browser.newPage();
+
+        // Habilitar la interceptación de solicitudes
+        await page.setRequestInterception(true);
+
+        await page.evaluateOnNewDocument(() => {
+            // Object.defineProperty(navigator, 'webdriver', { get: () => false });
+            const proto = Object.getPrototypeOf(navigator);
+            delete proto.webdriver;
+            Object.setPrototypeOf(navigator, proto);
+
+            Object.defineProperty(navigator, 'plugins', {
+                get: () => [1, 2, 3],
+            });
+
+            Object.defineProperty(navigator, 'languages', {
+                get: () => ['es-MX', 'es'],
+            });
+
+            window.chrome = { runtime: {} };
+
+            Object.defineProperty(navigator, 'platform', {
+                get: () => 'Win32',
+            });
+
+            Object.defineProperty(navigator, 'maxTouchPoints', {
+                get: () => 1,
+            });
+        });
+
+        // Interceptar las solicitudes de red
+        page.on('request', (request) => {
+            request.continue();
+        });
+
+        // Añadir una función para capturar errores de navegación
+        page.on('error', error => {
+            console.error('Error en la página:', error);
+        });
+
+        // Navegar a la URL
+        // await Promise.all([
+        //     page.waitForNavigation({ waitUntil: 'networkidle2' }),
+        //     page.goto(url)
+        // ]);
+        await page.goto(url, { waitUntil: 'domcontentloaded' });
+        await page.waitForSelector('#detail-view-sections-desktop', { timeout: 20000 });
+        // Extraer el contenido de la tabla con los registros por día
+        const tableData = await page.evaluate(() => {
+            const rows = document.querySelectorAll('#detail-view-sections-desktop .fdx-c-table__tbody__tr.travel-history-table__row');
+            const extractedData = [];
+            rows.forEach(row => {
+                const dateElement = row.querySelector('.travel-history-table__scan-event-date span');
+
+                const _rows = row.querySelectorAll('.fdx-o-grid__row.fdx-u-mb--3.fdx-u-fontsize--extra-small.travel-history__scan-event');
+                _rows.forEach(_row => {
+                    const timeElement = _row.querySelector('.travel-history__scan-event span');
+                    const statusElement = _row.querySelector('#status');
+                    const locationElement = _row.querySelector('.fdx-o-grid__item--4.fdx-u-fontweight--regular');
+
+                    const rowData = {
+                        date: dateElement ? dateElement.innerText.trim() : 'N/A',
+                        time: timeElement ? timeElement.innerText.trim() : 'N/A',
+                        status: statusElement ? statusElement.innerText.trim() : 'N/A',
+                        location: locationElement ? locationElement.innerText.trim() : 'N/A'
+                    };
+                    extractedData.push(rowData);
+                });
+            });
+            return extractedData;
+        });
+
+        serviceInfo = tableData;
+
+        serviceInfo.forEach(row => {
+            row.timestamp = row.date ? convertToISO(row.date, row.time || '12:00 AM') : null;
+        });
+
+        // consoleLog('serviceInfo', serviceInfo);
+
+        let trackingStatuses = serviceInfo.map(entry => ({
+            timestamp: entry.timestamp,
+            status_code: translateStatusFedex(entry.status),
+            description: `${translateStatus(translateStatusFedex(entry.status))} | ${entry.status}`,
+            location: entry.location
+        }));    
+
+        // consoleLog('trackingStatuses', trackingStatuses);
+
+        return trackingStatuses
+    } catch (error) {
+        console.error('Ocurrió un error al iniciar el navegador o procesar la página:', error);
+        if (browser) {
+            await browser.close();
+        }
+        return {};
+    } finally {
+        // Cerrar el navegador
         await browser.close();
     }
-    return res.status(500).json({ message: "Error al rastrear el envío", error: error.message });
 }
+
+export async function queryShipmentTracking(req, res) {
+    try {
+        consoleLog("req.body:", req.body);
+        let { tracking_number, company } = req.body;
+        // let shipmentData = req.body.shipmentData; 
+        let statusInfo = {};
+        // Obtener información envío actual del rastreador provista por la paquetería
+        switch(company){
+            case "DHL":
+                consoleLog('DHL');
+                statusInfo = await dhlTrackingNew(tracking_number);
+                break;
+            case "Estafeta":
+                consoleLog('Estafeta');
+                statusInfo = await estafetaTracking(tracking_number);
+                break;
+            case "FedEx":
+                consoleLog('FedEx');
+                statusInfo = await fedExTrackingNew(tracking_number);
+                break;
+        }
+        return res.status(200).json({success: true, shipment_status: statusInfo});
+    } catch (error) {
+        return res.status(500).json({success: false, message: "Error al consultar el estatus del envío"});
+    }
 }

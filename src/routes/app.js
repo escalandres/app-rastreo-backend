@@ -4,6 +4,8 @@ import { obtenerContenedoresUsuario, vincularRastreador, obtenerEnvioMasReciente
     generateReporteSeguimiento, getShipments, endShipment, changeTrackingCode
 } from '#controllers/app.js';
 
+import { queryShipmentTracking } from '#controllers/shipment.js';
+
 const router = express.Router();
 // ---------------- Endpoints info app ----------------
 router.get('/get-info', obtenerInfo);
@@ -21,5 +23,7 @@ router.get('/shipments/:id', obtenerEnvioMasReciente);
 router.post('/start-shipment', startShipment);
 router.patch('/shipments/end/:id', endShipment);
 router.patch('/shipments/change-tracking-code/:id', changeTrackingCode);
+
+router.post('/shipments/query-tracking', queryShipmentTracking);
 
 export default router;

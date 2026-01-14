@@ -981,6 +981,147 @@ export async function fedExTracking(req, res) {
     }
 }
 
+// export async function fedExTrackingNew(trackingCode) {
+//     consoleLog('fedExTracking', "", true);
+
+//     const url = `https://www.fedex.com/fedextrack/?trknbr=${trackingCode}&~${trackingCode}~FX`;
+//     consoleLog('url', url);
+
+//     let browser;
+//     let serviceInfo = [];
+
+//     try {
+//         // console.log('executablePath:', puppeteer.executablePath());
+        
+//         // Configuración del navegador
+//         const launchOptions = {
+//             executablePath: puppeteer.executablePath(),
+//             headless: process.env.NODE_ENV === 'production',
+//             timeout: 60000,
+//             args: [
+//                 '--disable-infobars',
+//                 '--no-sandbox',
+//                 '--disable-setuid-sandbox',
+//                 '--disable-dev-shm-usage',
+//                 '--disable-blink-features=AutomationControlled',
+//             ]
+//         };
+
+//         if (process.env.IS_DOCKER === 'true') {
+//             consoleLog('Running in Docker, setting executablePath for Chromium');
+//             launchOptions.executablePath = '/usr/bin/chromium';
+//         }
+
+//         // consoleLog('launchOptions', launchOptions);
+
+//         // Iniciar navegador
+//         browser = await puppeteer.launch(launchOptions);
+//         const page = await browser.newPage();
+
+//         // Habilitar la interceptación de solicitudes
+//         await page.setRequestInterception(true);
+
+//         await page.evaluateOnNewDocument(() => {
+//             // Object.defineProperty(navigator, 'webdriver', { get: () => false });
+//             const proto = Object.getPrototypeOf(navigator);
+//             delete proto.webdriver;
+//             Object.setPrototypeOf(navigator, proto);
+
+//             Object.defineProperty(navigator, 'plugins', {
+//                 get: () => [1, 2, 3],
+//             });
+
+//             Object.defineProperty(navigator, 'languages', {
+//                 get: () => ['es-MX', 'es'],
+//             });
+
+//             window.chrome = { runtime: {} };
+
+//             Object.defineProperty(navigator, 'platform', {
+//                 get: () => 'Win32',
+//             });
+
+//             Object.defineProperty(navigator, 'maxTouchPoints', {
+//                 get: () => 1,
+//             });
+//         });
+
+//         // Interceptar las solicitudes de red
+//         page.on('request', (request) => {
+//             request.continue();
+//         });
+
+//         // Añadir una función para capturar errores de navegación
+//         page.on('error', error => {
+//             console.error('Error en la página:', error);
+//         });
+
+//         page.on('pageerror', err => console.log("PageError:", err));
+//         browser.on('disconnected', () => console.log("Browser crashed"));
+//         // Navegar a la URL
+
+//         await page.goto(url, { waitUntil: 'domcontentloaded' });
+//         await page.waitForSelector('.shipment-info-container', { timeout: 60000 });
+//         // Extraer el contenido de la tabla con los registros por día
+//         const tableData = await page.evaluate(() => {
+//             const rows = document.querySelectorAll('#detail-view-sections-desktop .fdx-c-table__tbody__tr.travel-history-table__row');
+//             const extractedData = [];
+//             rows.forEach(row => {
+//                 const dateElement = row.querySelector('.travel-history-table__scan-event-date span');
+
+//                 const _rows = row.querySelectorAll('.fdx-o-grid__row.fdx-u-mb--3.fdx-u-fontsize--extra-small.travel-history__scan-event');
+//                 _rows.forEach(_row => {
+//                     const timeElement = _row.querySelector('.travel-history__scan-event span');
+//                     const statusElement = _row.querySelector('#status');
+//                     const locationElement = _row.querySelector('.fdx-o-grid__item--4.fdx-u-fontweight--regular');
+
+//                     const rowData = {
+//                         date: dateElement ? dateElement.innerText.trim() : 'N/A',
+//                         time: timeElement ? timeElement.innerText.trim() : 'N/A',
+//                         status: statusElement ? statusElement.innerText.trim() : 'N/A',
+//                         location: locationElement ? locationElement.innerText.trim() : 'N/A'
+//                     };
+//                     extractedData.push(rowData);
+//                 });
+//             });
+//             return extractedData;
+//         });
+
+//         serviceInfo = tableData;
+
+//         serviceInfo.forEach(row => {
+//             row.timestamp = row.date ? convertToISO(row.date, row.time || '12:00 AM') : null;
+//         });
+
+//         // consoleLog('serviceInfo', serviceInfo);
+//         let trackingStatuses = [];
+//         if(serviceInfo.length === 0){
+//             consoleLog('No se encontraron registros de seguimiento para el número proporcionado.');
+//             return trackingStatuses;
+//         }
+
+//         trackingStatuses = serviceInfo.map(entry => ({
+//             timestamp: entry.timestamp,
+//             status_code: translateStatusFedex(entry.status),
+//             description: `${translateStatus(translateStatusFedex(entry.status))} | ${entry.status}`,
+//             location: entry.location
+//         }));    
+
+//         // consoleLog('trackingStatuses', trackingStatuses);
+
+//         return trackingStatuses
+//     } catch (error) {
+//         console.error('Ocurrió un error al iniciar el navegador o procesar la página:', error);
+//         if (browser) {
+//             await browser.close();
+//         }
+//         return [];
+//     } finally {
+//         // Cerrar el navegador
+//         await browser.close();
+//     }
+// }
+
 export async function fedExTrackingNew(trackingCode) {
     consoleLog('fedExTracking', "", true);
 
@@ -991,19 +1132,19 @@ export async function fedExTrackingNew(trackingCode) {
     let serviceInfo = [];
 
     try {
-        // console.log('executablePath:', puppeteer.executablePath());
-        
-        // Configuración del navegador
         const launchOptions = {
             executablePath: puppeteer.executablePath(),
             headless: process.env.NODE_ENV === 'production',
             timeout: 60000,
             args: [
                 '--disable-infobars',
-            '--no-sandbox',
-            '--disable-setuid-sandbox',
-            '--disable-dev-shm-usage',
-            '--disable-blink-features=AutomationControlled',
+                '--no-sandbox',
+                '--disable-setuid-sandbox',
+                '--disable-dev-shm-usage',
+                '--disable-blink-features=AutomationControlled',
+                '--disable-gpu',
+                '--disable-software-rasterizer',
+                '--window-size=1280,800'
             ]
         };
 
@@ -1012,61 +1153,87 @@ export async function fedExTrackingNew(trackingCode) {
             launchOptions.executablePath = '/usr/bin/chromium';
         }
 
-        // consoleLog('launchOptions', launchOptions);
-
-        // Iniciar navegador
         browser = await puppeteer.launch(launchOptions);
         const page = await browser.newPage();
 
-        // Habilitar la interceptación de solicitudes
-        await page.setRequestInterception(true);
+        // ❌ NO request interception (FedEx lo detecta)
+        // await page.setRequestInterception(true);
 
+        // 🧩 Fingerprint completo
         await page.evaluateOnNewDocument(() => {
-            // Object.defineProperty(navigator, 'webdriver', { get: () => false });
             const proto = Object.getPrototypeOf(navigator);
             delete proto.webdriver;
             Object.setPrototypeOf(navigator, proto);
 
+            // Plugins simulados válidos
             Object.defineProperty(navigator, 'plugins', {
-                get: () => [1, 2, 3],
+                get: () => [
+                    { name: "Chrome PDF Plugin" },
+                    { name: "Chrome PDF Viewer" },
+                    { name: "Native Client" }
+                ]
             });
 
             Object.defineProperty(navigator, 'languages', {
-                get: () => ['es-MX', 'es'],
+                get: () => ['es-MX', 'es']
             });
 
-            window.chrome = { runtime: {} };
-
             Object.defineProperty(navigator, 'platform', {
-                get: () => 'Win32',
+                get: () => 'Win32'
             });
 
             Object.defineProperty(navigator, 'maxTouchPoints', {
-                get: () => 1,
+                get: () => 1
             });
+
+            Object.defineProperty(navigator, 'hardwareConcurrency', {
+                get: () => 4
+            });
+
+            Object.defineProperty(navigator, 'deviceMemory', {
+                get: () => 8
+            });
+
+            // Chrome object completo
+            window.chrome = {
+                runtime: {},
+                app: {},
+                webstore: {},
+                csi: () => {},
+                loadTimes: () => {}
+            };
+
+            // Patch de permissions.query
+            const originalQuery = window.navigator.permissions.query;
+            window.navigator.permissions.query = (parameters) => (
+                parameters.name === 'notifications'
+                    ? Promise.resolve({ state: Notification.permission })
+                    : originalQuery(parameters)
+            );
         });
 
-        // Interceptar las solicitudes de red
-        page.on('request', (request) => {
-            request.continue();
-        });
+        // Logs de crash
+        page.on('pageerror', err => console.log("PageError:", err));
+        // browser.on('disconnected', () => console.log("Browser crashed"));
 
-        // Añadir una función para capturar errores de navegación
-        page.on('error', error => {
-            console.error('Error en la página:', error);
-        });
+        // 🧩 Paso 1: visitar fedex.com para obtener cookies
+        await page.goto("https://www.fedex.com", { waitUntil: "domcontentloaded" });
+        // await page.waitForTimeout(1500);
 
-        // Navegar a la URL
-        // await Promise.all([
-        //     page.waitForNavigation({ waitUntil: 'networkidle2' }),
-        //     page.goto(url)
-        // ]);
+        // 🧩 Paso 2: ir al tracking
         await page.goto(url, { waitUntil: 'domcontentloaded' });
-        await page.waitForSelector('#detail-view-sections-desktop', { timeout: 40000 });
-        // Extraer el contenido de la tabla con los registros por día
+
+        // Espera temprana antes del nodo profundo
+        await page.waitForSelector('app-root', { timeout: 30000 });
+
+        // Ahora sí, esperar el nodo profundo
+        await page.waitForSelector('.shipment-info-container', { timeout: 60000 });
+
+        // Extraer datos
         const tableData = await page.evaluate(() => {
             const rows = document.querySelectorAll('#detail-view-sections-desktop .fdx-c-table__tbody__tr.travel-history-table__row');
             const extractedData = [];
+
             rows.forEach(row => {
                 const dateElement = row.querySelector('.travel-history-table__scan-event-date span');
 
@@ -1076,15 +1243,15 @@ export async function fedExTrackingNew(trackingCode) {
                     const statusElement = _row.querySelector('#status');
                     const locationElement = _row.querySelector('.fdx-o-grid__item--4.fdx-u-fontweight--regular');
 
-                    const rowData = {
+                    extractedData.push({
                         date: dateElement ? dateElement.innerText.trim() : 'N/A',
                         time: timeElement ? timeElement.innerText.trim() : 'N/A',
                         status: statusElement ? statusElement.innerText.trim() : 'N/A',
                         location: locationElement ? locationElement.innerText.trim() : 'N/A'
-                    };
-                    extractedData.push(rowData);
+                    });
                 });
             });
+
             return extractedData;
         });
 
@@ -1094,27 +1261,28 @@ export async function fedExTrackingNew(trackingCode) {
             row.timestamp = row.date ? convertToISO(row.date, row.time || '12:00 AM') : null;
         });
 
-        // consoleLog('serviceInfo', serviceInfo);
+        if (serviceInfo.length === 0) {
+            consoleLog('No se encontraron registros de seguimiento para el número proporcionado.');
+            return [];
+        }
 
-        let trackingStatuses = serviceInfo.map(entry => ({
+        const trackingStatuses = serviceInfo.map(entry => ({
             timestamp: entry.timestamp,
             status_code: translateStatusFedex(entry.status),
             description: `${translateStatus(translateStatusFedex(entry.status))} | ${entry.status}`,
             location: entry.location
-        }));    
+        }));
 
-        // consoleLog('trackingStatuses', trackingStatuses);
+        consoleLog('Registros de seguimiento encontrados para el número proporcionado.');
 
-        return trackingStatuses
+        return trackingStatuses;
+
     } catch (error) {
         console.error('Ocurrió un error al iniciar el navegador o procesar la página:', error);
-        if (browser) {
-            await browser.close();
-        }
-        return {};
+        if (browser) await browser.close();
+        return [];
     } finally {
-        // Cerrar el navegador
-        await browser.close();
+        if (browser) await browser.close();
     }
 }
 

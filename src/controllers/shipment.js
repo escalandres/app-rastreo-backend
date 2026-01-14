@@ -1223,6 +1223,9 @@ export async function fedExTrackingNew(trackingCode) {
         // 🧩 Paso 2: ir al tracking
         await page.goto(url, { waitUntil: 'domcontentloaded' });
 
+        const html = await page.content();
+        console.log("HTML recibido:", html.slice(0, 500));
+
         // Espera temprana antes del nodo profundo
         await page.waitForSelector('app-root', { timeout: 30000 });
 

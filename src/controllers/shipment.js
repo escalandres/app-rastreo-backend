@@ -996,7 +996,7 @@ export async function fedExTrackingNew(trackingCode) {
         // Configuración del navegador
         const launchOptions = {
             executablePath: puppeteer.executablePath(),
-            headless: false,
+            headless: process.env.NODE_ENV === 'production',
             timeout: 60000,
             args: [
                 '--disable-infobars',

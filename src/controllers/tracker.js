@@ -1,6 +1,6 @@
 import { processTracker } from "./shipment.js";
 import { sendTrackerOn, sendTrackerActivated, sendTrackingStarted } from "./modules/email.mjs";
-import { consoleLog, convertirUTCAMexico } from "./modules/utils.mjs";
+import { consoleLog, convertirUTCAMexico, formatear_UTC } from "./modules/utils.mjs";
 
 export async function subirDatos(req, res){
     try {
@@ -183,7 +183,7 @@ function extraerDatosEncendido(mensaje) {
             numcell: resultado[1],
             fecha: formatDate_ddMMyyyy(resultado[2]),
             tracker: resultado[4],
-            time: convertirUTCAMexico(resultado[5]),
+            time: formatear_UTC(resultado[5]),
         };
     }
 

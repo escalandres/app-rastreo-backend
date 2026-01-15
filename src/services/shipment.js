@@ -80,7 +80,7 @@ export async function registerNewShipment(shipment) {
     shipment.id = shipmentID;
     consoleLog("shipment", shipment);
     // Crear índices únicos en email y userId
-    await shipmentCollection.createIndex({ id: 1 }, { unique: true });
+    // await shipmentCollection.createIndex({ id: 1 }, { unique: true });
 
     const dbResult = await shipmentCollection.insertOne(shipment);
     if (dbResult.acknowledged) {
@@ -306,9 +306,9 @@ export async function db_startShipment(shipment) {
   try {
     client = await dbClient.connect();
     const collection = client.collection('shipments');
-    await collection.createIndex({ id: 1 }, { unique: true });
+    // await collection.createIndex({ id: 1 }, { unique: true });
     // Crear un índice único en shipment_data.tracking_number
-    await collection.createIndex({ "shipment_data.tracking_number": 1 }, { unique: true });
+    // await collection.createIndex({ "shipment_data.tracking_number": 1 }, { unique: true });
 
     // Verificar si el número de rastreo ya existe
     const existingTracker = await collection.findOne({ "shipment_data.tracking_number": shipment.shipment_data.tracking_number });

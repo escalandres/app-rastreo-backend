@@ -259,8 +259,7 @@ export function convertirUTCAMexico(fechaUTC) {
 export function formatear_UTC(fechaUTC) {
     if (!fechaUTC || fechaUTC === 'INVALID') return null;
 
-    let fechaMexico = new Date(fechaUTC+"Z").toLocaleString('en-US', { timeZone: 'America/Mexico_City' });
-    let fecha = new Date(fechaMexico);
+    let fecha = new Date(fechaUTC);
     
     let año = fecha.getFullYear();
     let mes = String(fecha.getMonth() + 1).padStart(2, '0'); // Meses en JS van de 0-11

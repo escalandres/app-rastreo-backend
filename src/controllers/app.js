@@ -177,6 +177,14 @@ export async function startShipment(req, res) {
                 }
                 console.log("shipment:", shipment);
                 const result = await db_startShipment(shipment);
+                const payload = {
+                    shipment_id: shipment.id,
+                    date: shipment.start_date,
+                    tracker: trackerID,
+                    company: companyID,
+                    tracking_number: trackingCode
+                }
+                const response = await sendTrackingStarted(payload);
                 // consoleLog("result:", result);
                 if(!result.success){
                     return res.status(200).json({success: false, message: result.error});

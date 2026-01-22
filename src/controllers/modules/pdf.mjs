@@ -124,7 +124,7 @@ function processDataSource(datasource) {
     datasource.shipment_status.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
     datasource.locations = datasource.locations.map(item => ({
         ...item, // conserva los campos originales
-        location: processLocation(item.isCellTower, item.radius),
+        location: processLocation(item.source, item.radius),
         formatted_timestamp: convertDateToReport(item.date)
     }));
     datasource.locations.sort((a, b) => new Date(b.date) - new Date(a.date));
